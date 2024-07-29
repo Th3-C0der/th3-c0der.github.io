@@ -1,0 +1,23 @@
+{
+  "name": "Th3-C0der",
+  "short_name": "Th3-C0der",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "description": "Official Website of Th3-C0der",
+  "icons": [
+    {
+      "src": "//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png/:/rs=w:192,h:192,m",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png/:/rs=w:512,h:512,m",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

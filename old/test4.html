@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    	<link rel="icon" href="https://img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/favicon/34e2d94e-5b26-4855-b58c-079e702da852.png/:/rs=w:16,h:16,m" sizes="16x16"/><link rel="icon" href="https://img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/favicon/34e2d94e-5b26-4855-b58c-079e702da852.png/:/rs=w:24,h:24,m" sizes="24x24"/><link rel="icon" href="https://img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/favicon/34e2d94e-5b26-4855-b58c-079e702da852.png/:/rs=w:32,h:32,m" sizes="32x32"/><link rel="icon" href="https://img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/favicon/34e2d94e-5b26-4855-b58c-079e702da852.png/:/rs=w:48,h:48,m" sizes="48x48"/><link rel="icon" href="https://img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/favicon/34e2d94e-5b26-4855-b58c-079e702da852.png/:/rs=w:64,h:64,m" sizes="64x64"/><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>test4 | Th3-C0der</title><meta name="author" content="Th3-C0der"/><meta name="generator" content="Starfield Technologies; Th3 C0der"/><link rel="manifest" href="manifest.webmanifest"/><link rel="apple-touch-icon" sizes="57x57" href="https://img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000035623.png/:/rs=w:57,h:57,m"/><link rel="apple-touch-icon" sizes="60x60" href="https://img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000035623.png/:/rs=w:60,h:60,m"/><link rel="apple-touch-icon" sizes="72x72" href="https://img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000035623.png/:/rs=w:72,h:72,m"/><link rel="apple-touch-icon" sizes="114x114" href="https://img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000035623.png/:/rs=w:114,h:114,m"/><link rel="apple-touch-icon" sizes="120x120" href="https://img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000035623.png/:/rs=w:120,h:120,m"/><link rel="apple-touch-icon" sizes="144x144" href="https://img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000035623.png/:/rs=w:144,h:144,m"/><link rel="apple-touch-icon" sizes="152x152" href="https://img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000035623.png/:/rs=w:152,h:152,m"/><link rel="apple-touch-icon" sizes="180x180" href="https://img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000035623.png/:/rs=w:180,h:180,m"/><meta property="og:url" content="https://Th3-C0der.Github.io/test4"/>
+<meta property="og:site_name" content="Th3-C0der"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokemon Fetcher</title>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        input {
+            padding: 8px;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: black;
+            color: white;
+            border: 2px solid #00ff00;
+            cursor: pointer;
+        }
+
+        img {
+    display: none;
+    margin-top: 20px;
+    max-width: 100%;
+    width: 400px;
+    height: auto;
+    border: 2px solid #00ff00;
+    border-radius: 8px;
+    transform: perspective(1000px) rotateX(20deg);
+    
+}
+    </style>
+</head>
+<body>
+
+    <label for="pokemonName">Enter Pokemon Name:</label>
+    <input type="text" id="pokemonName" placeholder="Enter Pokemon Name">
+
+    <button onclick="fetchData()">Fetch Pokemon</button>
+
+    <img id="pokemonSprite" alt="Pokemon Sprite">
+
+    <script>
+        async function fetchData() {
+            try {
+                const pokemonName = document.getElementById("pokemonName").value.toLowerCase();
+                const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonName}`);
+                
+                if (!response.ok) {
+                    throw new Error("Could not fetch resource");
+                }
+
+                const data = await response.json();
+                const pokemonSprite = data.sprites.front_default;
+                const imgElement = document.getElementById("pokemonSprite");
+
+                imgElement.src = pokemonSprite;
+                imgElement.style.display = "block";
+            } catch (error) {
+                console.error(error);
+            }
+        }
+    </script>
+
+</body>
+</html>

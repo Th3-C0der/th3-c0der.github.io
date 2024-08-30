@@ -4,6 +4,11 @@ Welcome to Th3-C0der's portfolio! This repository contains the source code for m
 
 ## 🖥️ Projects
 
+### DynaSpark Ai
+A versatile and dynamic AI assistant, specializing in creative problem-solving and advanced image generation.
+
+[View Dynaspark AI](https://dynaspark.onrender.com)
+
 ### Th3-AI
 Th3-AI is your gateway to multiple AI assistants created by Th3-C0der. It provides access to various AI-powered tools and services.
 

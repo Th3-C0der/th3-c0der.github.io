@@ -1,3 +1,7 @@
+# Old Website Archive
+#### It is one of my first website i created using website builder & actually this is where i started my coding journey.
+#### My journey of building a website in a website builder to building website and apps from scratch was quite amazing....
+---
 ## Th3-C0der Is A Website Where You Can Learn Coding & Hacking For Free.
 ### Th3-C0der Also Have Few Games To Play But They Are In Beta Stages.
 #### In The Test Drop-Down List In The Menu, There Are Few Pages Where I Test Some Codes.

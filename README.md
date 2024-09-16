@@ -23,7 +23,7 @@ Th3-Space Data Explorer is an interactive web app offering real-time access to d
 
 - GitHub: [@Th3-C0der](https://github.com/Th3-C0der)
 - YouTube: [@Th3Coder](https://youtube.com/@Th3Coder)
-- Instagram: [@th3unknown_03](https://instagram.com/th3unknown_03)
+- Instagram: [@th3unknown_03](https://instagram.com/th3_c0der)
 
 ---
 

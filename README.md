@@ -24,6 +24,11 @@ Th3-Search is an AI-powered ad free search engine offering quick AI summary of s
 
 [Visit Th3-Search](https://th3-search.onrender.com)
 
+### Th3-Share  
+Th3-Share is a seamless and secure file-sharing platform, designed to offer fast transfers while ensuring user privacy and data protection.
+
+[Visit Th3-Share](https://th3-share.onrender.com)
+
 ## 📞 Contact
 
 - GitHub: [@Th3-C0der](https://github.com/Th3-C0der)

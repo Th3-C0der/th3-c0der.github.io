@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Synthesizer - Th3-C0der Playground</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718" crossorigin="anonymous"></script>
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            font-family: Arial, sans-serif;
+            color: white;
+            overflow: hidden;
+        }
+
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .synthesizer {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            color: white;
+            text-align: center;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            min-width: 400px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .control-group h3 {
+            margin: 0 0 10px 0;
+            font-size: 16px;
+            color: white;
+        }
+
+        .controls button, .controls select {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 12px 15px;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            width: 100%;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .controls button:hover, .controls select:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-1px);
+        }
+
+        .controls button:active, .controls select:active {
+            transform: translateY(1px);
+        }
+
+        .controls input[type="range"] {
+            width: 100%;
+            margin: 5px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            height: 6px;
+            -webkit-appearance: none;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 2;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .instructions {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            font-size: 14px;
+            max-width: 250px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .instructions h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .instructions p {
+            margin: 5px 0;
+            line-height: 1.4;
+        }
+
+        .keyboard {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+            display: flex;
+            gap: 2px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .key {
+            width: 40px;
+            height: 120px;
+            background: white;
+            border-radius: 0 0 4px 4px;
+            cursor: pointer;
+            transition: all 0.1s;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .key.black {
+            width: 30px;
+            height: 80px;
+            background: #333;
+            margin-left: -15px;
+            margin-right: -15px;
+            z-index: 1;
+            border-radius: 0 0 4px 4px;
+        }
+
+        .key:active, .key.active {
+            background: #ddd;
+            transform: translateY(2px);
+        }
+
+        .key.black:active, .key.black.active {
+            background: #222;
+        }
+
+        @media (max-width: 768px) {
+            .synthesizer {
+                grid-template-columns: 1fr;
+                width: 90%;
+                min-width: auto;
+            }
+
+            .instructions {
+                display: none;
+            }
+
+            .keyboard {
+                width: 90%;
+                overflow-x: auto;
+                padding: 10px;
+            }
+
+            .key {
+                width: 30px;
+                height: 100px;
+            }
+
+            .key.black {
+                width: 20px;
+                height: 60px;
+                margin-left: -10px;
+                margin-right: -10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="/playground" class="back-btn">← Back to Playground</a>
+    <div class="container">
+        <h1>Web Synthesizer</h1>
+        <div class="controls">
+            <div class="control-group">
+                <label for="waveform">Waveform</label>
+                <select id="waveform">
+                    <option value="sine">Sine</option>
+                    <option value="square">Square</option>
+                    <option value="sawtooth">Sawtooth</option>
+                    <option value="triangle">Triangle</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="attack">Attack</label>
+                <input type="range" id="attack" min="0" max="2" step="0.01" value="0.1">
+                <div class="value-display">0.1s</div>
+            </div>
+            <div class="control-group">
+                <label for="decay">Decay</label>
+                <input type="range" id="decay" min="0" max="2" step="0.01" value="0.1">
+                <div class="value-display">0.1s</div>
+            </div>
+            <div class="control-group">
+                <label for="sustain">Sustain</label>
+                <input type="range" id="sustain" min="0" max="1" step="0.01" value="0.7">
+                <div class="value-display">0.7</div>
+            </div>
+            <div class="control-group">
+                <label for="release">Release</label>
+                <input type="range" id="release" min="0" max="2" step="0.01" value="0.2">
+                <div class="value-display">0.2s</div>
+            </div>
+            <div class="control-group">
+                <label for="reverb">Reverb</label>
+                <input type="range" id="reverb" min="0" max="1" step="0.01" value="0.3">
+                <div class="value-display">0.3</div>
+            </div>
+            <div class="control-group">
+                <label for="filter">Filter</label>
+                <input type="range" id="filter" min="20" max="20000" step="1" value="2000">
+                <div class="value-display">2000 Hz</div>
+            </div>
+        </div>
+        <div class="octave-control">
+            <button class="octave-btn" id="octave-down">-</button>
+            <span class="octave-display">Octave: <span id="octave">4</span></span>
+            <button class="octave-btn" id="octave-up">+</button>
+        </div>
+        <div class="keyboard" id="keyboard"></div>
+        <div class="buttons">
+            <button id="record">Record</button>
+            <button id="play">Play</button>
+            <button id="stop">Stop</button>
+        </div>
+    </div>
+
+    <script>
+        class Synthesizer {
+            constructor() {
+                this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                this.oscillators = new Map();
+                this.gainNodes = new Map();
+                this.reverb = this.createReverb();
+                this.filter = this.createFilter();
+                this.recording = [];
+                this.isRecording = false;
+                this.octave = 4;
+                this.setupControls();
+                this.createKeyboard();
+            }
+
+            createReverb() {
+                const convolver = this.audioContext.createConvolver();
+                const reverbGain = this.audioContext.createGain();
+                reverbGain.gain.value = 0.3;
+                convolver.connect(reverbGain);
+                reverbGain.connect(this.audioContext.destination);
+                return { convolver, gain: reverbGain };
+            }
+
+            createFilter() {
+                const filter = this.audioContext.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.value = 2000;
+                filter.connect(this.audioContext.destination);
+                return filter;
+            }
+
+            setupControls() {
+                // Waveform control
+                document.getElementById('waveform').addEventListener('change', (e) => {
+                    this.oscillators.forEach(osc => {
+                        osc.type = e.target.value;
+                    });
+                });
+
+                // ADSR controls
+                ['attack', 'decay', 'sustain', 'release'].forEach(param => {
+                    document.getElementById(param).addEventListener('input', (e) => {
+                        const value = parseFloat(e.target.value);
+                        e.target.nextElementSibling.textContent = value + (param === 'sustain' ? '' : 's');
+                    });
+                });
+
+                // Effects controls
+                document.getElementById('reverb').addEventListener('input', (e) => {
+                    this.reverb.gain.gain.value = parseFloat(e.target.value);
+                });
+
+                document.getElementById('filter').addEventListener('input', (e) => {
+                    this.filter.frequency.value = parseFloat(e.target.value);
+                });
+
+                // Octave controls
+                document.getElementById('octave-up').addEventListener('click', () => {
+                    if (this.octave < 7) {
+                        this.octave++;
+                        document.getElementById('octave').textContent = this.octave;
+                    }
+                });
+
+                document.getElementById('octave-down').addEventListener('click', () => {
+                    if (this.octave > 1) {
+                        this.octave--;
+                        document.getElementById('octave').textContent = this.octave;
+                    }
+                });
+
+                // Recording controls
+                document.getElementById('record').addEventListener('click', () => {
+                    this.isRecording = !this.isRecording;
+                    this.recording = [];
+                    document.getElementById('record').textContent = this.isRecording ? 'Stop Recording' : 'Record';
+                });
+
+                document.getElementById('play').addEventListener('click', () => {
+                    this.playRecording();
+                });
+
+                document.getElementById('stop').addEventListener('click', () => {
+                    this.stopAll();
+                });
+            }
+
+            createKeyboard() {
+                const keyboard = document.getElementById('keyboard');
+                const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+                const whiteKeys = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
+                const blackKeys = ['C#', 'D#', 'F#', 'G#', 'A#'];
+
+                notes.forEach((note, i) => {
+                    const key = document.createElement('div');
+                    key.className = `key ${blackKeys.includes(note) ? 'black' : ''}`;
+                    key.dataset.note = note;
+                    key.dataset.index = i;
+                    key.addEventListener('mousedown', () => this.noteOn(note));
+                    key.addEventListener('mouseup', () => this.noteOff(note));
+                    key.addEventListener('mouseleave', () => this.noteOff(note));
+                    keyboard.appendChild(key);
+                });
+
+                // Keyboard controls
+                document.addEventListener('keydown', (e) => {
+                    const keyMap = {
+                        'a': 'C', 'w': 'C#', 's': 'D', 'e': 'D#', 'd': 'E',
+                        'f': 'F', 't': 'F#', 'g': 'G', 'y': 'G#', 'h': 'A',
+                        'u': 'A#', 'j': 'B'
+                    };
+                    if (keyMap[e.key] && !e.repeat) {
+                        this.noteOn(keyMap[e.key]);
+                        document.querySelector(`[data-note="${keyMap[e.key]}"]`).classList.add('active');
+                    }
+                });
+
+                document.addEventListener('keyup', (e) => {
+                    const keyMap = {
+                        'a': 'C', 'w': 'C#', 's': 'D', 'e': 'D#', 'd': 'E',
+                        'f': 'F', 't': 'F#', 'g': 'G', 'y': 'G#', 'h': 'A',
+                        'u': 'A#', 'j': 'B'
+                    };
+                    if (keyMap[e.key]) {
+                        this.noteOff(keyMap[e.key]);
+                        document.querySelector(`[data-note="${keyMap[e.key]}"]`).classList.remove('active');
+                    }
+                });
+            }
+
+            noteOn(note) {
+                if (this.oscillators.has(note)) return;
+
+                const oscillator = this.audioContext.createOscillator();
+                const gainNode = this.audioContext.createGain();
+                const frequency = this.getFrequency(note);
+
+                oscillator.type = document.getElementById('waveform').value;
+                oscillator.frequency.value = frequency;
+                gainNode.gain.value = 0;
+
+                oscillator.connect(gainNode);
+                gainNode.connect(this.filter);
+                gainNode.connect(this.reverb.convolver);
+
+                oscillator.start();
+                this.oscillators.set(note, oscillator);
+                this.gainNodes.set(note, gainNode);
+
+                // ADSR envelope
+                const now = this.audioContext.currentTime;
+                const attack = parseFloat(document.getElementById('attack').value);
+                const decay = parseFloat(document.getElementById('decay').value);
+                const sustain = parseFloat(document.getElementById('sustain').value);
+                const release = parseFloat(document.getElementById('release').value);
+
+                gainNode.gain.setValueAtTime(0, now);
+                gainNode.gain.linearRampToValueAtTime(1, now + attack);
+                gainNode.gain.linearRampToValueAtTime(sustain, now + attack + decay);
+
+                if (this.isRecording) {
+                    this.recording.push({
+                        note,
+                        time: Date.now(),
+                        type: 'on'
+                    });
+                }
+            }
+
+            noteOff(note) {
+                const oscillator = this.oscillators.get(note);
+                const gainNode = this.gainNodes.get(note);
+                if (!oscillator || !gainNode) return;
+
+                const now = this.audioContext.currentTime;
+                const release = parseFloat(document.getElementById('release').value);
+
+                gainNode.gain.cancelScheduledValues(now);
+                gainNode.gain.setValueAtTime(gainNode.gain.value, now);
+                gainNode.gain.linearRampToValueAtTime(0, now + release);
+
+                setTimeout(() => {
+                    oscillator.stop();
+                    this.oscillators.delete(note);
+                    this.gainNodes.delete(note);
+                }, release * 1000);
+
+                if (this.isRecording) {
+                    this.recording.push({
+                        note,
+                        time: Date.now(),
+                        type: 'off'
+                    });
+                }
+            }
+
+            getFrequency(note) {
+                const noteMap = {
+                    'C': 0, 'C#': 1, 'D': 2, 'D#': 3, 'E': 4,
+                    'F': 5, 'F#': 6, 'G': 7, 'G#': 8, 'A': 9,
+                    'A#': 10, 'B': 11
+                };
+                const baseFrequency = 440 * Math.pow(2, (noteMap[note] - 9) / 12);
+                return baseFrequency * Math.pow(2, this.octave - 4);
+            }
+
+            stopAll() {
+                this.oscillators.forEach((oscillator, note) => {
+                    this.noteOff(note);
+                });
+            }
+
+            playRecording() {
+                if (this.recording.length === 0) return;
+
+                const startTime = this.recording[0].time;
+                this.recording.forEach(event => {
+                    const delay = (event.time - startTime) / 1000;
+                    setTimeout(() => {
+                        if (event.type === 'on') {
+                            this.noteOn(event.note);
+                        } else {
+                            this.noteOff(event.note);
+                        }
+                    }, delay);
+                });
+            }
+        }
+
+        // Initialize the synthesizer
+        const synth = new Synthesizer();
+    </script>
+</body>
+</html> 

@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neural Network Playground - Th3-C0der Playground</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718" crossorigin="anonymous"></script>
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            font-family: Arial, sans-serif;
+            color: white;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            max-width: 1200px;
+            width: 90%;
+        }
+
+        #canvas {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            margin: 1rem 0;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .control-group {
+            text-align: left;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        input[type="range"] {
+            width: 100%;
+            margin-bottom: 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            height: 6px;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #4ecdc4;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        select {
+            width: 100%;
+            padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .value-display {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        button {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #4ecdc4;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .controls {
+                grid-template-columns: 1fr;
+            }
+
+            #canvas {
+                width: 100%;
+                height: auto;
+            }
+
+            .stats {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="/playground" class="back-btn">← Back to Playground</a>
+    <div class="container">
+        <h1>Neural Network Playground</h1>
+        <canvas id="canvas" width="800" height="600"></canvas>
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-value" id="epoch">0</div>
+                <div class="stat-label">Epoch</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="loss">0.00</div>
+                <div class="stat-label">Loss</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="accuracy">0%</div>
+                <div class="stat-label">Accuracy</div>
+            </div>
+        </div>
+        <div class="controls">
+            <div class="control-group">
+                <label for="network-type">Network Type</label>
+                <select id="network-type">
+                    <option value="xor">XOR Problem</option>
+                    <option value="circle">Circle Classification</option>
+                    <option value="spiral">Spiral Classification</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="learning-rate">Learning Rate</label>
+                <input type="range" id="learning-rate" min="0.001" max="0.1" step="0.001" value="0.01">
+                <div class="value-display">0.01</div>
+            </div>
+            <div class="control-group">
+                <label for="hidden-layers">Hidden Layers</label>
+                <input type="range" id="hidden-layers" min="1" max="5" value="2">
+                <div class="value-display">2</div>
+            </div>
+            <div class="control-group">
+                <label for="neurons-per-layer">Neurons per Layer</label>
+                <input type="range" id="neurons-per-layer" min="2" max="16" value="4">
+                <div class="value-display">4</div>
+            </div>
+        </div>
+        <div class="buttons">
+            <button id="train">Train Network</button>
+            <button id="reset">Reset Network</button>
+        </div>
+    </div>
+
+    <script>
+        class NeuralNetwork {
+            constructor(inputSize, hiddenLayers, neuronsPerLayer, outputSize) {
+                this.inputSize = inputSize;
+                this.hiddenLayers = hiddenLayers;
+                this.neuronsPerLayer = neuronsPerLayer;
+                this.outputSize = outputSize;
+                this.weights = [];
+                this.biases = [];
+                this.initializeNetwork();
+            }
+
+            initializeNetwork() {
+                // Initialize weights and biases for each layer
+                let prevSize = this.inputSize;
+                for (let i = 0; i < this.hiddenLayers; i++) {
+                    this.weights.push(this.randomMatrix(this.neuronsPerLayer, prevSize));
+                    this.biases.push(this.randomMatrix(this.neuronsPerLayer, 1));
+                    prevSize = this.neuronsPerLayer;
+                }
+                this.weights.push(this.randomMatrix(this.outputSize, prevSize));
+                this.biases.push(this.randomMatrix(this.outputSize, 1));
+            }
+
+            randomMatrix(rows, cols) {
+                return Array(rows).fill().map(() => 
+                    Array(cols).fill().map(() => Math.random() * 2 - 1)
+                );
+            }
+
+            sigmoid(x) {
+                return 1 / (1 + Math.exp(-x));
+            }
+
+            sigmoidDerivative(x) {
+                return x * (1 - x);
+            }
+
+            forward(input) {
+                let current = input;
+                this.activations = [input];
+                this.zValues = [];
+
+                for (let i = 0; i < this.weights.length; i++) {
+                    const z = this.matrixMultiply(this.weights[i], current);
+                    this.zValues.push(z);
+                    current = z.map(row => row.map(val => this.sigmoid(val)));
+                    this.activations.push(current);
+                }
+
+                return current;
+            }
+
+            matrixMultiply(a, b) {
+                return a.map(row => 
+                    Array(b[0].length).fill().map((_, i) =>
+                        row.reduce((sum, val, j) => sum + val * b[j][i], 0)
+                    )
+                );
+            }
+
+            train(input, target, learningRate) {
+                // Forward pass
+                const output = this.forward(input);
+                
+                // Backward pass
+                let error = this.matrixSubtract(target, output);
+                let delta = error.map(row => 
+                    row.map(val => val * this.sigmoidDerivative(output[0][0]))
+                );
+
+                // Update weights and biases
+                for (let i = this.weights.length - 1; i >= 0; i--) {
+                    const gradient = this.matrixMultiply(
+                        delta,
+                        this.matrixTranspose(this.activations[i])
+                    );
+                    
+                    this.weights[i] = this.matrixAdd(
+                        this.weights[i],
+                        this.matrixMultiply(gradient, learningRate)
+                    );
+                    
+                    this.biases[i] = this.matrixAdd(
+                        this.biases[i],
+                        this.matrixMultiply(delta, learningRate)
+                    );
+
+                    if (i > 0) {
+                        const nextDelta = this.matrixMultiply(
+                            this.matrixTranspose(this.weights[i]),
+                            delta
+                        );
+                        delta = nextDelta.map(row =>
+                            row.map(val => val * this.sigmoidDerivative(this.activations[i][0][0]))
+                        );
+                    }
+                }
+
+                return this.calculateLoss(target, output);
+            }
+
+            matrixSubtract(a, b) {
+                return a.map((row, i) => row.map((val, j) => val - b[i][j]));
+            }
+
+            matrixAdd(a, b) {
+                return a.map((row, i) => row.map((val, j) => val + b[i][j]));
+            }
+
+            matrixTranspose(matrix) {
+                return matrix[0].map((_, i) => matrix.map(row => row[i]));
+            }
+
+            calculateLoss(target, output) {
+                return target.reduce((sum, row, i) =>
+                    sum + row.reduce((rowSum, val, j) =>
+                        rowSum + Math.pow(val - output[i][j], 2), 0
+                    ), 0
+                ) / target.length;
+            }
+        }
+
+        class NetworkVisualizer {
+            constructor(canvas) {
+                this.canvas = canvas;
+                this.ctx = canvas.getContext('2d');
+                this.network = null;
+                this.trainingData = null;
+                this.isTraining = false;
+                this.epoch = 0;
+                this.setupControls();
+            }
+
+            setupControls() {
+                const controls = {
+                    networkType: document.getElementById('network-type'),
+                    learningRate: document.getElementById('learning-rate'),
+                    hiddenLayers: document.getElementById('hidden-layers'),
+                    neuronsPerLayer: document.getElementById('neurons-per-layer')
+                };
+
+                // Update value displays and redraw
+                Object.entries(controls).forEach(([key, control]) => {
+                    control.addEventListener('input', () => {
+                        const display = control.nextElementSibling;
+                        if (display && display.classList.contains('value-display')) {
+                            display.textContent = control.value;
+                        }
+                        this.resetNetwork();
+                    });
+                });
+
+                // Train button
+                document.getElementById('train').addEventListener('click', () => {
+                    if (!this.isTraining) {
+                        this.isTraining = true;
+                        this.train();
+                    }
+                });
+
+                // Reset button
+                document.getElementById('reset').addEventListener('click', () => {
+                    this.resetNetwork();
+                });
+            }
+
+            resetNetwork() {
+                const networkType = document.getElementById('network-type').value;
+                const hiddenLayers = parseInt(document.getElementById('hidden-layers').value);
+                const neuronsPerLayer = parseInt(document.getElementById('neurons-per-layer').value);
+
+                let inputSize, outputSize;
+                switch (networkType) {
+                    case 'xor':
+                        inputSize = 2;
+                        outputSize = 1;
+                        this.trainingData = this.generateXORData();
+                        break;
+                    case 'circle':
+                        inputSize = 2;
+                        outputSize = 1;
+                        this.trainingData = this.generateCircleData();
+                        break;
+                    case 'spiral':
+                        inputSize = 2;
+                        outputSize = 1;
+                        this.trainingData = this.generateSpiralData();
+                        break;
+                }
+
+                this.network = new NeuralNetwork(inputSize, hiddenLayers, neuronsPerLayer, outputSize);
+                this.epoch = 0;
+                this.updateStats(0, 0, 0);
+                this.draw();
+            }
+
+            generateXORData() {
+                return {
+                    inputs: [[0, 0], [0, 1], [1, 0], [1, 1]],
+                    targets: [[0], [1], [1], [0]]
+                };
+            }
+
+            generateCircleData() {
+                const points = [];
+                const targets = [];
+                for (let i = 0; i < 100; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const radius = Math.random() * 2;
+                    const x = Math.cos(angle) * radius;
+                    const y = Math.sin(angle) * radius;
+                    points.push([x, y]);
+                    targets.push([radius < 1 ? 1 : 0]);
+                }
+                return { inputs: points, targets: targets };
+            }
+
+            generateSpiralData() {
+                const points = [];
+                const targets = [];
+                for (let i = 0; i < 100; i++) {
+                    const angle = Math.random() * Math.PI * 4;
+                    const radius = angle / 4;
+                    const x = Math.cos(angle) * radius;
+                    const y = Math.sin(angle) * radius;
+                    points.push([x, y]);
+                    targets.push([angle < Math.PI * 2 ? 1 : 0]);
+                }
+                return { inputs: points, targets: targets };
+            }
+
+            async train() {
+                const learningRate = parseFloat(document.getElementById('learning-rate').value);
+                let totalLoss = 0;
+                let correct = 0;
+
+                for (let i = 0; i < this.trainingData.inputs.length; i++) {
+                    const input = this.trainingData.inputs[i];
+                    const target = this.trainingData.targets[i];
+                    const loss = this.network.train(input, target, learningRate);
+                    totalLoss += loss;
+
+                    const output = this.network.forward(input);
+                    if (Math.round(output[0][0]) === target[0][0]) {
+                        correct++;
+                    }
+                }
+
+                this.epoch++;
+                const accuracy = (correct / this.trainingData.inputs.length) * 100;
+                this.updateStats(this.epoch, totalLoss / this.trainingData.inputs.length, accuracy);
+                this.draw();
+
+                if (this.isTraining && this.epoch < 1000) {
+                    requestAnimationFrame(() => this.train());
+                } else {
+                    this.isTraining = false;
+                }
+            }
+
+            updateStats(epoch, loss, accuracy) {
+                document.getElementById('epoch').textContent = epoch;
+                document.getElementById('loss').textContent = loss.toFixed(4);
+                document.getElementById('accuracy').textContent = accuracy.toFixed(1) + '%';
+            }
+
+            draw() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                this.drawNetwork();
+                this.drawDecisionBoundary();
+            }
+
+            drawNetwork() {
+                const padding = 50;
+                const layerWidth = (this.canvas.width - 2 * padding) / (this.network.weights.length + 1);
+                const maxNeurons = Math.max(
+                    this.network.inputSize,
+                    this.network.neuronsPerLayer,
+                    this.network.outputSize
+                );
+                const neuronRadius = 20;
+                const layerHeight = this.canvas.height - 2 * padding;
+
+                // Draw connections
+                for (let i = 0; i < this.network.weights.length; i++) {
+                    const x1 = padding + i * layerWidth;
+                    const x2 = padding + (i + 1) * layerWidth;
+                    const neurons1 = i === 0 ? this.network.inputSize : this.network.neuronsPerLayer;
+                    const neurons2 = i === this.network.weights.length - 1 ? 
+                        this.network.outputSize : this.network.neuronsPerLayer;
+
+                    for (let j = 0; j < neurons1; j++) {
+                        const y1 = padding + (j + 1) * (layerHeight / (neurons1 + 1));
+                        for (let k = 0; k < neurons2; k++) {
+                            const y2 = padding + (k + 1) * (layerHeight / (neurons2 + 1));
+                            this.ctx.beginPath();
+                            this.ctx.moveTo(x1, y1);
+                            this.ctx.lineTo(x2, y2);
+                            this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+                            this.ctx.stroke();
+                        }
+                    }
+                }
+
+                // Draw neurons
+                for (let i = 0; i <= this.network.weights.length; i++) {
+                    const x = padding + i * layerWidth;
+                    const neurons = i === 0 ? this.network.inputSize :
+                        i === this.network.weights.length ? this.network.outputSize :
+                        this.network.neuronsPerLayer;
+
+                    for (let j = 0; j < neurons; j++) {
+                        const y = padding + (j + 1) * (layerHeight / (neurons + 1));
+                        this.ctx.beginPath();
+                        this.ctx.arc(x, y, neuronRadius, 0, Math.PI * 2);
+                        this.ctx.fillStyle = 'rgba(78, 205, 196, 0.3)';
+                        this.ctx.fill();
+                        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+                        this.ctx.stroke();
+                    }
+                }
+            }
+
+            drawDecisionBoundary() {
+                const resolution = 50;
+                const step = this.canvas.width / resolution;
+
+                for (let i = 0; i < resolution; i++) {
+                    for (let j = 0; j < resolution; j++) {
+                        const x = (i / resolution) * 4 - 2;
+                        const y = (j / resolution) * 4 - 2;
+                        const output = this.network.forward([[x, y]]);
+                        const color = output[0][0] > 0.5 ? 
+                            'rgba(78, 205, 196, 0.1)' : 'rgba(255, 255, 255, 0.05)';
+                        
+                        this.ctx.fillStyle = color;
+                        this.ctx.fillRect(i * step, j * step, step, step);
+                    }
+                }
+
+                // Draw training points
+                this.trainingData.inputs.forEach((input, i) => {
+                    const x = (input[0] + 2) / 4 * this.canvas.width;
+                    const y = (input[1] + 2) / 4 * this.canvas.height;
+                    const target = this.trainingData.targets[i][0];
+
+                    this.ctx.beginPath();
+                    this.ctx.arc(x, y, 5, 0, Math.PI * 2);
+                    this.ctx.fillStyle = target > 0.5 ? '#4ecdc4' : '#ff6b6b';
+                    this.ctx.fill();
+                });
+            }
+        }
+
+        // Initialize the network visualizer
+        const visualizer = new NetworkVisualizer(document.getElementById('canvas'));
+    </script>
+</body>
+</html> 

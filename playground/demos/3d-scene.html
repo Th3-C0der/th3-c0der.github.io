@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Scene Explorer - Th3-C0der Playground</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718" crossorigin="anonymous"></script>
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            font-family: Arial, sans-serif;
+            color: white;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            color: white;
+            text-align: center;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            min-width: 300px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .controls button, .controls select {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 12px 15px;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            width: 100%;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .controls button:hover, .controls select:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-1px);
+        }
+
+        .controls button:active, .controls select:active {
+            transform: translateY(1px);
+        }
+
+        .controls input[type="range"] {
+            width: 100%;
+            margin: 5px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            height: 6px;
+            -webkit-appearance: none;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 2;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .instructions {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            font-size: 14px;
+            max-width: 250px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .instructions h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .instructions p {
+            margin: 5px 0;
+            line-height: 1.4;
+        }
+
+        @media (max-width: 768px) {
+            .controls {
+                grid-template-columns: 1fr;
+                width: 90%;
+            }
+
+            .instructions {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading">Loading HDR Environment...</div>
+    <a href="/playground" class="back-btn">← Back to Playground</a>
+    <div class="instructions">
+        <h3>Controls:</h3>
+        <p>• Left Click + Drag: Rotate</p>
+        <p>• Right Click + Drag: Pan</p>
+        <p>• Scroll: Zoom</p>
+        <p>• Space: Toggle Auto-Rotation</p>
+        <p>• R: Reset Camera</p>
+        <p>• 1-5: Change Scene</p>
+        <p>• F: Toggle Fullscreen</p>
+    </div>
+    <div class="controls">
+        <div class="control-group">
+            <select id="sceneType">
+                <option value="showcase">Showcase</option>
+                <option value="particles">Particle System</option>
+                <option value="physics">Physics Demo</option>
+                <option value="reflection">Reflection Room</option>
+                <option value="volumetric">Volumetric Light</option>
+            </select>
+            <select id="environment">
+                <option value="studio">Studio</option>
+                <option value="sunset">Sunset</option>
+                <option value="night">Night</option>
+                <option value="sunrise">Sunrise</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label>Rotation Speed: <span id="rotationValue">0.01</span></label>
+            <input type="range" id="rotationSpeed" min="0" max="0.1" step="0.001" value="0.01">
+            <label>Exposure: <span id="exposureValue">1.0</span></label>
+            <input type="range" id="exposure" min="0" max="2" step="0.1" value="1.0">
+        </div>
+        <div class="control-group">
+            <button onclick="toggleRotation()">Toggle Auto-Rotation</button>
+            <button onclick="resetCamera()">Reset Camera</button>
+            <button onclick="togglePostProcessing()">Toggle Effects</button>
+        </div>
+    </div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.skypack.dev/three@0.132.2",
+                "three/addons/": "https://cdn.skypack.dev/three@0.132.2/examples/jsm/"
+            }
+        }
+    </script>
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+        import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+        import { FXAAShader } from 'three/addons/shaders/FXAAShader.js';
+        import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+        import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+        import { Water } from 'three/addons/objects/Water.js';
+        import { Sky } from 'three/addons/objects/Sky.js';
+        import { SimplexNoise } from 'three/addons/math/SimplexNoise.js';
+
+        let scene, camera, renderer, controls;
+        let composer, bloomPass;
+        let objects = [];
+        let autoRotate = true;
+        let showEffects = false;
+        let currentScene = 'showcase';
+        let currentEnvironment = 'studio';
+        let water, sun, sky;
+        let particles = [];
+        let clock = new THREE.Clock();
+        let noise = new SimplexNoise();
+
+        // HDR Environment Maps
+        const environments = {
+            studio: 'https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/studio_small_03_1k.hdr',
+            sunset: 'https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/sunset_jc_1k.hdr',
+            night: 'https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/venice_sunset_1k.hdr',
+            sunrise: 'https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/venice_sunrise_1k.hdr'
+        };
+
+        async function init() {
+            // Scene setup
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 1.0;
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            document.body.appendChild(renderer.domElement);
+
+            // Camera position
+            camera.position.set(0, 2, 5);
+
+            // Controls
+            controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.autoRotate = autoRotate;
+            controls.autoRotateSpeed = parseFloat(document.getElementById('rotationSpeed').value);
+
+            // Post-processing
+            composer = new EffectComposer(renderer);
+            const renderPass = new RenderPass(scene, camera);
+            composer.addPass(renderPass);
+
+            bloomPass = new UnrealBloomPass(
+                new THREE.Vector2(window.innerWidth, window.innerHeight),
+                1.5,  // strength
+                0.4,  // radius
+                0.85  // threshold
+            );
+            composer.addPass(bloomPass);
+
+            const fxaaPass = new ShaderPass(FXAAShader);
+            fxaaPass.uniforms['resolution'].value.set(1 / (window.innerWidth * renderer.getPixelRatio()), 1 / (window.innerHeight * renderer.getPixelRatio()));
+            composer.addPass(fxaaPass);
+
+            // Load HDR environment
+            const rgbeLoader = new RGBELoader();
+            const hdrTexture = await rgbeLoader.loadAsync(environments[currentEnvironment]);
+            hdrTexture.mapping = THREE.EquirectangularReflectionMapping;
+            scene.environment = hdrTexture;
+            scene.background = hdrTexture;
+
+            // Initialize scene
+            createScene();
+            animate();
+
+            // Remove loading message
+            document.querySelector('.loading').style.display = 'none';
+        }
+
+        function createScene() {
+            // Clear existing objects
+            objects.forEach(obj => scene.remove(obj));
+            objects = [];
+            particles = [];
+
+            switch(currentScene) {
+                case 'showcase':
+                    createShowcaseScene();
+                    break;
+                case 'particles':
+                    createParticleScene();
+                    break;
+                case 'physics':
+                    createPhysicsScene();
+                    break;
+                case 'reflection':
+                    createReflectionScene();
+                    break;
+                case 'volumetric':
+                    createVolumetricScene();
+                    break;
+            }
+        }
+
+        function createShowcaseScene() {
+            // Create a complex object
+            const geometry = new THREE.TorusKnotGeometry(1, 0.3, 128, 32);
+            const material = new THREE.MeshPhysicalMaterial({
+                color: 0x00ff00,
+                metalness: 0.9,
+                roughness: 0.1,
+                clearcoat: 1.0,
+                clearcoatRoughness: 0.1,
+                transmission: 0.5,
+                thickness: 0.5
+            });
+            const mesh = new THREE.Mesh(geometry, material);
+            mesh.castShadow = true;
+            scene.add(mesh);
+            objects.push(mesh);
+
+            // Add floating orbs
+            for (let i = 0; i < 5; i++) {
+                const orbGeometry = new THREE.SphereGeometry(0.2, 32, 32);
+                const orbMaterial = new THREE.MeshPhysicalMaterial({
+                    color: new THREE.Color().setHSL(i / 5, 1, 0.5),
+                    metalness: 0.8,
+                    roughness: 0.2,
+                    transmission: 0.8
+                });
+                const orb = new THREE.Mesh(orbGeometry, orbMaterial);
+                orb.position.set(
+                    Math.cos(i * Math.PI * 2 / 5) * 3,
+                    Math.sin(i * Math.PI * 2 / 5) * 3,
+                    0
+                );
+                orb.castShadow = true;
+                scene.add(orb);
+                objects.push(orb);
+            }
+        }
+
+        function createParticleScene() {
+            const particleCount = 1000;
+            const geometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(particleCount * 3);
+            const colors = new Float32Array(particleCount * 3);
+
+            for (let i = 0; i < particleCount; i++) {
+                positions[i * 3] = (Math.random() - 0.5) * 10;
+                positions[i * 3 + 1] = (Math.random() - 0.5) * 10;
+                positions[i * 3 + 2] = (Math.random() - 0.5) * 10;
+
+                colors[i * 3] = Math.random();
+                colors[i * 3 + 1] = Math.random();
+                colors[i * 3 + 2] = Math.random();
+            }
+
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+            const material = new THREE.PointsMaterial({
+                size: 0.1,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.8
+            });
+
+            const particles = new THREE.Points(geometry, material);
+            scene.add(particles);
+            objects.push(particles);
+        }
+
+        function createPhysicsScene() {
+            // Create a water surface
+            const waterGeometry = new THREE.PlaneGeometry(100, 100);
+            water = new Water(waterGeometry, {
+                textureWidth: 512,
+                textureHeight: 512,
+                waterNormals: new THREE.TextureLoader().load('https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/waternormals.jpg', function(texture) {
+                    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+                }),
+                sunDirection: new THREE.Vector3(),
+                sunColor: 0xffffff,
+                waterColor: 0x001e0f,
+                distortionScale: 3.7,
+                fog: scene.fog !== undefined
+            });
+            water.rotation.x = -Math.PI / 2;
+            scene.add(water);
+            objects.push(water);
+
+            // Add floating objects
+            for (let i = 0; i < 10; i++) {
+                const geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+                const material = new THREE.MeshPhysicalMaterial({
+                    color: new THREE.Color().setHSL(Math.random(), 0.8, 0.5),
+                    metalness: 0.5,
+                    roughness: 0.5
+                });
+                const box = new THREE.Mesh(geometry, material);
+                box.position.set(
+                    (Math.random() - 0.5) * 10,
+                    2 + Math.random() * 2,
+                    (Math.random() - 0.5) * 10
+                );
+                box.castShadow = true;
+                scene.add(box);
+                objects.push(box);
+            }
+        }
+
+        function createReflectionScene() {
+            // Create a reflective room
+            const roomGeometry = new THREE.BoxGeometry(10, 10, 10);
+            const roomMaterial = new THREE.MeshPhysicalMaterial({
+                color: 0x808080,
+                metalness: 0.9,
+                roughness: 0.1,
+                envMapIntensity: 1.0
+            });
+            const room = new THREE.Mesh(roomGeometry, roomMaterial);
+            room.material.side = THREE.BackSide;
+            scene.add(room);
+            objects.push(room);
+
+            // Add reflective spheres
+            for (let i = 0; i < 5; i++) {
+                const sphereGeometry = new THREE.SphereGeometry(0.5, 32, 32);
+                const sphereMaterial = new THREE.MeshPhysicalMaterial({
+                    color: new THREE.Color().setHSL(i / 5, 1, 0.5),
+                    metalness: 1.0,
+                    roughness: 0.0,
+                    transmission: 0.5
+                });
+                const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+                sphere.position.set(
+                    Math.cos(i * Math.PI * 2 / 5) * 3,
+                    Math.sin(i * Math.PI * 2 / 5) * 3,
+                    0
+                );
+                scene.add(sphere);
+                objects.push(sphere);
+            }
+        }
+
+        function createVolumetricScene() {
+            // Create volumetric light
+            const lightGeometry = new THREE.CylinderGeometry(0.1, 0.1, 10, 32);
+            const lightMaterial = new THREE.MeshPhysicalMaterial({
+                color: 0xffffff,
+                emissive: 0xffffff,
+                emissiveIntensity: 1,
+                transparent: true,
+                opacity: 0.5
+            });
+            const light = new THREE.Mesh(lightGeometry, lightMaterial);
+            light.position.set(0, 5, 0);
+            scene.add(light);
+            objects.push(light);
+
+            // Add fog
+            scene.fog = new THREE.FogExp2(0x000000, 0.05);
+
+            // Add particles in light beam
+            const particleCount = 1000;
+            const geometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(particleCount * 3);
+
+            for (let i = 0; i < particleCount; i++) {
+                positions[i * 3] = (Math.random() - 0.5) * 2;
+                positions[i * 3 + 1] = Math.random() * 10;
+                positions[i * 3 + 2] = (Math.random() - 0.5) * 2;
+            }
+
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+            const material = new THREE.PointsMaterial({
+                size: 0.05,
+                color: 0xffffff,
+                transparent: true,
+                opacity: 0.5
+            });
+
+            const particles = new THREE.Points(geometry, material);
+            scene.add(particles);
+            objects.push(particles);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const delta = clock.getDelta();
+
+            controls.update();
+
+            // Update scene based on current type
+            switch(currentScene) {
+                case 'showcase':
+                    objects.forEach((obj, i) => {
+                        if (i > 0) { // Skip main object
+                            obj.rotation.x += delta * 0.5;
+                            obj.rotation.y += delta * 0.5;
+                        }
+                    });
+                    break;
+                case 'particles':
+                    const positions = objects[0].geometry.attributes.position.array;
+                    for (let i = 0; i < positions.length; i += 3) {
+                        positions[i] += Math.sin(delta + i) * 0.01;
+                        positions[i + 1] += Math.cos(delta + i) * 0.01;
+                        positions[i + 2] += Math.sin(delta + i) * 0.01;
+                    }
+                    objects[0].geometry.attributes.position.needsUpdate = true;
+                    break;
+                case 'physics':
+                    water.material.uniforms['time'].value += delta;
+                    objects.forEach((obj, i) => {
+                        if (i > 0) { // Skip water
+                            obj.position.y -= delta * 0.5;
+                            if (obj.position.y < -2) {
+                                obj.position.y = 2 + Math.random() * 2;
+                            }
+                        }
+                    });
+                    break;
+                case 'reflection':
+                    objects.forEach((obj, i) => {
+                        if (i > 0) { // Skip room
+                            obj.rotation.x += delta * 0.5;
+                            obj.rotation.y += delta * 0.5;
+                        }
+                    });
+                    break;
+                case 'volumetric':
+                    const particlePositions = objects[1].geometry.attributes.position.array;
+                    for (let i = 0; i < particlePositions.length; i += 3) {
+                        particlePositions[i + 1] += delta * 2;
+                        if (particlePositions[i + 1] > 10) {
+                            particlePositions[i + 1] = 0;
+                        }
+                    }
+                    objects[1].geometry.attributes.position.needsUpdate = true;
+                    break;
+            }
+
+            if (showEffects) {
+                composer.render();
+            } else {
+                renderer.render(scene, camera);
+            }
+        }
+
+        function toggleRotation() {
+            autoRotate = !autoRotate;
+            controls.autoRotate = autoRotate;
+        }
+
+        function resetCamera() {
+            camera.position.set(0, 2, 5);
+            controls.reset();
+        }
+
+        function togglePostProcessing() {
+            showEffects = !showEffects;
+        }
+
+        // Event Listeners
+        document.getElementById('sceneType').addEventListener('change', (e) => {
+            currentScene = e.target.value;
+            createScene();
+        });
+
+        document.getElementById('environment').addEventListener('change', async (e) => {
+            currentEnvironment = e.target.value;
+            const rgbeLoader = new RGBELoader();
+            const hdrTexture = await rgbeLoader.loadAsync(environments[currentEnvironment]);
+            hdrTexture.mapping = THREE.EquirectangularReflectionMapping;
+            scene.environment = hdrTexture;
+            scene.background = hdrTexture;
+        });
+
+        document.getElementById('rotationSpeed').addEventListener('input', (e) => {
+            controls.autoRotateSpeed = parseFloat(e.target.value);
+            document.getElementById('rotationValue').textContent = e.target.value;
+        });
+
+        document.getElementById('exposure').addEventListener('input', (e) => {
+            const exposure = parseFloat(e.target.value);
+            renderer.toneMappingExposure = exposure;
+            document.getElementById('exposureValue').textContent = e.target.value;
+        });
+
+        document.addEventListener('keydown', (e) => {
+            switch(e.code) {
+                case 'Space':
+                    toggleRotation();
+                    break;
+                case 'KeyR':
+                    resetCamera();
+                    break;
+                case 'Digit1':
+                case 'Digit2':
+                case 'Digit3':
+                case 'Digit4':
+                case 'Digit5':
+                    const scenes = ['showcase', 'particles', 'physics', 'reflection', 'volumetric'];
+                    currentScene = scenes[parseInt(e.code[5]) - 1];
+                    document.getElementById('sceneType').value = currentScene;
+                    createScene();
+                    break;
+                case 'KeyF':
+                    if (!document.fullscreenElement) {
+                        document.documentElement.requestFullscreen();
+                    } else {
+                        document.exitFullscreen();
+                    }
+                    break;
+            }
+        });
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            composer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        init();
+    </script>
+</body>
+</html> 

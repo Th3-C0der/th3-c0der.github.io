@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fractal Explorer - Th3-C0der Playground</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718" crossorigin="anonymous"></script>
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            font-family: Arial, sans-serif;
+            color: white;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            color: white;
+            text-align: center;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            min-width: 300px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .controls button, .controls select {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 12px 15px;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            width: 100%;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .controls button:hover, .controls select:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-1px);
+        }
+
+        .controls button:active, .controls select:active {
+            transform: translateY(1px);
+        }
+
+        .controls input[type="range"] {
+            width: 100%;
+            margin: 5px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            height: 6px;
+            -webkit-appearance: none;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 2;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .instructions {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            font-size: 14px;
+            max-width: 250px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .instructions h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .instructions p {
+            margin: 5px 0;
+            line-height: 1.4;
+        }
+
+        .coordinates {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            font-size: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .controls {
+                grid-template-columns: 1fr;
+                width: 90%;
+            }
+
+            .instructions {
+                display: none;
+            }
+
+            .coordinates {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading">Loading Fractal Explorer...</div>
+    <a href="/playground" class="back-btn">← Back to Playground</a>
+    <div class="instructions">
+        <h3>Controls:</h3>
+        <p>• Click + Drag: Pan</p>
+        <p>• Scroll: Zoom</p>
+        <p>• Double Click: Reset View</p>
+        <p>• Space: Toggle Julia Set</p>
+        <p>• R: Reset All</p>
+    </div>
+    <div class="controls">
+        <div class="control-group">
+            <select id="fractalType">
+                <option value="mandelbrot">Mandelbrot Set</option>
+                <option value="julia">Julia Set</option>
+            </select>
+            <select id="colorScheme">
+                <option value="rainbow">Rainbow</option>
+                <option value="fire">Fire</option>
+                <option value="ocean">Ocean</option>
+                <option value="neon">Neon</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label>Iterations: <span id="iterationsValue">100</span></label>
+            <input type="range" id="iterations" min="20" max="1000" step="10" value="100">
+            <label>Color Speed: <span id="colorSpeedValue">1.0</span></label>
+            <input type="range" id="colorSpeed" min="0.1" max="5" step="0.1" value="1.0">
+        </div>
+        <div class="control-group">
+            <button onclick="resetView()">Reset View</button>
+            <button onclick="toggleJulia()">Toggle Julia Set</button>
+            <button onclick="screenshot()">Take Screenshot</button>
+        </div>
+    </div>
+    <div class="coordinates">X: 0.000 Y: 0.000 Zoom: 1.000x</div>
+
+    <script type="module">
+        import * as THREE from 'https://cdn.skypack.dev/three@0.132.2';
+
+        let scene, camera, renderer;
+        let uniforms;
+        let isJulia = false;
+        let juliaC = new THREE.Vector2(-0.4, 0.6);
+        let zoom = 1.0;
+        let offset = new THREE.Vector2(0, 0);
+        let isDragging = false;
+        let previousMousePosition = new THREE.Vector2();
+
+        const vertexShader = `
+            varying vec2 vUv;
+            void main() {
+                vUv = uv;
+                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+            }
+        `;
+
+        const fragmentShader = `
+            uniform vec2 resolution;
+            uniform vec2 offset;
+            uniform float zoom;
+            uniform int maxIterations;
+            uniform float colorSpeed;
+            uniform vec2 juliaC;
+            uniform bool isJulia;
+            uniform int colorScheme;
+            varying vec2 vUv;
+
+            vec3 getColor(float t, int scheme) {
+                if (scheme == 0) { // Rainbow
+                    return 0.5 + 0.5 * cos(3.0 + t * colorSpeed + vec3(0.0, 0.6, 1.0));
+                } else if (scheme == 1) { // Fire
+                    return vec3(t * colorSpeed, t * t * colorSpeed, 0.0);
+                } else if (scheme == 2) { // Ocean
+                    return vec3(0.0, t * colorSpeed, 1.0 - t * colorSpeed);
+                } else { // Neon
+                    return vec3(sin(t * colorSpeed), cos(t * colorSpeed), sin(t * colorSpeed * 0.5));
+                }
+            }
+
+            void main() {
+                vec2 c = (vUv - 0.5) * 4.0 / zoom + offset;
+                vec2 z = isJulia ? vUv * 4.0 - 2.0 : vec2(0.0);
+                vec2 constant = isJulia ? juliaC : c;
+                
+                int i;
+                for(i = 0; i < maxIterations; i++) {
+                    z = vec2(z.x * z.x - z.y * z.y, 2.0 * z.x * z.y) + constant;
+                    if(dot(z, z) > 4.0) break;
+                }
+                
+                if(i == maxIterations) {
+                    gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+                } else {
+                    float t = float(i) + 1.0 - log2(log2(dot(z, z))) + 4.0;
+                    gl_FragColor = vec4(getColor(t, colorScheme), 1.0);
+                }
+            }
+        `;
+
+        function init() {
+            scene = new THREE.Scene();
+            camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 10);
+            camera.position.z = 1;
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            uniforms = {
+                resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+                offset: { value: offset },
+                zoom: { value: zoom },
+                maxIterations: { value: 100 },
+                colorSpeed: { value: 1.0 },
+                juliaC: { value: juliaC },
+                isJulia: { value: isJulia },
+                colorScheme: { value: 0 }
+            };
+
+            const material = new THREE.ShaderMaterial({
+                uniforms: uniforms,
+                vertexShader: vertexShader,
+                fragmentShader: fragmentShader
+            });
+
+            const geometry = new THREE.PlaneGeometry(2, 2);
+            const mesh = new THREE.Mesh(geometry, material);
+            scene.add(mesh);
+
+            // Event Listeners
+            window.addEventListener('resize', onWindowResize);
+            renderer.domElement.addEventListener('mousedown', onMouseDown);
+            window.addEventListener('mousemove', onMouseMove);
+            window.addEventListener('mouseup', onMouseUp);
+            renderer.domElement.addEventListener('wheel', onMouseWheel);
+            renderer.domElement.addEventListener('dblclick', resetView);
+
+            document.getElementById('fractalType').addEventListener('change', (e) => {
+                isJulia = e.target.value === 'julia';
+                uniforms.isJulia.value = isJulia;
+            });
+
+            document.getElementById('colorScheme').addEventListener('change', (e) => {
+                const schemes = { rainbow: 0, fire: 1, ocean: 2, neon: 3 };
+                uniforms.colorScheme.value = schemes[e.target.value];
+            });
+
+            document.getElementById('iterations').addEventListener('input', (e) => {
+                uniforms.maxIterations.value = parseInt(e.target.value);
+                document.getElementById('iterationsValue').textContent = e.target.value;
+            });
+
+            document.getElementById('colorSpeed').addEventListener('input', (e) => {
+                uniforms.colorSpeed.value = parseFloat(e.target.value);
+                document.getElementById('colorSpeedValue').textContent = e.target.value;
+            });
+
+            document.addEventListener('keydown', (e) => {
+                switch(e.code) {
+                    case 'Space':
+                        toggleJulia();
+                        break;
+                    case 'KeyR':
+                        resetAll();
+                        break;
+                }
+            });
+
+            // Remove loading message
+            document.querySelector('.loading').style.display = 'none';
+            animate();
+        }
+
+        function onWindowResize() {
+            uniforms.resolution.value.set(window.innerWidth, window.innerHeight);
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function onMouseDown(event) {
+            isDragging = true;
+            previousMousePosition.set(event.clientX, event.clientY);
+        }
+
+        function onMouseMove(event) {
+            if (!isDragging) return;
+
+            const delta = new THREE.Vector2(
+                event.clientX - previousMousePosition.x,
+                event.clientY - previousMousePosition.y
+            );
+
+            offset.x += delta.x * 0.01 / zoom;
+            offset.y -= delta.y * 0.01 / zoom;
+            uniforms.offset.value = offset;
+
+            previousMousePosition.set(event.clientX, event.clientY);
+            updateCoordinates();
+        }
+
+        function onMouseUp() {
+            isDragging = false;
+        }
+
+        function onMouseWheel(event) {
+            const zoomFactor = event.deltaY > 0 ? 1.1 : 0.9;
+            zoom *= zoomFactor;
+            uniforms.zoom.value = zoom;
+            updateCoordinates();
+        }
+
+        function resetView() {
+            zoom = 1.0;
+            offset.set(0, 0);
+            uniforms.zoom.value = zoom;
+            uniforms.offset.value = offset;
+            updateCoordinates();
+        }
+
+        function resetAll() {
+            resetView();
+            uniforms.maxIterations.value = 100;
+            uniforms.colorSpeed.value = 1.0;
+            uniforms.colorScheme.value = 0;
+            document.getElementById('iterations').value = 100;
+            document.getElementById('colorSpeed').value = 1.0;
+            document.getElementById('colorScheme').value = 'rainbow';
+            document.getElementById('iterationsValue').textContent = '100';
+            document.getElementById('colorSpeedValue').textContent = '1.0';
+        }
+
+        function toggleJulia() {
+            isJulia = !isJulia;
+            uniforms.isJulia.value = isJulia;
+            document.getElementById('fractalType').value = isJulia ? 'julia' : 'mandelbrot';
+        }
+
+        function updateCoordinates() {
+            const coords = document.querySelector('.coordinates');
+            coords.textContent = `X: ${offset.x.toFixed(3)} Y: ${offset.y.toFixed(3)} Zoom: ${zoom.toFixed(3)}x`;
+        }
+
+        function screenshot() {
+            const link = document.createElement('a');
+            link.download = 'fractal-screenshot.png';
+            link.href = renderer.domElement.toDataURL();
+            link.click();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+
+        init();
+    </script>
+</body>
+</html> 

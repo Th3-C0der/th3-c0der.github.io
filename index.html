@@ -48,6 +48,7 @@
 		}
 		</script>
 		<script type="module" src="/static/script.js"></script>
+		<script src="/static/js/protection.js"></script>
 	</head>
 	<body>
 		<header>
@@ -60,9 +61,9 @@
 					<i class="fas fa-bars"></i>
 				</div>
 				<div class="nav-links">
-					<a href="">Home</a>
+					<a href="" class="active">Home</a>
 					<a href="#projects">Projects</a>
-					<a href="/blog#blog" class="active">Blog</a>
+					<a href="/blog#blog">Blog</a>
 					<a href="#about">About</a>
 					<a href="#" id="contact-link">Contact</a>
 					<button class="theme-toggle" aria-label="Toggle dark mode">
@@ -89,6 +90,23 @@
 				</div>
 			</section>
 			<section id="projects" class="projects">
+				<div class="project-card playground-card">
+					<div class="playground-badge">Featured</div>
+					<img src="https://raw.githubusercontent.com/Th3-AI/Th3-AI.github.io/main/assets/playground-preview.png" alt="Creative Playground" class="project-image">
+					<div class="project-info">
+						
+						<p>Explore interactive experiments, creative coding projects & games!</p>
+						<div class="playground-tags">
+							<span>Interactive</span>
+							<span>Creative</span>
+							<span>Fun</span>
+						</div>
+						<a href="/playground" class="project-link playground-link">
+							<i class="fas fa-gamepad"></i>
+							Explore Playground
+						</a>
+					</div>
+				</div>
 				<div class="project-card">
 					<img src="https://raw.githubusercontent.com/Th3-AI/Th3-AI.github.io/main/assets/DynaSpark.png" alt="Project 3" class="project-image">
 					<div class="project-info">
@@ -122,12 +140,12 @@
 					</div>
 				</div>
 				<div class="project-card">
-				    	<img src="https://raw.githubusercontent.com/Th3-AI/Th3-AI.github.io/main/assets/Th3-Share.png" alt="Project 5" class="project-image">
-				    	<div class="project-info">
-					        <h3>Th3-Share</h3>
-					        <p>A seamless and secure file-sharing platform, designed for fast transfers and data protection.</p>
-					        <a href="https://th3-share.onrender.com" class="project-link">View Project</a>
-				    	</div>
+					<img src="https://raw.githubusercontent.com/Th3-AI/Th3-AI.github.io/main/assets/Th3-Share.png" alt="Project 5" class="project-image">
+					<div class="project-info">
+						<h3>Th3-Share</h3>
+						<p>A seamless and secure file-sharing platform, designed for fast transfers and data protection.</p>
+						<a href="https://th3-share.onrender.com" class="project-link">View Project</a>
+					</div>
 				</div>
 			</section>
 		</main>

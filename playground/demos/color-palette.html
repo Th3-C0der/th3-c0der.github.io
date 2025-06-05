@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Palette Generator - Th3-C0der Playground</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718" crossorigin="anonymous"></script>
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            font-family: Arial, sans-serif;
+            color: white;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            max-width: 1200px;
+            width: 90%;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .color-wheel-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 2rem auto;
+        }
+
+        .color-wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(
+                red, yellow, lime, cyan, blue, magenta, red
+            );
+            position: relative;
+            cursor: crosshair;
+        }
+
+        .color-wheel::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 80%;
+            height: 80%;
+            background: #1a1a1a;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .color-picker {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border: 2px solid black;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        .palette-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .color-swatch {
+            height: 150px;
+            border-radius: 8px;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .color-swatch:hover {
+            transform: scale(1.05);
+        }
+
+        .color-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 0.5rem;
+            border-radius: 0 0 8px 8px;
+            font-size: 0.9rem;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .control-group {
+            text-align: left;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        select, button {
+            width: 100%;
+            padding: 0.8rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        select:hover, button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .accessibility-info {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            text-align: left;
+        }
+
+        .contrast-ratio {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 0.5rem 0;
+        }
+
+        .contrast-ratio.pass {
+            color: #4caf50;
+        }
+
+        .contrast-ratio.fail {
+            color: #f44336;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .color-wheel-container {
+                width: 250px;
+                height: 250px;
+            }
+
+            .controls {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="/playground" class="back-btn">← Back to Playground</a>
+    <div class="container">
+        <h1>Color Palette Generator</h1>
+        <div class="color-wheel-container">
+            <div class="color-wheel" id="colorWheel"></div>
+            <div class="color-picker" id="colorPicker"></div>
+        </div>
+        <div class="controls">
+            <div class="control-group">
+                <label for="harmony">Color Harmony</label>
+                <select id="harmony">
+                    <option value="complementary">Complementary</option>
+                    <option value="triadic">Triadic</option>
+                    <option value="analogous">Analogous</option>
+                    <option value="split-complementary">Split Complementary</option>
+                    <option value="square">Square</option>
+                    <option value="tetradic">Tetradic</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="colorBlindness">Color Blindness Simulation</label>
+                <select id="colorBlindness">
+                    <option value="none">None</option>
+                    <option value="protanopia">Protanopia (Red-Blind)</option>
+                    <option value="deuteranopia">Deuteranopia (Green-Blind)</option>
+                    <option value="tritanopia">Tritanopia (Blue-Blind)</option>
+                </select>
+            </div>
+        </div>
+        <div class="palette-container" id="paletteContainer"></div>
+        <div class="accessibility-info" id="accessibilityInfo"></div>
+        <div class="buttons">
+            <button id="exportBtn">Export Palette</button>
+            <button id="saveBtn">Save Palette</button>
+            <button id="loadBtn">Load Palette</button>
+        </div>
+    </div>
+
+    <script>
+        class ColorPaletteGenerator {
+            constructor() {
+                this.baseColor = { h: 0, s: 100, l: 50 };
+                this.harmony = 'complementary';
+                this.colorBlindness = 'none';
+                this.palette = [];
+                this.setupEventListeners();
+                this.updatePalette();
+            }
+
+            setupEventListeners() {
+                const colorWheel = document.getElementById('colorWheel');
+                const colorPicker = document.getElementById('colorPicker');
+                const harmonySelect = document.getElementById('harmony');
+                const colorBlindnessSelect = document.getElementById('colorBlindness');
+                const exportBtn = document.getElementById('exportBtn');
+                const saveBtn = document.getElementById('saveBtn');
+                const loadBtn = document.getElementById('loadBtn');
+
+                colorWheel.addEventListener('mousemove', (e) => this.handleColorWheelMove(e));
+                colorWheel.addEventListener('click', (e) => this.handleColorWheelClick(e));
+                harmonySelect.addEventListener('change', (e) => {
+                    this.harmony = e.target.value;
+                    this.updatePalette();
+                });
+                colorBlindnessSelect.addEventListener('change', (e) => {
+                    this.colorBlindness = e.target.value;
+                    this.updatePalette();
+                });
+                exportBtn.addEventListener('click', () => this.exportPalette());
+                saveBtn.addEventListener('click', () => this.savePalette());
+                loadBtn.addEventListener('click', () => this.loadPalette());
+            }
+
+            handleColorWheelMove(e) {
+                const rect = e.target.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+
+                const angle = Math.atan2(y - centerY, x - centerX) * (180 / Math.PI) + 90;
+                const distance = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
+                const maxDistance = rect.width / 2;
+
+                this.baseColor.h = (angle + 360) % 360;
+                this.baseColor.s = Math.min(100, (distance / maxDistance) * 100);
+
+                document.getElementById('colorPicker').style.left = `${x}px`;
+                document.getElementById('colorPicker').style.top = `${y}px`;
+
+                this.updatePalette();
+            }
+
+            handleColorWheelClick(e) {
+                this.handleColorWheelMove(e);
+            }
+
+            updatePalette() {
+                this.palette = this.generateHarmonyColors();
+                this.renderPalette();
+                this.updateAccessibilityInfo();
+            }
+
+            generateHarmonyColors() {
+                const colors = [this.baseColor];
+                const h = this.baseColor.h;
+                const s = this.baseColor.s;
+                const l = this.baseColor.l;
+
+                switch (this.harmony) {
+                    case 'complementary':
+                        colors.push({ h: (h + 180) % 360, s, l });
+                        break;
+                    case 'triadic':
+                        colors.push({ h: (h + 120) % 360, s, l });
+                        colors.push({ h: (h + 240) % 360, s, l });
+                        break;
+                    case 'analogous':
+                        colors.push({ h: (h + 30) % 360, s, l });
+                        colors.push({ h: (h + 60) % 360, s, l });
+                        break;
+                    case 'split-complementary':
+                        colors.push({ h: (h + 150) % 360, s, l });
+                        colors.push({ h: (h + 210) % 360, s, l });
+                        break;
+                    case 'square':
+                        colors.push({ h: (h + 90) % 360, s, l });
+                        colors.push({ h: (h + 180) % 360, s, l });
+                        colors.push({ h: (h + 270) % 360, s, l });
+                        break;
+                    case 'tetradic':
+                        colors.push({ h: (h + 60) % 360, s, l });
+                        colors.push({ h: (h + 180) % 360, s, l });
+                        colors.push({ h: (h + 240) % 360, s, l });
+                        break;
+                }
+
+                return colors;
+            }
+
+            renderPalette() {
+                const container = document.getElementById('paletteContainer');
+                container.innerHTML = '';
+
+                this.palette.forEach(color => {
+                    const swatch = document.createElement('div');
+                    swatch.className = 'color-swatch';
+                    const hsl = `hsl(${color.h}, ${color.s}%, ${color.l}%)`;
+                    swatch.style.background = hsl;
+
+                    const info = document.createElement('div');
+                    info.className = 'color-info';
+                    info.textContent = this.getColorFormats(color);
+
+                    swatch.appendChild(info);
+                    container.appendChild(swatch);
+                });
+            }
+
+            getColorFormats(color) {
+                const hsl = `hsl(${Math.round(color.h)}, ${Math.round(color.s)}%, ${Math.round(color.l)}%)`;
+                const rgb = this.hslToRgb(color.h, color.s, color.l);
+                const hex = this.rgbToHex(rgb.r, rgb.g, rgb.b);
+                return `${hex}\n${hsl}`;
+            }
+
+            hslToRgb(h, s, l) {
+                s /= 100;
+                l /= 100;
+                const k = n => (n + h / 30) % 12;
+                const a = s * Math.min(l, 1 - l);
+                const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+                return {
+                    r: Math.round(255 * f(0)),
+                    g: Math.round(255 * f(8)),
+                    b: Math.round(255 * f(4))
+                };
+            }
+
+            rgbToHex(r, g, b) {
+                return '#' + [r, g, b].map(x => {
+                    const hex = x.toString(16);
+                    return hex.length === 1 ? '0' + hex : hex;
+                }).join('');
+            }
+
+            updateAccessibilityInfo() {
+                const container = document.getElementById('accessibilityInfo');
+                container.innerHTML = '<h3>Accessibility Information</h3>';
+
+                for (let i = 0; i < this.palette.length; i++) {
+                    for (let j = i + 1; j < this.palette.length; j++) {
+                        const ratio = this.calculateContrastRatio(
+                            this.hslToRgb(this.palette[i].h, this.palette[i].s, this.palette[i].l),
+                            this.hslToRgb(this.palette[j].h, this.palette[j].s, this.palette[j].l)
+                        );
+
+                        const div = document.createElement('div');
+                        div.className = `contrast-ratio ${ratio >= 4.5 ? 'pass' : 'fail'}`;
+                        div.textContent = `Contrast Ratio: ${ratio.toFixed(2)}:1`;
+                        container.appendChild(div);
+                    }
+                }
+            }
+
+            calculateContrastRatio(rgb1, rgb2) {
+                const l1 = this.calculateRelativeLuminance(rgb1);
+                const l2 = this.calculateRelativeLuminance(rgb2);
+                const lighter = Math.max(l1, l2);
+                const darker = Math.min(l1, l2);
+                return (lighter + 0.05) / (darker + 0.05);
+            }
+
+            calculateRelativeLuminance(rgb) {
+                const [r, g, b] = [rgb.r, rgb.g, rgb.b].map(c => {
+                    c = c / 255;
+                    return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+                });
+                return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+            }
+
+            exportPalette() {
+                const paletteData = this.palette.map(color => ({
+                    hex: this.rgbToHex(...Object.values(this.hslToRgb(color.h, color.s, color.l))),
+                    hsl: `hsl(${Math.round(color.h)}, ${Math.round(color.s)}%, ${Math.round(color.l)}%)`,
+                    rgb: this.hslToRgb(color.h, color.s, color.l)
+                }));
+
+                const blob = new Blob([JSON.stringify(paletteData, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'color-palette.json';
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+
+            savePalette() {
+                const paletteData = this.palette.map(color => ({
+                    h: color.h,
+                    s: color.s,
+                    l: color.l
+                }));
+                localStorage.setItem('savedPalette', JSON.stringify(paletteData));
+                alert('Palette saved successfully!');
+            }
+
+            loadPalette() {
+                const savedPalette = localStorage.getItem('savedPalette');
+                if (savedPalette) {
+                    this.palette = JSON.parse(savedPalette);
+                    this.baseColor = this.palette[0];
+                    this.updatePalette();
+                    alert('Palette loaded successfully!');
+                } else {
+                    alert('No saved palette found!');
+                }
+            }
+        }
+
+        // Initialize the color palette generator
+        const generator = new ColorPaletteGenerator();
+    </script>
+</body>
+</html> 

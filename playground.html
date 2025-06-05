@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" href="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png/:/rs=w:16,h:16,m" sizes="16x16">
+    <link rel="icon" href="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png/:/rs=w:24,h:24,m" sizes="24x24">
+    <link rel="icon" href="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png/:/rs=w:32,h:32,m" sizes="32x32">
+    <link rel="icon" href="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png/:/rs=w:48,h:48,m" sizes="48x48">
+    <link rel="icon" href="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png/:/rs=w:64,h:64,m" sizes="64x64">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Th3-C0der">
+    <meta name="generator" content="Th3-C0der; Th3_1.8.3.8.9">
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="apple-touch-icon" sizes="72x72" href="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png/:/rs=w:72,h:72,m">
+    <link rel="apple-touch-icon" sizes="114x114" href="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png/:/rs=w:114,h:114,m">
+    <link rel="apple-touch-icon" sizes="120x120" href="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png/:/rs=w:120,h:120,m">
+    <link rel="apple-touch-icon" sizes="144x144" href="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png/:/rs=w:144,h:144,m">
+    <link rel="apple-touch-icon" sizes="152x152" href="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png/:/rs=w:152,h:152,m">
+    <link rel="apple-touch-icon" sizes="180x180" href="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png/:/rs=w:180,h:180,m">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <meta property="og:url" content="https://th3-c0der.github.io/playground">
+    <meta property="og:site_name" content="Th3-C0der">
+    <meta property="og:title" content="Th3-C0der Playground">
+    <meta property="og:description" content="Interactive coding experiments and creative projects">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png">
+    <meta property="og:locale" content="en_IN">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@Th3Drag8N">
+    <meta name="twitter:title" content="Th3-C0der Playground">
+    <meta name="twitter:description" content="Interactive coding experiments and creative projects">
+    <meta name="twitter:image" content="https://img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png">
+    <meta name="twitter:image:alt" content="Th3-C0der Playground">
+    <meta name="theme-color" content="#00ff00">
+    <title>Th3-C0der Playground</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718" crossorigin="anonymous"></script>
+    <link href="/static/style.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/ScrollTrigger.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.skypack.dev/three@0.132.2"
+        }
+    }
+    </script>
+    <script type="module" src="/static/script.js"></script>
+    <style>
+        .playground-container {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .playground-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .playground-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+        }
+
+        .playground-header p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        .disclaimer {
+            background: rgba(255, 193, 7, 0.1);
+            border: 2px solid #ffc107;
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            margin: 0 auto 2rem;
+            max-width: 800px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            animation: pulse 2s infinite;
+        }
+
+        .disclaimer i {
+            font-size: 1.5rem;
+            color: #ffc107;
+        }
+
+        .disclaimer p {
+            margin: 0;
+            color: var(--text-color);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(255, 193, 7, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 193, 7, 0);
+            }
+        }
+
+        .playground-categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: var(--card-bg);
+            border-radius: 20px;
+            border: 1px solid rgba(0, 255, 157, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .category-btn {
+            padding: 0.8rem 1.8rem;
+            border: none;
+            border-radius: 30px;
+            background: var(--card-bg);
+            color: var(--text-color);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid var(--accent-color);
+            font-size: 0.95rem;
+            position: relative;
+            overflow: hidden;
+            transform-origin: center;
+        }
+
+        .category-btn:active {
+            transform: scale(0.95);
+        }
+
+        .category-btn.active {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            box-shadow: 0 5px 15px rgba(0, 255, 157, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .random-btn {
+            background: linear-gradient(135deg, var(--accent-color), var(--secondary-color));
+            color: var(--bg-color);
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.8rem 2rem;
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .random-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .random-btn:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 5px 20px rgba(0, 255, 157, 0.4);
+        }
+
+        .random-btn:hover::before {
+            opacity: 1;
+        }
+
+        .random-btn i, .random-btn span {
+            position: relative;
+            z-index: 2;
+        }
+
+        .random-btn i {
+            font-size: 1.2em;
+        }
+
+        .playground-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 1rem;
+            position: relative;
+            min-height: 400px;
+        }
+
+        .playground-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            position: relative;
+            will-change: transform, opacity;
+        }
+
+        .playground-card.hidden {
+            position: absolute;
+            opacity: 0;
+            transform: scale(0.95) translateY(20px);
+            pointer-events: none;
+            visibility: hidden;
+        }
+
+        .playground-card.entering {
+            animation: cardEnter 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        .playground-card.exiting {
+            animation: cardExit 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes cardEnter {
+            from {
+                opacity: 0;
+                transform: scale(0.95) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        @keyframes cardExit {
+            from {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: scale(0.95) translateY(20px);
+            }
+        }
+
+        .playground-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-preview {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--accent-color), var(--secondary-color));
+            transition: all 0.3s ease;
+        }
+
+        .card-preview::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0));
+            z-index: 1;
+        }
+
+        .card-preview i {
+            font-size: 4rem;
+            color: rgba(255, 255, 255, 0.9);
+            z-index: 2;
+            transition: transform 0.3s ease;
+        }
+
+        .playground-card:hover .card-preview i {
+            transform: scale(1.1);
+        }
+
+        .playground-card[data-category="visual"] .card-preview {
+            background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+        }
+
+        .playground-card[data-category="ai"] .card-preview {
+            background: linear-gradient(135deg, #4FACFE, #00F2FE);
+        }
+
+        .playground-card[data-category="game"] .card-preview {
+            background: linear-gradient(135deg, #43E97B, #38F9D7);
+        }
+
+        .playground-card[data-category="audio"] .card-preview {
+            background: linear-gradient(135deg, #FA709A, #FEE140);
+        }
+
+        .playground-card[data-category="physics"] .card-preview {
+            background: linear-gradient(135deg, #667EEA, #764BA2);
+        }
+
+        .card-content {
+            padding: 1.5rem;
+        }
+
+        .card-content h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+        }
+
+        .card-content p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-tag {
+            background: var(--accent-color);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+        }
+
+        .try-now-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--accent-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background 0.3s ease;
+        }
+
+        .try-now-btn:hover {
+            background: var(--accent-hover);
+        }
+
+        @media (max-width: 768px) {
+            .playground-container {
+                padding: 1rem;
+            }
+
+            .playground-header h1 {
+                font-size: 2rem;
+            }
+
+            .playground-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .playground-categories {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 1rem;
+            }
+
+            .category-btn {
+                width: 100%;
+                margin: 0.2rem 0;
+            }
+
+            .random-btn {
+                margin-top: 0.5rem;
+            }
+
+            .playground-card {
+                margin: 0.5rem 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <img src="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png" alt="Th3-C0der Logo">
+                Th3-C0der
+            </div>
+            <div class="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </div>
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <a href="/#projects">Projects</a>
+                <a href="/blog#blog">Blog</a>
+                <a href="/#about">About</a>
+                <a href="#" id="contact-link">Contact</a>
+                <button class="theme-toggle" aria-label="Toggle dark mode">
+                    <i class="fas fa-moon"></i>
+                    <span>Theme</span>
+                </button>
+            </div>
+        </nav>
+    </header>
+    <div class="nav-overlay"></div>
+    <main>
+        <section id="home" class="hero">
+            <div class="hero-content">
+                <h1>Welcome to
+                    <br>
+                    <span class="highlight">Th3-C0der's</span>
+                    Playground</h1>
+                <p>Explore interactive experiments and creative coding projects</p>
+            </div>
+            <div class="hero-background">
+                <div class="circle circle-1"></div>
+                <div class="circle circle-2"></div>
+                <div class="circle circle-3"></div>
+            </div>
+        </section>
+        <section class="playground-container">
+            <div class="playground-header">
+            <div class="disclaimer">
+                <i class="fas fa-flask"></i>
+                <p>🚧 These playground demos are currently in beta/alpha stage. Some features may be experimental, incomplete, or not fully functional. Feel free to explore and report any issues you encounter! 🚧</p>
+            </div>
+            <div class="playground-categories">
+                <button class="category-btn active" data-category="all">All</button>
+                <button class="category-btn" data-category="ai">AI & ML</button>
+                <button class="category-btn" data-category="game">Games</button>
+                <button class="category-btn" data-category="visual">Visual</button>
+                <button class="category-btn" data-category="audio">Audio</button>
+                <button class="category-btn" data-category="physics">Physics</button>
+                <button class="category-btn random-btn">
+                    <i class="fas fa-random"></i>
+                    Random Demo
+                </button>
+            </div>
+            <div class="playground-grid">
+                <!-- Project Card 1 -->
+                <div class="playground-card" data-category="physics">
+                    <div class="card-preview">
+                        <i class="fas fa-atom"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Interactive Particle System</h3>
+                        <p>An interactive canvas-based particle system that responds to mouse movement and gravity.</p>
+                        <div class="card-tags">
+                            <span>Canvas</span>
+                            <span>JavaScript</span>
+                            <span>Animation</span>
+                        </div>
+                        <a href="/playground/demos/particle-system.html" class="try-now-btn">Try Now</a>
+                    </div>
+                </div>
+
+                <!-- Project Card 2 -->
+                <div class="playground-card" data-category="visual">
+                    <div class="card-preview">
+                        <i class="fas fa-cube"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>3D Scene Explorer</h3>
+                        <p>An interactive 3D scene built with Three.js featuring different geometric shapes and camera controls.</p>
+                        <div class="card-tags">
+                            <span>Three.js</span>
+                            <span>WebGL</span>
+                            <span>3D</span>
+                        </div>
+                        <a href="/playground/demos/3d-scene.html" class="try-now-btn">Try Now</a>
+                    </div>
+                </div>
+
+                <!-- Project Card 3 -->
+                <div class="playground-card" data-category="audio">
+                    <div class="card-preview">
+                        <i class="fas fa-music"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Audio Visualizer</h3>
+                        <p>A real-time audio visualizer that creates dynamic visualizations from audio input using the Web Audio API.</p>
+                        <div class="card-tags">
+                            <span>Web Audio API</span>
+                            <span>Canvas</span>
+                            <span>Audio</span>
+                        </div>
+                        <a href="/playground/demos/audio-visualizer.html" class="try-now-btn">Try Now</a>
+                    </div>
+                </div>
+
+                <!-- Project Card 4 -->
+                <div class="playground-card" data-category="visual">
+                    <div class="card-preview">
+                        <i class="fas fa-palette"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>CSS Art Gallery</h3>
+                        <p>A collection of creative artworks created using pure CSS, featuring animations and interactive elements.</p>
+                        <div class="card-tags">
+                            <span>CSS</span>
+                            <span>Animation</span>
+                            <span>Art</span>
+                        </div>
+                        <a href="/playground/demos/css-art.html" class="try-now-btn">Try Now</a>
+                    </div>
+                </div>
+
+                <!-- Project Card 5 -->
+                <div class="playground-card" data-category="visual">
+                    <div class="card-preview">
+                        <i class="fas fa-project-diagram"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Fractal Explorer</h3>
+                        <p>An interactive fractal visualization tool featuring the Mandelbrot and Julia sets with real-time coloring and zooming.</p>
+                        <div class="card-tags">
+                            <span>WebGL</span>
+                            <span>Mathematics</span>
+                            <span>Fractals</span>
+                        </div>
+                        <a href="/playground/demos/fractal-explorer.html" class="try-now-btn">Try Now</a>
+                    </div>
+                </div>
+
+                <!-- Project Card 6 -->
+                <div class="playground-card" data-category="physics">
+                    <div class="card-preview">
+                        <i class="fas fa-water"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Fluid Simulation</h3>
+                        <p>A real-time fluid dynamics simulation using WebGL, featuring interactive flow fields and particle systems.</p>
+                        <div class="card-tags">
+                            <span>WebGL</span>
+                            <span>Physics</span>
+                            <span>Simulation</span>
+                        </div>
+                        <a href="/playground/demos/fluid-simulation.html" class="try-now-btn">Try Now</a>
+                    </div>
+                </div>
+
+                <!-- Project Card 7 -->
+                <div class="playground-card" data-category="ai">
+                    <div class="card-preview">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Neural Network Playground</h3>
+                        <p>An interactive visualization of neural networks, allowing you to create and train simple networks in real-time.</p>
+                        <div class="card-tags">
+                            <span>AI</span>
+                            <span>Machine Learning</span>
+                            <span>Visualization</span>
+                        </div>
+                        <a href="/playground/demos/neural-network.html" class="try-now-btn">Try Now</a>
+                    </div>
+                </div>
+
+                <!-- Project Card 8 -->
+                <div class="playground-card" data-category="audio">
+                    <div class="card-preview">
+                        <i class="fas fa-guitar"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Web Synthesizer</h3>
+                        <p>An interactive web-based synthesizer with multiple waveforms, effects, and a virtual keyboard interface.</p>
+                        <div class="card-tags">
+                            <span>Web Audio API</span>
+                            <span>Music</span>
+                            <span>Interactive</span>
+                        </div>
+                        <a href="/playground/demos/synthesizer.html" class="try-now-btn">Try Now</a>
+                    </div>
+                </div>
+
+                <!-- Project Card 9 -->
+                <div class="playground-card" data-category="game">
+                    <div class="card-preview">
+                        <i class="fas fa-gamepad"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>AI Tic-Tac-Toe</h3>
+                        <p>Play Tic-Tac-Toe against an AI that learns from your moves. Features adaptive learning and difficulty levels.</p>
+                        <div class="card-tags">
+                            <span>AI</span>
+                            <span>Game</span>
+                            <span>Machine Learning</span>
+                        </div>
+                        <a href="/playground/demos/ai-tictactoe.html" class="try-now-btn">Try Now</a>
+                    </div>
+                </div>
+
+                <!-- Project Card 10 -->
+                <div class="playground-card" data-category="game">
+                    <div class="card-preview">
+                        <i class="fas fa-puzzle-piece"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Memory Match</h3>
+                        <p>Test your memory with this modern card matching game. Features multiple themes, animations, and difficulty levels.</p>
+                        <div class="card-tags">
+                            <span>Game</span>
+                            <span>Animation</span>
+                            <span>Interactive</span>
+                        </div>
+                        <a href="/playground/demos/memory-match.html" class="try-now-btn">Try Now</a>
+                    </div>
+                </div>
+
+                <!-- Project Card 11 -->
+                <div class="playground-card" data-category="game">
+                    <div class="card-preview">
+                        <i class="fas fa-staff-snake"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Modern Snake</h3>
+                        <p>A modern take on the classic Snake game with smooth controls, power-ups, and multiple game modes.</p>
+                        <div class="card-tags">
+                            <span>Game</span>
+                            <span>Canvas</span>
+                            <span>Classic</span>
+                        </div>
+                        <a href="/playground/demos/snake.html" class="try-now-btn">Try Now</a>
+                    </div>
+                </div>
+
+                <!-- Project Card 12 -->
+                <div class="playground-card" data-category="visual">
+                    <div class="card-preview">
+                        <i class="fas fa-tree"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Fractal Tree Generator</h3>
+                        <p>Create beautiful fractal tree patterns with interactive controls for branching, angles, and colors.</p>
+                        <div class="card-tags">
+                            <span>Canvas</span>
+                            <span>Fractals</span>
+                            <span>Interactive</span>
+                        </div>
+                        <a href="/playground/demos/fractal-tree.html" class="try-now-btn">Try Now</a>
+                    </div>
+                </div>
+
+                <!-- Project Card 13 -->
+                <div class="playground-card" data-category="ai">
+                    <div class="card-preview">
+                        <i class="fas fa-network-wired"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Neural Network Playground</h3>
+                        <p>Create and train simple neural networks in real-time. Visualize the learning process and experiment with different architectures.</p>
+                        <div class="card-tags">
+                            <span>AI</span>
+                            <span>Machine Learning</span>
+                            <span>Visualization</span>
+                        </div>
+                        <a href="/playground/demos/neural-network.html" class="try-now-btn">Try Now</a>
+                    </div>
+                </div>
+
+                <!-- Project Card 14 -->
+                <div class="playground-card" data-category="visual">
+                    <div class="card-preview">
+                        <i class="fas fa-palette"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Color Palette Generator</h3>
+                        <p>Create beautiful color schemes with this interactive tool. Features color harmony rules, accessibility checking, and export options.</p>
+                        <div class="card-tags">
+                            <span>Design</span>
+                            <span>Colors</span>
+                            <span>Tools</span>
+                        </div>
+                        <a href="/playground/demos/color-palette.html" class="try-now-btn">Try Now</a>
+                    </div>
+                </div>
+
+                <!-- Project Card 15 -->
+                <div class="playground-card" data-category="physics">
+                    <div class="card-preview">
+                        <i class="fas fa-atom"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Particle Physics Sandbox</h3>
+                        <p>Create and experiment with interactive particle systems. Features gravity, forces, collisions, and various particle behaviors.</p>
+                        <div class="card-tags">
+                            <span>Physics</span>
+                            <span>Simulation</span>
+                            <span>Interactive</span>
+                        </div>
+                        <a href="/playground/demos/particle-physics.html" class="try-now-btn">Try Now</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer id="about" class="about">
+        <p>© 2025 Th3-C0der. All rights reserved.</p>
+        <div class="social-links">
+            <a href="https://github.com/Th3-C0der" target="_blank">
+                <i class="fab fa-github"></i>
+            </a>
+            <a href="https://youtube.com/@Th3Coder" target="_blank">
+                <i class="fab fa-youtube"></i>
+            </a>
+            <a href="https://instagram.com/th3_c0der" target="_blank">
+                <i class="fab fa-instagram"></i>
+            </a>
+            <a href="https://www.linkedin.com/in/Th3-C0der" target="_blank">
+                <i class="fab fa-linkedin"></i>
+            </a>
+        </div>
+    </footer>
+    <div class="modal" id="contact-modal">
+        <div class="modal-content">
+            <i class="fas fa-times modal-close"></i>
+            <h2>Contact Me</h2>
+            <form class="contact-form" id="contact-form">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="subject">Subject</label>
+                    <input type="text" id="subject" name="subject" required>
+                </div>
+                <div class="form-group">
+                    <label for="message">Message</label>
+                    <textarea id="message" name="message" rows="5" required></textarea>
+                </div>
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-paper-plane"></i>
+                    Send Message
+                </button>
+            </form>
+        </div>
+    </div>
+    <script type="module">
+        import { initPokemonEffect } from '/static/pokemon-effect.js';
+        import ParticleBackground from '/static/background.js';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize Pokemon effect
+            initPokemonEffect();
+            
+            // Initialize particle background
+            new ParticleBackground();
+
+            const categoryButtons = document.querySelectorAll('.category-btn:not(.random-btn)');
+            const cards = document.querySelectorAll('.playground-card');
+            const randomButton = document.querySelector('.random-btn');
+            let isAnimating = false;
+
+            // Function to shuffle array
+            function shuffleArray(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+                return array;
+            }
+
+            // Function to randomize card order
+            function randomizeCards() {
+                const cardsArray = Array.from(cards);
+                const shuffledCards = shuffleArray(cardsArray);
+                const grid = document.querySelector('.playground-grid');
+                
+                // Remove all cards
+                cards.forEach(card => card.remove());
+                
+                // Add cards back in random order
+                shuffledCards.forEach(card => grid.appendChild(card));
+            }
+
+            // Initial randomization
+            randomizeCards();
+
+            // Category filtering with improved animation
+            categoryButtons.forEach(button => {
+                button.addEventListener('click', async () => {
+                    if (isAnimating) return;
+                    isAnimating = true;
+
+                    const category = button.dataset.category;
+                    
+                    // Update active button with animation
+                    categoryButtons.forEach(btn => {
+                        if (btn === button) {
+                            btn.classList.add('active');
+                        } else {
+                            btn.classList.remove('active');
+                        }
+                    });
+
+                    // Exit animation for all cards
+                    cards.forEach(card => {
+                        if (category === 'all' || card.dataset.category === category) {
+                            card.classList.add('exiting');
+                        }
+                    });
+
+                    // Wait for exit animation
+                    await new Promise(resolve => setTimeout(resolve, 400));
+
+                    // Update visibility and start enter animation
+                    cards.forEach(card => {
+                        if (category === 'all' || card.dataset.category === category) {
+                            card.classList.remove('exiting');
+                            card.classList.remove('hidden');
+                            card.classList.add('entering');
+                        } else {
+                            card.classList.add('hidden');
+                        }
+                    });
+
+                    // Wait for enter animation
+                    await new Promise(resolve => setTimeout(resolve, 400));
+
+                    // Clean up classes
+                    cards.forEach(card => {
+                        card.classList.remove('entering');
+                    });
+
+                    // Randomize visible cards
+                    if (category === 'all') {
+                        randomizeCards();
+                    }
+
+                    isAnimating = false;
+                });
+            });
+
+            // Random demo functionality with improved animation
+            randomButton.addEventListener('click', async () => {
+                if (isAnimating) return;
+                isAnimating = true;
+
+                const visibleCards = Array.from(cards).filter(card => !card.classList.contains('hidden'));
+                if (visibleCards.length > 0) {
+                    // Add click animation
+                    randomButton.style.transform = 'scale(0.95)';
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    randomButton.style.transform = 'translateY(-2px) scale(1.05)';
+
+                    // Select random card and navigate
+                    const randomCard = visibleCards[Math.floor(Math.random() * visibleCards.length)];
+                    const demoLink = randomCard.querySelector('.try-now-btn').href;
+                    
+                    // Add transition effect
+                    document.body.style.opacity = '0';
+                    document.body.style.transition = 'opacity 0.3s ease';
+                    
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                    window.location.href = demoLink;
+                }
+                isAnimating = false;
+            });
+
+            // Initialize with 'all' category
+            document.querySelector('[data-category="all"]').click();
+        });
+    </script>
+</body>
+</html> 

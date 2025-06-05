@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fluid Simulation - Th3-C0der Playground</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718" crossorigin="anonymous"></script>
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            font-family: Arial, sans-serif;
+            color: white;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            color: white;
+            text-align: center;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            min-width: 300px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .controls button, .controls select {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 12px 15px;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            width: 100%;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .controls button:hover, .controls select:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-1px);
+        }
+
+        .controls button:active, .controls select:active {
+            transform: translateY(1px);
+        }
+
+        .controls input[type="range"] {
+            width: 100%;
+            margin: 5px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            height: 6px;
+            -webkit-appearance: none;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 2;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .instructions {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            font-size: 14px;
+            max-width: 250px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .instructions h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .instructions p {
+            margin: 5px 0;
+            line-height: 1.4;
+        }
+
+        .stats {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            font-size: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .controls {
+                grid-template-columns: 1fr;
+                width: 90%;
+            }
+
+            .instructions {
+                display: none;
+            }
+
+            .stats {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading">Loading Fluid Simulation...</div>
+    <a href="/playground" class="back-btn">← Back to Playground</a>
+    <div class="instructions">
+        <h3>Controls:</h3>
+        <p>• Click/Drag: Add Force</p>
+        <p>• Right Click: Add Dye</p>
+        <p>• Space: Toggle Pause</p>
+        <p>• R: Reset Simulation</p>
+        <p>• 1-4: Switch Modes</p>
+    </div>
+    <div class="controls">
+        <div class="control-group">
+            <select id="simulationMode">
+                <option value="flow">Flow Field</option>
+                <option value="vortex">Vortex</option>
+                <option value="turbulence">Turbulence</option>
+                <option value="gravity">Gravity</option>
+            </select>
+            <select id="colorMode">
+                <option value="rainbow">Rainbow</option>
+                <option value="fire">Fire</option>
+                <option value="ocean">Ocean</option>
+                <option value="neon">Neon</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label>Force: <span id="forceValue">50</span></label>
+            <input type="range" id="force" min="1" max="100" step="1" value="50">
+            <label>Viscosity: <span id="viscosityValue">0.1</span></label>
+            <input type="range" id="viscosity" min="0.01" max="1" step="0.01" value="0.1">
+        </div>
+        <div class="control-group">
+            <label>Dissipation: <span id="dissipationValue">0.98</span></label>
+            <input type="range" id="dissipation" min="0.9" max="0.999" step="0.001" value="0.98">
+            <label>Pressure: <span id="pressureValue">0.8</span></label>
+            <input type="range" id="pressure" min="0.1" max="1" step="0.1" value="0.8">
+        </div>
+    </div>
+    <canvas id="canvas"></canvas>
+
+    <script>
+        // Simulation Parameters
+        let width, height;
+        let canvas, ctx;
+        let isPaused = false;
+        let isMouseDown = false;
+        let mouseX = 0, mouseY = 0;
+        let prevMouseX = 0, prevMouseY = 0;
+        let velocityField, densityField;
+        let simulationMode = 'flow';
+        let colorMode = 'rainbow';
+
+        // Initialize Simulation
+        function init() {
+            canvas = document.getElementById('canvas');
+            ctx = canvas.getContext('2d');
+            
+            function resize() {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+                initFields();
+            }
+            
+            window.addEventListener('resize', resize);
+            resize();
+            
+            // Initialize Fields
+            initFields();
+            
+            // Event Listeners
+            setupEventListeners();
+            
+            // Start Animation
+            requestAnimationFrame(update);
+            
+            document.querySelector('.loading').style.display = 'none';
+        }
+
+        // Initialize Velocity and Density Fields
+        function initFields() {
+            velocityField = {
+                x: new Float32Array(width * height),
+                y: new Float32Array(width * height)
+            };
+            densityField = new Float32Array(width * height);
+        }
+
+        // Setup Event Listeners
+        function setupEventListeners() {
+            canvas.addEventListener('mousedown', (e) => {
+                isMouseDown = true;
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+                prevMouseX = mouseX;
+                prevMouseY = mouseY;
+            });
+
+            canvas.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+            });
+
+            canvas.addEventListener('mouseup', () => {
+                isMouseDown = false;
+            });
+
+            canvas.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                addDye(e.clientX, e.clientY);
+            });
+
+            document.addEventListener('keydown', (e) => {
+                switch(e.code) {
+                    case 'Space':
+                        isPaused = !isPaused;
+                        break;
+                    case 'KeyR':
+                        initFields();
+                        break;
+                    case 'Digit1':
+                        simulationMode = 'flow';
+                        break;
+                    case 'Digit2':
+                        simulationMode = 'vortex';
+                        break;
+                    case 'Digit3':
+                        simulationMode = 'turbulence';
+                        break;
+                    case 'Digit4':
+                        simulationMode = 'gravity';
+                        break;
+                }
+            });
+
+            // Control Updates
+            document.getElementById('simulationMode').addEventListener('change', (e) => {
+                simulationMode = e.target.value;
+            });
+
+            document.getElementById('colorMode').addEventListener('change', (e) => {
+                colorMode = e.target.value;
+            });
+
+            document.getElementById('force').addEventListener('input', (e) => {
+                document.getElementById('forceValue').textContent = e.target.value;
+            });
+
+            document.getElementById('viscosity').addEventListener('input', (e) => {
+                document.getElementById('viscosityValue').textContent = e.target.value;
+            });
+
+            document.getElementById('dissipation').addEventListener('input', (e) => {
+                document.getElementById('dissipationValue').textContent = e.target.value;
+            });
+
+            document.getElementById('pressure').addEventListener('input', (e) => {
+                document.getElementById('pressureValue').textContent = e.target.value;
+            });
+        }
+
+        // Add Force to Velocity Field
+        function addForce(x, y, fx, fy) {
+            const force = parseFloat(document.getElementById('force').value);
+            const index = Math.floor(y) * width + Math.floor(x);
+            
+            if (index >= 0 && index < width * height) {
+                velocityField.x[index] += fx * force;
+                velocityField.y[index] += fy * force;
+            }
+        }
+
+        // Add Dye to Density Field
+        function addDye(x, y) {
+            const radius = 20;
+            for (let i = -radius; i <= radius; i++) {
+                for (let j = -radius; j <= radius; j++) {
+                    const distance = Math.sqrt(i * i + j * j);
+                    if (distance <= radius) {
+                        const index = Math.floor(y + j) * width + Math.floor(x + i);
+                        if (index >= 0 && index < width * height) {
+                            densityField[index] = 1.0;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Update Simulation
+        function update() {
+            if (!isPaused) {
+                // Apply Forces
+                if (isMouseDown) {
+                    const dx = mouseX - prevMouseX;
+                    const dy = mouseY - prevMouseY;
+                    
+                    switch(simulationMode) {
+                        case 'flow':
+                            addForce(mouseX, mouseY, dx * 0.1, dy * 0.1);
+                            break;
+                        case 'vortex':
+                            const angle = Math.atan2(dy, dx);
+                            addForce(mouseX, mouseY, Math.cos(angle), Math.sin(angle));
+                            break;
+                        case 'turbulence':
+                            addForce(mouseX, mouseY, Math.random() - 0.5, Math.random() - 0.5);
+                            break;
+                        case 'gravity':
+                            addForce(mouseX, mouseY, 0, 0.1);
+                            break;
+                    }
+                }
+                
+                // Update Fields
+                updateVelocityField();
+                updateDensityField();
+                
+                // Render
+                render();
+            }
+            
+            prevMouseX = mouseX;
+            prevMouseY = mouseY;
+            
+            requestAnimationFrame(update);
+        }
+
+        // Update Velocity Field
+        function updateVelocityField() {
+            const viscosity = parseFloat(document.getElementById('viscosity').value);
+            const pressure = parseFloat(document.getElementById('pressure').value);
+            
+            for (let i = 0; i < width * height; i++) {
+                // Apply Viscosity
+                velocityField.x[i] *= (1 - viscosity);
+                velocityField.y[i] *= (1 - viscosity);
+                
+                // Apply Pressure
+                if (i > 0 && i < width * height - 1) {
+                    velocityField.x[i] += (velocityField.x[i + 1] - velocityField.x[i - 1]) * pressure;
+                    velocityField.y[i] += (velocityField.y[i + 1] - velocityField.y[i - 1]) * pressure;
+                }
+            }
+        }
+
+        // Update Density Field
+        function updateDensityField() {
+            const dissipation = parseFloat(document.getElementById('dissipation').value);
+            
+            for (let i = 0; i < width * height; i++) {
+                // Apply Velocity
+                const x = i % width;
+                const y = Math.floor(i / width);
+                const vx = velocityField.x[i];
+                const vy = velocityField.y[i];
+                
+                const newX = Math.floor(x + vx);
+                const newY = Math.floor(y + vy);
+                
+                if (newX >= 0 && newX < width && newY >= 0 && newY < height) {
+                    const newIndex = newY * width + newX;
+                    densityField[newIndex] = densityField[i];
+                }
+                
+                // Apply Dissipation
+                densityField[i] *= dissipation;
+            }
+        }
+
+        // Render Simulation
+        function render() {
+            const imageData = ctx.createImageData(width, height);
+            const data = imageData.data;
+            
+            for (let i = 0; i < width * height; i++) {
+                const density = densityField[i];
+                const velocity = Math.sqrt(velocityField.x[i] * velocityField.x[i] + velocityField.y[i] * velocityField.y[i]);
+                
+                let r, g, b;
+                
+                switch(colorMode) {
+                    case 'rainbow':
+                        const hue = (velocity * 360) % 360;
+                        const [hR, hG, hB] = hslToRgb(hue / 360, 1, 0.5);
+                        r = hR * density;
+                        g = hG * density;
+                        b = hB * density;
+                        break;
+                    case 'fire':
+                        r = density * 255;
+                        g = density * velocity * 255;
+                        b = 0;
+                        break;
+                    case 'ocean':
+                        r = 0;
+                        g = density * velocity * 255;
+                        b = density * 255;
+                        break;
+                    case 'neon':
+                        r = density * Math.sin(velocity * 10) * 255;
+                        g = density * Math.sin(velocity * 10 + 2) * 255;
+                        b = density * Math.sin(velocity * 10 + 4) * 255;
+                        break;
+                }
+                
+                const index = i * 4;
+                data[index] = r;
+                data[index + 1] = g;
+                data[index + 2] = b;
+                data[index + 3] = density * 255;
+            }
+            
+            ctx.putImageData(imageData, 0, 0);
+        }
+
+        // Helper Functions
+        function hslToRgb(h, s, l) {
+            let r, g, b;
+            
+            if (s === 0) {
+                r = g = b = l;
+            } else {
+                const hue2rgb = (p, q, t) => {
+                    if (t < 0) t += 1;
+                    if (t > 1) t -= 1;
+                    if (t < 1/6) return p + (q - p) * 6 * t;
+                    if (t < 1/2) return q;
+                    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                    return p;
+                };
+                
+                const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                const p = 2 * l - q;
+                
+                r = hue2rgb(p, q, h + 1/3);
+                g = hue2rgb(p, q, h);
+                b = hue2rgb(p, q, h - 1/3);
+            }
+            
+            return [r * 255, g * 255, b * 255];
+        }
+
+        // Initialize
+        init();
+    </script>
+</body>
+</html> 

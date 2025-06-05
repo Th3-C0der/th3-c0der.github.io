@@ -29,20 +29,21 @@ class ParticleBackground {
         this.camera.position.z = 50;
         this.mouse = new THREE.Vector2();
         this.targetRotation = new THREE.Vector2();
+        this.mouseVelocity = new THREE.Vector2();
+        this.lastMousePosition = new THREE.Vector2();
     }
     
     createParticles() {
-        // Create multiple particle systems for depth effect
         this.particleSystems = [];
         
         // Foreground particles (smaller, more numerous)
-        this.createParticleSystem(3000, 0.15, 30, 0.32, 0.85, 0.7);
+        this.createParticleSystem(4000, 0.12, 30, 0.32, 0.85, 0.7);
         
         // Middle layer particles (medium size)
-        this.createParticleSystem(2000, 0.2, 40, 0.28, 0.8, 0.5);
+        this.createParticleSystem(2500, 0.18, 40, 0.28, 0.8, 0.5);
         
         // Background particles (larger, fewer)
-        this.createParticleSystem(1000, 0.25, 50, 0.25, 0.75, 0.3);
+        this.createParticleSystem(1500, 0.22, 50, 0.25, 0.75, 0.3);
     }
     
     createParticleSystem(count, size, radius, hueStart, saturation, brightness) {
@@ -50,6 +51,7 @@ class ParticleBackground {
         const positions = new Float32Array(count * 3);
         const colors = new Float32Array(count * 3);
         const scales = new Float32Array(count);
+        const velocities = new Float32Array(count * 3);
         
         const color = new THREE.Color();
         
@@ -66,6 +68,11 @@ class ParticleBackground {
             positions[i * 3 + 1] = y;
             positions[i * 3 + 2] = z;
             
+            // Random velocities for each particle
+            velocities[i * 3] = (Math.random() - 0.5) * 0.02;
+            velocities[i * 3 + 1] = (Math.random() - 0.5) * 0.02;
+            velocities[i * 3 + 2] = (Math.random() - 0.5) * 0.02;
+            
             // Varied green hues for depth
             const hue = hueStart + Math.random() * 0.08;
             color.setHSL(hue, saturation, brightness);
@@ -81,6 +88,7 @@ class ParticleBackground {
         geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
         geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
         geometry.setAttribute('scale', new THREE.BufferAttribute(scales, 1));
+        geometry.setAttribute('velocity', new THREE.BufferAttribute(velocities, 3));
         
         const material = new THREE.PointsMaterial({
             size: size,
@@ -98,8 +106,13 @@ class ParticleBackground {
     
     addMouseInteraction() {
         document.addEventListener('mousemove', (event) => {
+            this.lastMousePosition.copy(this.mouse);
             this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
             this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            
+            // Calculate mouse velocity
+            this.mouseVelocity.x = this.mouse.x - this.lastMousePosition.x;
+            this.mouseVelocity.y = this.mouse.y - this.lastMousePosition.y;
             
             this.targetRotation.x = this.mouse.y * 0.3;
             this.targetRotation.y = this.mouse.x * 0.3;
@@ -112,8 +125,10 @@ class ParticleBackground {
         const time = Date.now() * 0.0001;
         
         this.particleSystems.forEach((system, index) => {
-            // Different rotation speeds for each layer
             const speed = 0.2 - (index * 0.05);
+            const positions = system.geometry.attributes.position.array;
+            const velocities = system.geometry.attributes.velocity.array;
+            const scales = system.geometry.attributes.scale.array;
             
             // Smooth rotation following mouse
             system.rotation.x += (this.targetRotation.x - system.rotation.x) * 0.02;
@@ -122,13 +137,34 @@ class ParticleBackground {
             // Additional subtle rotations
             system.rotation.z += 0.0003 * speed;
             
-            // Wave effect
-            const positions = system.geometry.attributes.position.array;
-            const scales = system.geometry.attributes.scale.array;
-            
             for(let i = 0; i < positions.length; i += 3) {
-                // Subtle position animation
+                // Update positions based on velocities
+                positions[i] += velocities[i];
+                positions[i + 1] += velocities[i + 1];
+                positions[i + 2] += velocities[i + 2];
+                
+                // Boundary check and reset
+                const radius = 50;
+                const distance = Math.sqrt(
+                    positions[i] * positions[i] +
+                    positions[i + 1] * positions[i + 1] +
+                    positions[i + 2] * positions[i + 2]
+                );
+                
+                if (distance > radius) {
+                    const scale = radius / distance;
+                    positions[i] *= scale;
+                    positions[i + 1] *= scale;
+                    positions[i + 2] *= scale;
+                }
+                
+                // Wave effect
                 positions[i + 1] += Math.sin(time + positions[i] * 0.05) * 0.02;
+                
+                // Mouse influence
+                const mouseInfluence = 0.1;
+                positions[i] += this.mouseVelocity.x * mouseInfluence;
+                positions[i + 1] += this.mouseVelocity.y * mouseInfluence;
                 
                 // Pulse size animation
                 const j = i / 3;

@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fractal Tree Generator - Th3-C0der Playground</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718" crossorigin="anonymous"></script>
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            font-family: Arial, sans-serif;
+            color: white;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            max-width: 1200px;
+            width: 90%;
+        }
+
+        #canvas {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            margin: 1rem 0;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .control-group {
+            text-align: left;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        input[type="range"] {
+            width: 100%;
+            margin-bottom: 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            height: 6px;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #4ecdc4;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        input[type="color"] {
+            width: 100%;
+            height: 40px;
+            padding: 0;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .value-display {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        button {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .controls {
+                grid-template-columns: 1fr;
+            }
+
+            #canvas {
+                width: 100%;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="/playground" class="back-btn">← Back to Playground</a>
+    <div class="container">
+        <h1>Fractal Tree Generator</h1>
+        <canvas id="canvas" width="800" height="600"></canvas>
+        <div class="controls">
+            <div class="control-group">
+                <label for="iterations">Iterations</label>
+                <input type="range" id="iterations" min="1" max="12" value="8">
+                <div class="value-display">8</div>
+            </div>
+            <div class="control-group">
+                <label for="angle">Branch Angle</label>
+                <input type="range" id="angle" min="0" max="90" value="30">
+                <div class="value-display">30°</div>
+            </div>
+            <div class="control-group">
+                <label for="length">Branch Length</label>
+                <input type="range" id="length" min="0.1" max="0.9" step="0.1" value="0.7">
+                <div class="value-display">0.7</div>
+            </div>
+            <div class="control-group">
+                <label for="thickness">Branch Thickness</label>
+                <input type="range" id="thickness" min="1" max="20" value="10">
+                <div class="value-display">10</div>
+            </div>
+            <div class="control-group">
+                <label for="color1">Trunk Color</label>
+                <input type="color" id="color1" value="#8B4513">
+            </div>
+            <div class="control-group">
+                <label for="color2">Branch Color</label>
+                <input type="color" id="color2" value="#228B22">
+            </div>
+        </div>
+        <div class="buttons">
+            <button id="randomize">Randomize</button>
+            <button id="save">Save Image</button>
+        </div>
+    </div>
+
+    <script>
+        class FractalTree {
+            constructor() {
+                this.canvas = document.getElementById('canvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.setupControls();
+                this.draw();
+            }
+
+            setupControls() {
+                const controls = {
+                    iterations: document.getElementById('iterations'),
+                    angle: document.getElementById('angle'),
+                    length: document.getElementById('length'),
+                    thickness: document.getElementById('thickness'),
+                    color1: document.getElementById('color1'),
+                    color2: document.getElementById('color2')
+                };
+
+                // Update value displays and redraw
+                Object.entries(controls).forEach(([key, control]) => {
+                    control.addEventListener('input', () => {
+                        const display = control.nextElementSibling;
+                        if (display && display.classList.contains('value-display')) {
+                            display.textContent = control.value + (key === 'angle' ? '°' : '');
+                        }
+                        this.draw();
+                    });
+                });
+
+                // Randomize button
+                document.getElementById('randomize').addEventListener('click', () => {
+                    controls.iterations.value = Math.floor(Math.random() * 12) + 1;
+                    controls.angle.value = Math.floor(Math.random() * 90);
+                    controls.length.value = (Math.random() * 0.8 + 0.1).toFixed(1);
+                    controls.thickness.value = Math.floor(Math.random() * 20) + 1;
+                    controls.color1.value = this.getRandomColor();
+                    controls.color2.value = this.getRandomColor();
+                    
+                    // Trigger input events to update displays and redraw
+                    Object.values(controls).forEach(control => {
+                        control.dispatchEvent(new Event('input'));
+                    });
+                });
+
+                // Save button
+                document.getElementById('save').addEventListener('click', () => {
+                    const link = document.createElement('a');
+                    link.download = 'fractal-tree.png';
+                    link.href = this.canvas.toDataURL();
+                    link.click();
+                });
+            }
+
+            getRandomColor() {
+                return '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+            }
+
+            draw() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                const iterations = parseInt(document.getElementById('iterations').value);
+                const angle = parseInt(document.getElementById('angle').value) * Math.PI / 180;
+                const length = parseFloat(document.getElementById('length').value);
+                const thickness = parseInt(document.getElementById('thickness').value);
+                const color1 = document.getElementById('color1').value;
+                const color2 = document.getElementById('color2').value;
+
+                this.ctx.save();
+                this.ctx.translate(this.canvas.width / 2, this.canvas.height);
+                this.drawBranch(0, iterations, angle, length, thickness, color1, color2);
+                this.ctx.restore();
+            }
+
+            drawBranch(depth, maxDepth, angle, length, thickness, color1, color2) {
+                if (depth > maxDepth) return;
+
+                const branchLength = this.canvas.height * 0.3 * Math.pow(length, depth);
+                const lineWidth = thickness * Math.pow(0.7, depth);
+                
+                this.ctx.lineWidth = lineWidth;
+                this.ctx.strokeStyle = depth === 0 ? color1 : color2;
+                
+                this.ctx.beginPath();
+                this.ctx.moveTo(0, 0);
+                this.ctx.lineTo(0, -branchLength);
+                this.ctx.stroke();
+
+                if (depth < maxDepth) {
+                    this.ctx.translate(0, -branchLength);
+                    
+                    // Left branch
+                    this.ctx.save();
+                    this.ctx.rotate(-angle);
+                    this.drawBranch(depth + 1, maxDepth, angle, length, thickness, color1, color2);
+                    this.ctx.restore();
+                    
+                    // Right branch
+                    this.ctx.save();
+                    this.ctx.rotate(angle);
+                    this.drawBranch(depth + 1, maxDepth, angle, length, thickness, color1, color2);
+                    this.ctx.restore();
+                }
+            }
+        }
+
+        // Initialize the fractal tree
+        const tree = new FractalTree();
+    </script>
+</body>
+</html> 

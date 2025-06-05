@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Match - Th3-C0der Playground</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718" crossorigin="anonymous"></script>
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            font-family: Arial, sans-serif;
+            color: white;
+        }
+
+        .game-container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .game-board {
+            display: grid;
+            gap: 10px;
+            margin: 2rem 0;
+            perspective: 1000px;
+        }
+
+        .card {
+            width: 100px;
+            height: 100px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-front {
+            background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+            transform: rotateY(180deg);
+        }
+
+        .card-back {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        select, button {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        select:hover, button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #4ecdc4;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .win-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+            z-index: 1000;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            animation: confetti-fall 3s ease-in infinite;
+        }
+
+        @keyframes confetti-fall {
+            0% { transform: translateY(-100vh) rotate(0deg); }
+            100% { transform: translateY(100vh) rotate(360deg); }
+        }
+
+        @media (max-width: 600px) {
+            .game-container {
+                padding: 1rem;
+                width: 90%;
+            }
+
+            .card {
+                width: 80px;
+                height: 80px;
+                font-size: 1.5rem;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="/playground" class="back-btn">← Back to Playground</a>
+    <div class="game-container">
+        <h1>Memory Match</h1>
+        <div class="controls">
+            <select id="difficulty">
+                <option value="easy">Easy (4x3)</option>
+                <option value="medium">Medium (4x4)</option>
+                <option value="hard">Hard (6x4)</option>
+            </select>
+            <select id="theme">
+                <option value="emoji">Emoji</option>
+                <option value="animals">Animals</option>
+                <option value="fruits">Fruits</option>
+            </select>
+            <button id="reset">New Game</button>
+        </div>
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-value" id="moves">0</div>
+                <div class="stat-label">Moves</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="time">0</div>
+                <div class="stat-label">Time (s)</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="matches">0</div>
+                <div class="stat-label">Matches</div>
+            </div>
+        </div>
+        <div class="game-board" id="board"></div>
+    </div>
+
+    <script>
+        class MemoryGame {
+            constructor() {
+                this.cards = [];
+                this.flippedCards = [];
+                this.matchedPairs = 0;
+                this.moves = 0;
+                this.time = 0;
+                this.timer = null;
+                this.isLocked = false;
+                this.themes = {
+                    emoji: ['🎮', '🎲', '🎯', '🎨', '🎭', '🎪', '🎫', '🎬', '🎭', '🎪', '🎫', '🎬'],
+                    animals: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮'],
+                    fruits: ['🍎', '🍐', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🍈', '🍒', '🍑', '🥭']
+                };
+                this.setupEventListeners();
+                this.startNewGame();
+            }
+
+            setupEventListeners() {
+                document.getElementById('difficulty').addEventListener('change', () => this.startNewGame());
+                document.getElementById('theme').addEventListener('change', () => this.startNewGame());
+                document.getElementById('reset').addEventListener('click', () => this.startNewGame());
+            }
+
+            startNewGame() {
+                this.stopTimer();
+                this.moves = 0;
+                this.time = 0;
+                this.matchedPairs = 0;
+                this.flippedCards = [];
+                this.isLocked = false;
+                this.updateStats();
+                this.createBoard();
+                this.startTimer();
+            }
+
+            createBoard() {
+                const board = document.getElementById('board');
+                board.innerHTML = '';
+                
+                const difficulty = document.getElementById('difficulty').value;
+                const theme = document.getElementById('theme').value;
+                
+                let rows, cols;
+                switch(difficulty) {
+                    case 'easy':
+                        rows = 3; cols = 4;
+                        break;
+                    case 'medium':
+                        rows = 4; cols = 4;
+                        break;
+                    case 'hard':
+                        rows = 4; cols = 6;
+                        break;
+                }
+
+                board.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+                
+                const cardCount = rows * cols;
+                const symbols = this.themes[theme].slice(0, cardCount / 2);
+                this.cards = [...symbols, ...symbols]
+                    .sort(() => Math.random() - 0.5)
+                    .map((symbol, index) => ({
+                        id: index,
+                        symbol: symbol,
+                        isFlipped: false,
+                        isMatched: false
+                    }));
+
+                this.cards.forEach(card => {
+                    const cardElement = document.createElement('div');
+                    cardElement.className = 'card';
+                    cardElement.dataset.id = card.id;
+                    
+                    const front = document.createElement('div');
+                    front.className = 'card-front';
+                    front.textContent = card.symbol;
+                    
+                    const back = document.createElement('div');
+                    back.className = 'card-back';
+                    
+                    cardElement.appendChild(front);
+                    cardElement.appendChild(back);
+                    
+                    cardElement.addEventListener('click', () => this.flipCard(card.id));
+                    board.appendChild(cardElement);
+                });
+            }
+
+            flipCard(id) {
+                if (this.isLocked) return;
+                
+                const card = this.cards[id];
+                if (card.isFlipped || card.isMatched) return;
+                
+                const cardElement = document.querySelector(`[data-id="${id}"]`);
+                cardElement.classList.add('flipped');
+                card.isFlipped = true;
+                this.flippedCards.push(card);
+                
+                if (this.flippedCards.length === 2) {
+                    this.moves++;
+                    this.updateStats();
+                    this.checkMatch();
+                }
+            }
+
+            checkMatch() {
+                this.isLocked = true;
+                const [card1, card2] = this.flippedCards;
+                
+                if (card1.symbol === card2.symbol) {
+                    this.matchedPairs++;
+                    card1.isMatched = card2.isMatched = true;
+                    this.flippedCards = [];
+                    this.isLocked = false;
+                    
+                    if (this.matchedPairs === this.cards.length / 2) {
+                        this.handleWin();
+                    }
+                } else {
+                    setTimeout(() => {
+                        const card1Element = document.querySelector(`[data-id="${card1.id}"]`);
+                        const card2Element = document.querySelector(`[data-id="${card2.id}"]`);
+                        
+                        card1Element.classList.remove('flipped');
+                        card2Element.classList.remove('flipped');
+                        
+                        card1.isFlipped = card2.isFlipped = false;
+                        this.flippedCards = [];
+                        this.isLocked = false;
+                    }, 1000);
+                }
+            }
+
+            startTimer() {
+                this.timer = setInterval(() => {
+                    this.time++;
+                    this.updateStats();
+                }, 1000);
+            }
+
+            stopTimer() {
+                if (this.timer) {
+                    clearInterval(this.timer);
+                    this.timer = null;
+                }
+            }
+
+            updateStats() {
+                document.getElementById('moves').textContent = this.moves;
+                document.getElementById('time').textContent = this.time;
+                document.getElementById('matches').textContent = this.matchedPairs;
+            }
+
+            handleWin() {
+                this.stopTimer();
+                this.createConfetti();
+                
+                const winMessage = document.createElement('div');
+                winMessage.className = 'win-message';
+                winMessage.innerHTML = `
+                    <h2>Congratulations! 🎉</h2>
+                    <p>You completed the game in ${this.moves} moves and ${this.time} seconds!</p>
+                    <button onclick="this.parentElement.remove()">Play Again</button>
+                `;
+                document.body.appendChild(winMessage);
+            }
+
+            createConfetti() {
+                for (let i = 0; i < 100; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                    confetti.style.animationDelay = Math.random() * 3 + 's';
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => confetti.remove(), 3000);
+                }
+            }
+        }
+
+        // Initialize game
+        const game = new MemoryGame();
+    </script>
+</body>
+</html> 

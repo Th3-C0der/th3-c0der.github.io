@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS Art Gallery - Th3-C0der Playground</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718" crossorigin="anonymous"></script>
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            font-family: Arial, sans-serif;
+            color: white;
+            padding: 20px;
+        }
+
+        .container {
+            position: relative;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 2;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .art-piece {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .art-piece:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .art-container {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+            position: relative;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        h3 {
+            margin-top: 20px;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+
+        p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin: 10px 0;
+        }
+
+        /* CSS Art Pieces */
+        .sun {
+            background: radial-gradient(circle at center, #ffd700, #ff8c00);
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 50px #ff8c00;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.1); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .heart {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 100px;
+            background: #ff4b4b;
+            transform: rotate(45deg);
+        }
+
+        .heart:before,
+        .heart:after {
+            content: '';
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: #ff4b4b;
+            border-radius: 50%;
+        }
+
+        .heart:before {
+            left: -50px;
+        }
+
+        .heart:after {
+            top: -50px;
+        }
+
+        .rainbow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 20px;
+            background: linear-gradient(
+                to right,
+                #ff0000,
+                #ff7f00,
+                #ffff00,
+                #00ff00,
+                #0000ff,
+                #4b0082,
+                #8b00ff
+            );
+            animation: move 3s infinite;
+        }
+
+        @keyframes move {
+            0% { transform: translate(-50%, -50%) translateX(-50px); }
+            50% { transform: translate(-50%, -50%) translateX(50px); }
+            100% { transform: translate(-50%, -50%) translateX(-50px); }
+        }
+
+        @media (max-width: 768px) {
+            .gallery {
+                grid-template-columns: 1fr;
+                padding: 10px;
+            }
+
+            .art-container {
+                width: 150px;
+                height: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="/playground" class="back-btn">← Back to Playground</a>
+    <div class="gallery">
+        <div class="art-piece">
+            <div class="art-container">
+                <div class="sun"></div>
+            </div>
+            <h3>Pulsing Sun</h3>
+            <p>A glowing sun with a pulsing animation using radial gradients and keyframes.</p>
+        </div>
+
+        <div class="art-piece">
+            <div class="art-container">
+                <div class="heart"></div>
+            </div>
+            <h3>CSS Heart</h3>
+            <p>A heart shape created using pure CSS with pseudo-elements.</p>
+        </div>
+
+        <div class="art-piece">
+            <div class="art-container">
+                <div class="rainbow"></div>
+            </div>
+            <h3>Moving Rainbow</h3>
+            <p>A colorful rainbow bar that moves back and forth using linear gradients.</p>
+        </div>
+
+        <div class="art-piece">
+            <div class="art-container">
+                <div class="cube">
+                    <div class="front"></div>
+                    <div class="back"></div>
+                    <div class="right"></div>
+                    <div class="left"></div>
+                    <div class="top"></div>
+                    <div class="bottom"></div>
+                </div>
+            </div>
+            <h3>3D Cube</h3>
+            <p>A rotating 3D cube created using CSS transforms and animations.</p>
+        </div>
+    </div>
+</body>
+</html> 

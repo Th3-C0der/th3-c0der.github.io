@@ -52,6 +52,61 @@
             min-width: 300px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .controls.minimized {
+            transform: translateX(-50%) translateY(calc(100% - 40px));
+            opacity: 0.7;
+        }
+
+        .controls-toggle {
+            position: absolute;
+            top: -40px;
+            /* left: 50%;
+            transform: translateX(-50%); */
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+            border-radius: 8px 8px 0 0;
+            width: 60px;
+            height: 40px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .controls-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .controls-toggle::before {
+            content: '▼';
+            font-size: 1.2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .controls-toggle.minimized::before {
+            transform: rotate(180deg);
+        }
+
+        .progress-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 10px 20px;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            z-index: 2;
+            transition: transform 0.3s ease;
+        }
+
+        .progress-container.minimized {
+            transform: translateY(100%);
         }
 
         .control-group {
@@ -153,7 +208,7 @@
             cursor: pointer;
             display: inline-block;
             transition: all 0.3s;
-            width: 100%;
+            margin: 10px 0;
             text-align: center;
             font-weight: 500;
         }
@@ -210,10 +265,68 @@
             .controls {
                 grid-template-columns: 1fr;
                 width: 90%;
+                max-width: 400px;
+                padding: 15px;
+                gap: 10px;
+            }
+
+            .controls-toggle {
+                display: flex;
+            }
+
+            .control-group {
+                padding: 10px;
+                gap: 8px;
+            }
+
+            .controls button, .controls select {
+                padding: 8px 12px;
+                font-size: 13px;
+            }
+
+            .controls input[type="range"] {
+                margin: 3px 0;
             }
 
             .instructions {
                 display: none;
+            }
+
+            .back-btn {
+                padding: 8px 15px;
+                font-size: 14px;
+            }
+
+            .progress-container {
+                padding: 8px 15px;
+            }
+
+            .progress-bar {
+                height: 3px;
+            }
+
+            .time-display {
+                font-size: 11px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .controls {
+                padding: 10px;
+            }
+
+            .control-group {
+                padding: 8px;
+            }
+
+            .controls button, .controls select {
+                padding: 6px 10px;
+                font-size: 12px;
+            }
+
+            .file-label {
+                padding: 8px 12px;
+                font-size: 12px;
             }
         }
     </style>
@@ -228,7 +341,8 @@
         <p>• ←/→: Seek</p>
         <p>• ↑/↓: Volume</p>
     </div>
-    <div class="controls">
+    <div class="controls" id="controls">
+        <button class="controls-toggle" id="controlsToggle"></button>
         <div class="control-group">
             <input type="file" id="audio-file" class="file-input" accept="audio/*">
             <label for="audio-file" class="file-label">Choose Audio File</label>
@@ -595,6 +709,46 @@
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
         initAudio();
+
+        // Add controls toggle functionality
+        function setupControlsToggle() {
+            const toggle = document.getElementById('controlsToggle');
+            const controls = document.getElementById('controls');
+            const progressContainer = document.getElementById('progressContainer');
+            
+            toggle.addEventListener('click', () => {
+                controls.classList.toggle('minimized');
+                toggle.classList.toggle('minimized');
+                progressContainer.classList.toggle('minimized');
+            });
+
+            // Auto-minimize controls after 3 seconds of inactivity
+            let timeout;
+            const resetTimeout = () => {
+                clearTimeout(timeout);
+                if (window.innerWidth <= 768) {
+                    timeout = setTimeout(() => {
+                        controls.classList.add('minimized');
+                        toggle.classList.add('minimized');
+                        progressContainer.classList.add('minimized');
+                    }, 3000);
+                }
+            };
+
+            // Reset timeout on user interaction
+            controls.addEventListener('mouseenter', resetTimeout);
+            controls.addEventListener('touchstart', resetTimeout);
+            progressContainer.addEventListener('mouseenter', resetTimeout);
+            progressContainer.addEventListener('touchstart', resetTimeout);
+            
+            // Initial timeout
+            resetTimeout();
+        }
+
+        // Call setupControlsToggle after DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            setupControlsToggle();
+        });
     </script>
 </body>
 </html> 

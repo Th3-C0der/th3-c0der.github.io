@@ -76,6 +76,45 @@
             margin-bottom: 1rem;
             flex-wrap: wrap;
             justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .controls.minimized {
+            transform: translateY(-100%);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .controls-toggle {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .controls-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .controls-toggle::before {
+            content: '▼';
+            font-size: 1.2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .controls-toggle.minimized::before {
+            transform: rotate(180deg);
         }
 
         select, button {
@@ -173,16 +212,33 @@
             .game-container {
                 padding: 1rem;
                 width: 90%;
+                position: relative;
+            }
+
+            .controls-toggle {
+                display: flex;
+            }
+
+            .controls {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                background: rgba(26, 26, 26, 0.95);
+                padding: 1rem;
+                margin: 0;
+                border-radius: 0 0 15px 15px;
+                z-index: 5;
+            }
+
+            .controls.minimized {
+                transform: translateY(-100%);
             }
 
             .card {
                 width: 80px;
                 height: 80px;
                 font-size: 1.5rem;
-            }
-
-            .controls {
-                flex-direction: column;
             }
         }
     </style>
@@ -191,7 +247,8 @@
     <a href="/playground" class="back-btn">← Back to Playground</a>
     <div class="game-container">
         <h1>Memory Match</h1>
-        <div class="controls">
+        <button class="controls-toggle" id="controlsToggle"></button>
+        <div class="controls" id="gameControls">
             <select id="difficulty">
                 <option value="easy">Easy (4x3)</option>
                 <option value="medium">Medium (4x4)</option>
@@ -237,6 +294,7 @@
                     fruits: ['🍎', '🍐', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🍈', '🍒', '🍑', '🥭']
                 };
                 this.setupEventListeners();
+                this.setupControlsToggle();
                 this.startNewGame();
             }
 
@@ -244,6 +302,35 @@
                 document.getElementById('difficulty').addEventListener('change', () => this.startNewGame());
                 document.getElementById('theme').addEventListener('change', () => this.startNewGame());
                 document.getElementById('reset').addEventListener('click', () => this.startNewGame());
+            }
+
+            setupControlsToggle() {
+                const toggle = document.getElementById('controlsToggle');
+                const controls = document.getElementById('gameControls');
+                
+                toggle.addEventListener('click', () => {
+                    controls.classList.toggle('minimized');
+                    toggle.classList.toggle('minimized');
+                });
+
+                // Auto-minimize controls after 3 seconds of inactivity
+                let timeout;
+                const resetTimeout = () => {
+                    clearTimeout(timeout);
+                    if (window.innerWidth <= 600) {
+                        timeout = setTimeout(() => {
+                            controls.classList.add('minimized');
+                            toggle.classList.add('minimized');
+                        }, 3000);
+                    }
+                };
+
+                // Reset timeout on user interaction
+                controls.addEventListener('mouseenter', resetTimeout);
+                controls.addEventListener('touchstart', resetTimeout);
+                
+                // Initial timeout
+                resetTimeout();
             }
 
             startNewGame() {

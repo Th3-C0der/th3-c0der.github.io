@@ -34,6 +34,152 @@
 		<meta name="twitter:image:alt" content="Th3-C0der">
 		<meta name="theme-color" content="#00ff00">
 		<title>Th3-C0der</title>
+		<style>
+			html {
+				scroll-behavior: smooth;
+			}
+
+			.back-to-top {
+				position: fixed;
+				bottom: 20px;
+				right: 20px;
+				background: var(--accent-color);
+				color: var(--bg-color);
+				width: 40px;
+				height: 40px;
+				border-radius: 50%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				cursor: pointer;
+				opacity: 0;
+				visibility: hidden;
+				transition: all 0.3s ease;
+				z-index: 1000;
+				border: none;
+				box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+			}
+
+			.back-to-top.visible {
+				opacity: 1;
+				visibility: visible;
+			}
+
+			.back-to-top:hover {
+				transform: translateY(-3px);
+				box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+			}
+
+			@media (max-width: 768px) {
+				.hero-content h1 {
+					font-size: 2rem;
+					line-height: 1.2;
+				}
+
+				.hero-content p {
+					font-size: 1rem;
+					margin-top: 0.5rem;
+				}
+
+				.projects {
+					padding: 0.5rem;
+					gap: 1rem;
+					display: grid;
+					grid-template-columns: 1fr;
+				}
+
+				.project-card {
+					margin: 0;
+					width: 100%;
+				}
+
+				.project-image {
+					height: 160px;
+					object-fit: cover;
+				}
+
+				.project-info {
+					padding: 1rem;
+				}
+
+				.project-info h3 {
+					font-size: 1.2rem;
+					margin-bottom: 0.5rem;
+				}
+
+				.project-info p {
+					font-size: 0.9rem;
+					margin-bottom: 1rem;
+				}
+
+				.project-link {
+					padding: 0.5rem 1rem;
+					font-size: 0.9rem;
+					width: 100%;
+					text-align: center;
+				}
+
+				.playground-card {
+					margin: 0;
+				}
+
+				.playground-badge {
+					font-size: 0.8rem;
+					padding: 0.3rem 0.8rem;
+				}
+
+				.playground-tags {
+					flex-wrap: wrap;
+					gap: 0.3rem;
+				}
+
+				.playground-tags span {
+					font-size: 0.8rem;
+					padding: 0.2rem 0.6rem;
+				}
+
+				.playground-link {
+					padding: 0.5rem 1rem;
+					font-size: 0.9rem;
+					width: 100%;
+					text-align: center;
+				}
+
+				.back-to-top {
+					bottom: 15px;
+					right: 15px;
+					width: 35px;
+					height: 35px;
+				}
+			}
+
+			@media (max-width: 480px) {
+				.hero-content h1 {
+					font-size: 1.8rem;
+				}
+
+				.hero-content p {
+					font-size: 0.9rem;
+				}
+
+				.project-image {
+					height: 140px;
+				}
+
+				.project-info h3 {
+					font-size: 1.1rem;
+				}
+
+				.project-info p {
+					font-size: 0.85rem;
+				}
+
+				.project-link, .playground-link {
+					padding: 0.4rem 0.8rem;
+					font-size: 0.85rem;
+				}
+			}
+		</style>
 		<script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718" crossorigin="anonymous"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/ScrollTrigger.min.js"></script>
@@ -61,9 +207,9 @@
 					<i class="fas fa-bars"></i>
 				</div>
 				<div class="nav-links">
-					<a href="" class="active">Home</a>
+					<a href="#" class="active">Home</a>
 					<a href="#projects">Projects</a>
-					<a href="/blog#blog">Blog</a>
+					<a href="/blog">Blog</a>
 					<a href="#about">About</a>
 					<a href="#" id="contact-link">Contact</a>
 					<button class="theme-toggle" aria-label="Toggle dark mode">
@@ -152,17 +298,20 @@
 		<footer id="about" class="about">
 			<p>© 2025 Th3-C0der. All rights reserved.</p>
 			<div class="social-links">
-				<a href="https://github.com/Th3-C0der" target="_blank">
+				<a href="https://github.com/Th3-C0der" target="_blank" class="social-link">
 					<i class="fab fa-github"></i>
 				</a>
-				<a href="https://youtube.com/@Th3Coder" target="_blank">
+				<a href="https://youtube.com/@Th3Coder" target="_blank" class="social-link">
 					<i class="fab fa-youtube"></i>
 				</a>
-				<a href="https://instagram.com/th3_c0der" target="_blank">
+				<a href="https://instagram.com/th3_c0der" target="_blank" class="social-link">
 					<i class="fab fa-instagram"></i>
 				</a>
-				<a href="https://www.linkedin.com/in/Th3-C0der" target="_blank">
+				<a href="https://www.linkedin.com/in/Th3-C0der" target="_blank" class="social-link">
 					<i class="fab fa-linkedin"></i>
+				</a>
+				<a href="https://coff.ee/th3coder" target="_blank" class="social-link ko-fi">
+					<i class="fas fa-coffee"></i>
 				</a>
 			</div>
 		</footer>
@@ -194,5 +343,46 @@
 				</form>
 			</div>
 		</div>
+		<button class="back-to-top" aria-label="Back to top">
+			<i class="fas fa-arrow-up"></i>
+		</button>
+		<script>
+			document.addEventListener('DOMContentLoaded', function() {
+				// Smooth scroll for anchor links
+				document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+					anchor.addEventListener('click', function (e) {
+						e.preventDefault();
+						const targetId = this.getAttribute('href');
+						if (targetId === '#') return;
+						
+						const targetElement = document.querySelector(targetId);
+						if (targetElement) {
+							targetElement.scrollIntoView({
+								behavior: 'smooth',
+								block: 'start'
+							});
+						}
+					});
+				});
+
+				// Back to top button
+				const backToTop = document.querySelector('.back-to-top');
+				
+				window.addEventListener('scroll', () => {
+					if (window.pageYOffset > 300) {
+						backToTop.classList.add('visible');
+					} else {
+						backToTop.classList.remove('visible');
+					}
+				});
+
+				backToTop.addEventListener('click', () => {
+					window.scrollTo({
+						top: 0,
+						behavior: 'smooth'
+					});
+				});
+			});
+		</script>
 	</body>
 </html>

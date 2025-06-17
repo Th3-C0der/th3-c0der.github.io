@@ -34,6 +34,51 @@
     <meta name="twitter:image:alt" content="Th3-C0der Playground">
     <meta name="theme-color" content="#00ff00">
     <title>Th3-C0der Playground</title>
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--accent-color);
+            color: var(--bg-color);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            border: none;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .back-to-top {
+                bottom: 15px;
+                right: 15px;
+                width: 35px;
+                height: 35px;
+            }
+        }
+    </style>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718" crossorigin="anonymous"></script>
     <link href="/static/style.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
@@ -112,19 +157,38 @@
 
         .playground-categories {
             display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            justify-content: center;
+            flex-wrap: nowrap;
+            gap: 0.5rem;
+            justify-content: flex-start;
             margin-bottom: 2rem;
-            padding: 1.5rem;
+            padding: 1rem;
             background: var(--card-bg);
             border-radius: 20px;
             border: 1px solid rgba(0, 255, 157, 0.1);
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-color) var(--card-bg);
+            position: relative;
+        }
+
+        .playground-categories::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .playground-categories::-webkit-scrollbar-track {
+            background: var(--card-bg);
+            border-radius: 3px;
+        }
+
+        .playground-categories::-webkit-scrollbar-thumb {
+            background: var(--accent-color);
+            border-radius: 3px;
         }
 
         .category-btn {
-            padding: 0.8rem 1.8rem;
+            padding: 0.6rem 1.2rem;
             border: none;
             border-radius: 30px;
             background: var(--card-bg);
@@ -133,10 +197,10 @@
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             border: 2px solid var(--accent-color);
-            font-size: 0.95rem;
-            position: relative;
-            overflow: hidden;
-            transform-origin: center;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            flex-shrink: 0;
+            min-width: max-content;
         }
 
         .category-btn:active {
@@ -151,16 +215,10 @@
         }
 
         .random-btn {
-            background: linear-gradient(135deg, var(--accent-color), var(--secondary-color));
-            color: var(--bg-color);
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-            padding: 0.8rem 2rem;
-            border: none;
-            position: relative;
-            overflow: hidden;
+            padding: 0.6rem 1.2rem;
+            font-size: 0.85rem;
+            margin-left: auto;
+            flex-shrink: 0;
         }
 
         .random-btn::before {
@@ -208,8 +266,9 @@
             overflow: hidden;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            opacity: 1;
-            transform: scale(1) translateY(0);
+            opacity: 0;
+            transform: scale(0.95) translateY(20px);
+            animation: cardEnter 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
             position: relative;
             will-change: transform, opacity;
         }
@@ -257,6 +316,10 @@
             box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
         }
 
+        .playground-card:hover .card-preview i {
+            transform: scale(1.1) rotate(5deg);
+        }
+
         .card-preview {
             position: relative;
             width: 100%;
@@ -278,17 +341,18 @@
             bottom: 0;
             background: linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0));
             z-index: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        .playground-card:hover .card-preview::before {
+            opacity: 0.5;
         }
 
         .card-preview i {
             font-size: 4rem;
             color: rgba(255, 255, 255, 0.9);
             z-index: 2;
-            transition: transform 0.3s ease;
-        }
-
-        .playground-card:hover .card-preview i {
-            transform: scale(1.1);
+            transition: all 0.3s ease;
         }
 
         .playground-card[data-category="visual"] .card-preview {
@@ -352,44 +416,123 @@
             border-radius: 25px;
             text-decoration: none;
             font-weight: 500;
-            transition: background 0.3s ease;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .try-now-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0));
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .try-now-btn:hover::before {
+            transform: translateX(0);
         }
 
         .try-now-btn:hover {
-            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 255, 157, 0.3);
+        }
+
+        .try-now-btn i {
+            transition: transform 0.3s ease;
+        }
+
+        .try-now-btn:hover i {
+            transform: translateX(3px);
         }
 
         @media (max-width: 768px) {
             .playground-container {
-                padding: 1rem;
+                padding: 0.5rem;
             }
 
             .playground-header h1 {
-                font-size: 2rem;
+                font-size: 1.8rem;
+            }
+
+            .playground-header p {
+                font-size: 1rem;
+            }
+
+            .disclaimer {
+                padding: 0.8rem;
+                font-size: 0.9rem;
             }
 
             .playground-grid {
                 grid-template-columns: 1fr;
-                gap: 1.5rem;
-            }
-
-            .playground-categories {
-                flex-direction: column;
-                align-items: stretch;
-                padding: 1rem;
-            }
-
-            .category-btn {
-                width: 100%;
-                margin: 0.2rem 0;
-            }
-
-            .random-btn {
-                margin-top: 0.5rem;
+                gap: 1rem;
+                padding: 0.5rem;
             }
 
             .playground-card {
-                margin: 0.5rem 0;
+                margin-bottom: 1rem;
+            }
+
+            .card-preview {
+                height: 150px;
+            }
+
+            .card-preview i {
+                font-size: 3rem;
+            }
+
+            .card-content h3 {
+                font-size: 1.2rem;
+            }
+
+            .card-content p {
+                font-size: 0.9rem;
+            }
+
+            .try-now-btn {
+                padding: 0.6rem 1.2rem;
+                font-size: 0.9rem;
+                width: 100%;
+                justify-content: center;
+            }
+
+            .playground-categories {
+                margin: 0.5rem;
+                padding: 0.8rem;
+                gap: 0.4rem;
+            }
+
+            .category-btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.8rem;
+            }
+
+            .random-btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .playground-categories {
+                margin: 0.3rem;
+                padding: 0.6rem;
+                gap: 0.3rem;
+            }
+
+            .category-btn {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.75rem;
+            }
+
+            .random-btn {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.75rem;
             }
         }
     </style>
@@ -407,8 +550,8 @@
             <div class="nav-links">
                 <a href="/">Home</a>
                 <a href="/#projects">Projects</a>
-                <a href="/blog#blog">Blog</a>
-                <a href="/#about">About</a>
+                <a href="/blog">Blog</a>
+                <a href="#about">About</a>
                 <a href="#" id="contact-link">Contact</a>
                 <button class="theme-toggle" aria-label="Toggle dark mode">
                     <i class="fas fa-moon"></i>
@@ -657,23 +800,6 @@
                 </div>
 
                 <!-- Project Card 13 -->
-                <div class="playground-card" data-category="ai">
-                    <div class="card-preview">
-                        <i class="fas fa-network-wired"></i>
-                    </div>
-                    <div class="card-content">
-                        <h3>Neural Network Playground</h3>
-                        <p>Create and train simple neural networks in real-time. Visualize the learning process and experiment with different architectures.</p>
-                        <div class="card-tags">
-                            <span>AI</span>
-                            <span>Machine Learning</span>
-                            <span>Visualization</span>
-                        </div>
-                        <a href="/playground/demos/neural-network.html" class="try-now-btn">Try Now</a>
-                    </div>
-                </div>
-
-                <!-- Project Card 14 -->
                 <div class="playground-card" data-category="visual">
                     <div class="card-preview">
                         <i class="fas fa-palette"></i>
@@ -690,7 +816,7 @@
                     </div>
                 </div>
 
-                <!-- Project Card 15 -->
+                <!-- Project Card 14 -->
                 <div class="playground-card" data-category="physics">
                     <div class="card-preview">
                         <i class="fas fa-atom"></i>
@@ -706,23 +832,43 @@
                         <a href="/playground/demos/particle-physics.html" class="try-now-btn">Try Now</a>
                     </div>
                 </div>
+
+                <!-- Project Card for Sentiment Analysis Tool -->
+                <div class="playground-card" data-category="ai">
+                    <div class="card-preview">
+                        <i class="fas fa-laugh"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Sentiment Analysis Tool</h3>
+                        <p>Analyze the sentiment of text in real-time. Input text and see if it's positive, negative, or neutral using machine learning.</p>
+                        <div class="card-tags">
+                            <span>AI</span>
+                            <span>NLP</span>
+                            <span>Tool</span>
+                        </div>
+                        <a href="/playground/demos/sentiment-analysis.html" class="try-now-btn">Try Now</a>
+                    </div>
+                </div>
             </div>
         </section>
     </main>
     <footer id="about" class="about">
         <p>© 2025 Th3-C0der. All rights reserved.</p>
         <div class="social-links">
-            <a href="https://github.com/Th3-C0der" target="_blank">
+            <a href="https://github.com/Th3-C0der" target="_blank" class="social-link">
                 <i class="fab fa-github"></i>
             </a>
-            <a href="https://youtube.com/@Th3Coder" target="_blank">
+            <a href="https://youtube.com/@Th3Coder" target="_blank" class="social-link">
                 <i class="fab fa-youtube"></i>
             </a>
-            <a href="https://instagram.com/th3_c0der" target="_blank">
+            <a href="https://instagram.com/th3_c0der" target="_blank" class="social-link">
                 <i class="fab fa-instagram"></i>
             </a>
-            <a href="https://www.linkedin.com/in/Th3-C0der" target="_blank">
+            <a href="https://www.linkedin.com/in/Th3-C0der" target="_blank" class="social-link">
                 <i class="fab fa-linkedin"></i>
+            </a>
+            <a href="https://coff.ee/th3coder" target="_blank" class="social-link ko-fi">
+                <i class="fas fa-coffee"></i>
             </a>
         </div>
     </footer>
@@ -754,6 +900,9 @@
             </form>
         </div>
     </div>
+    <button class="back-to-top" aria-label="Back to top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
     <script type="module">
         import { initPokemonEffect } from '/static/pokemon-effect.js';
         import ParticleBackground from '/static/background.js';
@@ -878,6 +1027,60 @@
 
             // Initialize with 'all' category
             document.querySelector('[data-category="all"]').click();
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Smooth scroll for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#') return;
+                    
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+
+            // Handle links to other pages
+            document.querySelectorAll('a[href^="/"]').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const href = this.getAttribute('href');
+                    if (href.startsWith('/#')) {
+                        // Handle links to sections on the home page
+                        const sectionId = href.substring(1);
+                        window.location.href = '/' + sectionId;
+                    } else {
+                        // Handle regular page navigation
+                        window.location.href = href;
+                    }
+                });
+            });
+
+            // Back to top button
+            const backToTop = document.querySelector('.back-to-top');
+            
+            window.addEventListener('scroll', () => {
+                if (window.pageYOffset > 300) {
+                    backToTop.classList.add('visible');
+                } else {
+                    backToTop.classList.remove('visible');
+                }
+            });
+
+            backToTop.addEventListener('click', () => {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
         });
     </script>
 </body>

@@ -53,6 +53,45 @@
             min-width: 300px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .controls.minimized {
+            transform: translateX(-50%) translateY(calc(100% - 40px));
+            opacity: 0.7;
+        }
+
+        .controls-toggle {
+            position: absolute;
+            top: -40px;
+            /* left: 50%;
+            transform: translateX(-50%); */
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+            border-radius: 8px 8px 0 0;
+            width: 60px;
+            height: 40px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .controls-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .controls-toggle::before {
+            content: '▼';
+            font-size: 1.2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .controls-toggle.minimized::before {
+            transform: rotate(180deg);
         }
 
         .control-group {
@@ -146,10 +185,51 @@
             .controls {
                 grid-template-columns: 1fr;
                 width: 90%;
+                max-width: 400px;
+                padding: 15px;
+                gap: 10px;
+            }
+
+            .controls-toggle {
+                display: flex;
+            }
+
+            .control-group {
+                padding: 10px;
+                gap: 8px;
+            }
+
+            .controls button, .controls select {
+                padding: 8px 12px;
+                font-size: 13px;
+            }
+
+            .controls input[type="range"] {
+                margin: 3px 0;
             }
 
             .instructions {
                 display: none;
+            }
+
+            .back-btn {
+                padding: 8px 15px;
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .controls {
+                padding: 10px;
+            }
+
+            .control-group {
+                padding: 8px;
+            }
+
+            .controls button, .controls select {
+                padding: 6px 10px;
+                font-size: 12px;
             }
         }
     </style>
@@ -167,7 +247,8 @@
         <p>• 1-5: Change Scene</p>
         <p>• F: Toggle Fullscreen</p>
     </div>
-    <div class="controls">
+    <div class="controls" id="controls">
+        <button class="controls-toggle" id="controlsToggle"></button>
         <div class="control-group">
             <select id="sceneType">
                 <option value="showcase">Showcase</option>
@@ -175,24 +256,28 @@
                 <option value="physics">Physics Demo</option>
                 <option value="reflection">Reflection Room</option>
                 <option value="volumetric">Volumetric Light</option>
+                <option value="neon">Neon City</option>
+                <option value="blackhole">Black Hole</option>
+                <option value="galaxy">Galaxy</option>
+                <option value="crystal">Crystal Cave</option>
             </select>
             <select id="environment">
                 <option value="studio">Studio</option>
+                <option value="sunrise">Sunrise</option>
                 <option value="sunset">Sunset</option>
                 <option value="night">Night</option>
-                <option value="sunrise">Sunrise</option>
             </select>
         </div>
         <div class="control-group">
-            <label>Rotation Speed: <span id="rotationValue">0.01</span></label>
-            <input type="range" id="rotationSpeed" min="0" max="0.1" step="0.001" value="0.01">
+            <label>Rotation Speed: <span id="rotationValue">1.0</span></label>
+            <input type="range" id="rotationSpeed" min="0" max="10" step="1.0" value="1.0">
             <label>Exposure: <span id="exposureValue">1.0</span></label>
             <input type="range" id="exposure" min="0" max="2" step="0.1" value="1.0">
         </div>
         <div class="control-group">
-            <button onclick="toggleRotation()">Toggle Auto-Rotation</button>
-            <button onclick="resetCamera()">Reset Camera</button>
-            <button onclick="togglePostProcessing()">Toggle Effects</button>
+            <button id="toggleRotationBtn">Toggle Auto-Rotation</button>
+            <button id="resetCameraBtn">Reset Camera</button>
+            <button id="toggleEffectsBtn">Toggle Effects</button>
         </div>
     </div>
 
@@ -230,14 +315,54 @@
         let particles = [];
         let clock = new THREE.Clock();
         let noise = new SimplexNoise();
+        let blackHoleModel;
+        let neonGrid = [];
+        let galaxyParticles = [];
 
         // HDR Environment Maps
         const environments = {
             studio: 'https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/studio_small_03_1k.hdr',
-            sunset: 'https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/sunset_jc_1k.hdr',
-            night: 'https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/venice_sunset_1k.hdr',
-            sunrise: 'https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/venice_sunrise_1k.hdr'
+            sunrise: 'https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/venice_sunrise_1k.hdr',
+            sunset: 'https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/venice_sunset_1k.hdr',
+            night: 'https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/venice_night_1k.hdr'
         };
+
+        // Setup controls toggle
+        function setupControlsToggle() {
+            const toggle = document.getElementById('controlsToggle');
+            const controls = document.getElementById('controls');
+            
+            toggle.addEventListener('click', () => {
+                controls.classList.toggle('minimized');
+                toggle.classList.toggle('minimized');
+            });
+
+            // Auto-minimize controls after 3 seconds of inactivity
+            let timeout;
+            const resetTimeout = () => {
+                clearTimeout(timeout);
+                if (window.innerWidth <= 768) {
+                    timeout = setTimeout(() => {
+                        controls.classList.add('minimized');
+                        toggle.classList.add('minimized');
+                    }, 3000);
+                }
+            };
+
+            // Reset timeout on user interaction
+            controls.addEventListener('mouseenter', resetTimeout);
+            controls.addEventListener('touchstart', resetTimeout);
+            
+            // Initial timeout
+            resetTimeout();
+        }
+
+        // Setup button event listeners
+        function setupButtonListeners() {
+            document.getElementById('toggleRotationBtn').addEventListener('click', toggleRotation);
+            document.getElementById('resetCameraBtn').addEventListener('click', resetCamera);
+            document.getElementById('toggleEffectsBtn').addEventListener('click', togglePostProcessing);
+        }
 
         async function init() {
             // Scene setup
@@ -279,12 +404,18 @@
             fxaaPass.uniforms['resolution'].value.set(1 / (window.innerWidth * renderer.getPixelRatio()), 1 / (window.innerHeight * renderer.getPixelRatio()));
             composer.addPass(fxaaPass);
 
-            // Load HDR environment
-            const rgbeLoader = new RGBELoader();
-            const hdrTexture = await rgbeLoader.loadAsync(environments[currentEnvironment]);
-            hdrTexture.mapping = THREE.EquirectangularReflectionMapping;
-            scene.environment = hdrTexture;
-            scene.background = hdrTexture;
+            try {
+                // Load HDR environment
+                const rgbeLoader = new RGBELoader();
+                const hdrTexture = await rgbeLoader.loadAsync(environments[currentEnvironment]);
+                hdrTexture.mapping = THREE.EquirectangularReflectionMapping;
+                scene.environment = hdrTexture;
+                scene.background = hdrTexture;
+            } catch (error) {
+                console.error('Error loading HDR environment:', error);
+                // Fallback to a simple color background
+                scene.background = new THREE.Color(0x1a1a1a);
+            }
 
             // Initialize scene
             createScene();
@@ -292,13 +423,23 @@
 
             // Remove loading message
             document.querySelector('.loading').style.display = 'none';
+
+            setupControlsToggle();
+            setupButtonListeners();
         }
 
         function createScene() {
-            // Clear existing objects
-            objects.forEach(obj => scene.remove(obj));
+            // Clear existing objects and trails
+            objects.forEach(obj => {
+                if (obj.userData && obj.userData.trail) {
+                    scene.remove(obj.userData.trail);
+                }
+                scene.remove(obj);
+            });
             objects = [];
             particles = [];
+            neonGrid = [];
+            galaxyParticles = [];
 
             switch(currentScene) {
                 case 'showcase':
@@ -315,6 +456,18 @@
                     break;
                 case 'volumetric':
                     createVolumetricScene();
+                    break;
+                case 'neon':
+                    createNeonCityScene();
+                    break;
+                case 'blackhole':
+                    createBlackHoleScene();
+                    break;
+                case 'galaxy':
+                    createGalaxyScene();
+                    break;
+                case 'crystal':
+                    createCrystalCaveScene();
                     break;
             }
         }
@@ -504,6 +657,450 @@
             objects.push(particles);
         }
 
+        function createNeonCityScene() {
+            // Create ground grid with better neon green color
+            const gridSize = 20;
+            const gridDivisions = 50;
+            const gridGeometry = new THREE.PlaneGeometry(gridSize, gridSize, gridDivisions, gridDivisions);
+            const gridMaterial = new THREE.MeshBasicMaterial({
+                color: 0x00ff41, // Matrix-style neon green
+                wireframe: true,
+                transparent: true,
+                opacity: 0.7
+            });
+            const grid = new THREE.Mesh(gridGeometry, gridMaterial);
+            grid.rotation.x = -Math.PI / 2;
+            grid.position.y = -2;
+            scene.add(grid);
+            objects.push(grid);
+            neonGrid.push(grid);
+
+            // Create city buildings with neon edges
+            for (let i = 0; i < 50; i++) {
+                const height = Math.random() * 5 + 2;
+                const buildingGeometry = new THREE.BoxGeometry(0.5, height, 0.5);
+                const buildingMaterial = new THREE.MeshPhongMaterial({
+                    color: 0x1a1a1a,
+                    emissive: new THREE.Color().setHSL(Math.random(), 0.8, 0.5),
+                    emissiveIntensity: 0.5
+                });
+                const building = new THREE.Mesh(buildingGeometry, buildingMaterial);
+                building.position.set(
+                    (Math.random() - 0.5) * gridSize,
+                    height / 2 - 2,
+                    (Math.random() - 0.5) * gridSize
+                );
+                building.castShadow = true;
+                scene.add(building);
+                objects.push(building);
+
+                // Add neon edges to buildings
+                const edges = new THREE.EdgesGeometry(buildingGeometry);
+                const edgeMaterial = new THREE.LineBasicMaterial({
+                    color: new THREE.Color().setHSL(Math.random(), 0.8, 0.5),
+                    transparent: true,
+                    opacity: 0.8
+                });
+                const edgeLines = new THREE.LineSegments(edges, edgeMaterial);
+                edgeLines.position.copy(building.position);
+                scene.add(edgeLines);
+                objects.push(edgeLines);
+            }
+
+            // Create flying cars with improved trails
+            for (let i = 0; i < 20; i++) {
+                const carGeometry = new THREE.BoxGeometry(0.3, 0.2, 0.5);
+                const carMaterial = new THREE.MeshPhongMaterial({
+                    color: new THREE.Color().setHSL(Math.random(), 0.8, 0.5),
+                    emissive: new THREE.Color().setHSL(Math.random(), 0.8, 0.5),
+                    emissiveIntensity: 0.5
+                });
+                const car = new THREE.Mesh(carGeometry, carMaterial);
+                
+                // Random position in the city
+                car.position.set(
+                    (Math.random() - 0.5) * gridSize,
+                    Math.random() * 5 + 2,
+                    (Math.random() - 0.5) * gridSize
+                );
+                
+                // Add headlights
+                const headlightGeometry = new THREE.SphereGeometry(0.05, 8, 8);
+                const headlightMaterial = new THREE.MeshBasicMaterial({
+                    color: 0xffffff,
+                    emissive: 0xffffff,
+                    emissiveIntensity: 1
+                });
+                
+                const leftHeadlight = new THREE.Mesh(headlightGeometry, headlightMaterial);
+                leftHeadlight.position.set(-0.15, 0, 0.25);
+                car.add(leftHeadlight);
+                
+                const rightHeadlight = new THREE.Mesh(headlightGeometry, headlightMaterial);
+                rightHeadlight.position.set(0.15, 0, 0.25);
+                car.add(rightHeadlight);
+                
+                // Add trail effect with fade
+                const trailGeometry = new THREE.BufferGeometry();
+                const trailPositions = new Float32Array(50 * 3);
+                const trailColors = new Float32Array(50 * 3);
+                const trailMaterial = new THREE.LineBasicMaterial({
+                    vertexColors: true,
+                    transparent: true,
+                    opacity: 0.5,
+                    blending: THREE.AdditiveBlending
+                });
+                const trail = new THREE.Line(trailGeometry, trailMaterial);
+                car.userData.trail = trail;
+                car.userData.trailPositions = trailPositions;
+                car.userData.trailColors = trailColors;
+                car.userData.trailIndex = 0;
+                car.userData.trailColor = new THREE.Color().setHSL(Math.random(), 0.8, 0.5);
+                scene.add(trail);
+                
+                scene.add(car);
+                objects.push(car);
+            }
+
+            // Add ambient light
+            const ambientLight = new THREE.AmbientLight(0x404040);
+            scene.add(ambientLight);
+            objects.push(ambientLight);
+
+            // Add point lights
+            for (let i = 0; i < 10; i++) {
+                const light = new THREE.PointLight(
+                    new THREE.Color().setHSL(Math.random(), 0.8, 0.5),
+                    1,
+                    10
+                );
+                light.position.set(
+                    (Math.random() - 0.5) * gridSize,
+                    2,
+                    (Math.random() - 0.5) * gridSize
+                );
+                scene.add(light);
+                objects.push(light);
+            }
+        }
+
+        function createBlackHoleScene() {
+            // Create black hole event horizon with absolute blackness
+            const eventHorizonGeometry = new THREE.SphereGeometry(2, 64, 64);
+            const eventHorizonMaterial = new THREE.MeshBasicMaterial({
+                color: 0x000000,
+                side: THREE.BackSide,
+                transparent: false,
+                opacity: 1.0
+            });
+            const eventHorizon = new THREE.Mesh(eventHorizonGeometry, eventHorizonMaterial);
+            scene.add(eventHorizon);
+            objects.push(eventHorizon);
+
+            // Create accretion disk with realistic physics
+            const diskSegments = 256; // Increased segments for more detail
+            const diskGeometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(diskSegments * 3);
+            const colors = new Float32Array(diskSegments * 3);
+            const indices = [];
+            const uvs = new Float32Array(diskSegments * 2);
+
+            // Create disk vertices with realistic spiral pattern
+            for (let i = 0; i < diskSegments; i++) {
+                const angle = (i / diskSegments) * Math.PI * 2;
+                const radius = 2.5 + Math.sin(angle * 20) * 0.1; // More subtle variation
+                
+                positions[i * 3] = Math.cos(angle) * radius;
+                positions[i * 3 + 1] = Math.sin(angle * 10) * 0.05; // More subtle vertical wave
+                positions[i * 3 + 2] = Math.sin(angle) * radius;
+
+                // More realistic color gradient
+                const color = new THREE.Color();
+                if (radius < 2.8) {
+                    // Inner disk: white to yellow
+                    color.setHSL(0.1, 1, 0.5 + (radius - 2.5) * 0.5);
+                } else if (radius < 3.2) {
+                    // Middle disk: yellow to orange
+                    color.setHSL(0.05 + (radius - 2.8) * 0.1, 1, 0.5);
+                } else {
+                    // Outer disk: orange to red
+                    color.setHSL(0.0 + (radius - 3.2) * 0.02, 1, 0.5);
+                }
+                colors[i * 3] = color.r;
+                colors[i * 3 + 1] = color.g;
+                colors[i * 3 + 2] = color.b;
+
+                uvs[i * 2] = i / diskSegments;
+                uvs[i * 2 + 1] = 0;
+            }
+
+            // Create triangles for the disk
+            for (let i = 0; i < diskSegments - 2; i++) {
+                indices.push(0, i + 1, i + 2);
+            }
+
+            diskGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            diskGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            diskGeometry.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
+            diskGeometry.setIndex(indices);
+
+            // Create custom shader material for the accretion disk
+            const diskMaterial = new THREE.ShaderMaterial({
+                uniforms: {
+                    time: { value: 0 },
+                    distortionStrength: { value: 0.3 } // Reduced distortion
+                },
+                vertexShader: `
+                    varying vec2 vUv;
+                    varying vec3 vColor;
+                    uniform float time;
+                    uniform float distortionStrength;
+                    
+                    void main() {
+                        vUv = uv;
+                        vColor = color;
+                        
+                        // More subtle time-based distortion
+                        vec3 pos = position;
+                        float distortion = sin(time * 1.5 + position.x * 8.0) * distortionStrength;
+                        pos.y += distortion * 0.05;
+                        
+                        gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+                    }
+                `,
+                fragmentShader: `
+                    varying vec2 vUv;
+                    varying vec3 vColor;
+                    uniform float time;
+                    
+                    void main() {
+                        // More subtle glow effect
+                        float glow = sin(time * 2.0 + vUv.x * 8.0) * 0.3 + 0.7;
+                        vec3 finalColor = vColor * (1.0 + glow * 0.3);
+                        
+                        // Add subtle noise for realism
+                        float noise = fract(sin(dot(vUv, vec2(12.9898, 78.233))) * 43758.5453);
+                        finalColor += noise * 0.05;
+                        
+                        gl_FragColor = vec4(finalColor, 1.0);
+                    }
+                `,
+                transparent: true,
+                blending: THREE.AdditiveBlending,
+                side: THREE.DoubleSide
+            });
+
+            const disk = new THREE.Mesh(diskGeometry, diskMaterial);
+            disk.rotation.x = Math.PI / 2;
+            scene.add(disk);
+            objects.push(disk);
+
+            // Create particle system with realistic physics
+            const particleCount = 10000; // Increased particle count
+            const particleGeometry = new THREE.BufferGeometry();
+            const particlePositions = new Float32Array(particleCount * 3);
+            const particleColors = new Float32Array(particleCount * 3);
+            const particleSizes = new Float32Array(particleCount);
+            const particleVelocities = new Float32Array(particleCount);
+
+            for (let i = 0; i < particleCount; i++) {
+                const radius = 2.5 + Math.random() * 4;
+                const theta = Math.random() * Math.PI * 2;
+                const height = (Math.random() - 0.5) * 0.2; // Reduced height variation
+
+                particlePositions[i * 3] = Math.cos(theta) * radius;
+                particlePositions[i * 3 + 1] = height;
+                particlePositions[i * 3 + 2] = Math.sin(theta) * radius;
+
+                // More realistic color based on distance and temperature
+                const color = new THREE.Color();
+                if (radius < 2.8) {
+                    // Inner disk: white to yellow (hotter)
+                    color.setHSL(0.1, 1, 0.5 + (radius - 2.5) * 0.5);
+                } else if (radius < 3.2) {
+                    // Middle disk: yellow to orange
+                    color.setHSL(0.05 + (radius - 2.8) * 0.1, 1, 0.5);
+                } else {
+                    // Outer disk: orange to red (cooler)
+                    color.setHSL(0.0 + (radius - 3.2) * 0.02, 1, 0.5);
+                }
+                particleColors[i * 3] = color.r;
+                particleColors[i * 3 + 1] = color.g;
+                particleColors[i * 3 + 2] = color.b;
+
+                // Size based on distance and temperature
+                particleSizes[i] = 0.02 + (radius - 2.5) * 0.01;
+                
+                // Velocity based on Kepler's laws with relativistic correction
+                particleVelocities[i] = 1 / Math.sqrt(radius) * (1 - 0.1 / radius);
+            }
+
+            particleGeometry.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
+            particleGeometry.setAttribute('color', new THREE.BufferAttribute(particleColors, 3));
+            particleGeometry.setAttribute('size', new THREE.BufferAttribute(particleSizes, 1));
+
+            const particleMaterial = new THREE.PointsMaterial({
+                size: 0.05,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.6,
+                blending: THREE.AdditiveBlending,
+                sizeAttenuation: true
+            });
+
+            const particles = new THREE.Points(particleGeometry, particleMaterial);
+            particles.userData.velocities = particleVelocities;
+            scene.add(particles);
+            objects.push(particles);
+        }
+
+        function createGalaxyScene() {
+            const particleCount = 10000;
+            const geometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(particleCount * 3);
+            const colors = new Float32Array(particleCount * 3);
+
+            for (let i = 0; i < particleCount; i++) {
+                const radius = Math.random() * 10;
+                const spinAngle = radius * 5;
+                const branchAngle = (i % 3) * Math.PI * 2 / 3;
+
+                const x = Math.cos(spinAngle + branchAngle) * radius;
+                const y = (Math.random() - 0.5) * 0.5;
+                const z = Math.sin(spinAngle + branchAngle) * radius;
+
+                positions[i * 3] = x;
+                positions[i * 3 + 1] = y;
+                positions[i * 3 + 2] = z;
+
+                const color = new THREE.Color();
+                color.setHSL(radius / 10, 0.8, 0.5);
+                colors[i * 3] = color.r;
+                colors[i * 3 + 1] = color.g;
+                colors[i * 3 + 2] = color.b;
+            }
+
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+            const material = new THREE.PointsMaterial({
+                size: 0.05,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.8
+            });
+
+            const galaxy = new THREE.Points(geometry, material);
+            scene.add(galaxy);
+            objects.push(galaxy);
+            galaxyParticles.push(galaxy);
+        }
+
+        function createCrystalCaveScene() {
+            // Create cave walls with darker material
+            const caveGeometry = new THREE.SphereGeometry(10, 32, 32);
+            const caveMaterial = new THREE.MeshPhongMaterial({
+                color: 0x0a0a0a,
+                side: THREE.BackSide,
+                transparent: true,
+                opacity: 0.9
+            });
+            const cave = new THREE.Mesh(caveGeometry, caveMaterial);
+            scene.add(cave);
+            objects.push(cave);
+
+            // Create crystals with enhanced glow
+            for (let i = 0; i < 50; i++) {
+                const height = Math.random() * 2 + 1;
+                const geometry = new THREE.ConeGeometry(0.2, height, 4);
+                
+                // Create glowing material
+                const material = new THREE.MeshPhongMaterial({
+                    color: new THREE.Color().setHSL(Math.random(), 0.8, 0.5),
+                    emissive: new THREE.Color().setHSL(Math.random(), 0.8, 0.5),
+                    emissiveIntensity: 1,
+                    transparent: true,
+                    opacity: 0.9,
+                    shininess: 100,
+                    specular: 0xffffff
+                });
+                
+                const crystal = new THREE.Mesh(geometry, material);
+                
+                // Position on cave wall
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.random() * Math.PI;
+                const radius = 9;
+                
+                crystal.position.set(
+                    radius * Math.sin(phi) * Math.cos(theta),
+                    radius * Math.sin(phi) * Math.sin(theta),
+                    radius * Math.cos(phi)
+                );
+                
+                // Orient crystal to point outward
+                crystal.lookAt(0, 0, 0);
+                crystal.rotateX(Math.PI / 2);
+
+                // Add inner glow
+                const innerGlowGeometry = new THREE.ConeGeometry(0.15, height * 0.8, 4);
+                const innerGlowMaterial = new THREE.MeshBasicMaterial({
+                    color: new THREE.Color().setHSL(Math.random(), 0.8, 0.7),
+                    transparent: true,
+                    opacity: 0.5,
+                    blending: THREE.AdditiveBlending
+                });
+                const innerGlow = new THREE.Mesh(innerGlowGeometry, innerGlowMaterial);
+                crystal.add(innerGlow);
+                
+                // Add crystal edges
+                const edges = new THREE.EdgesGeometry(geometry);
+                const edgeMaterial = new THREE.LineBasicMaterial({
+                    color: new THREE.Color().setHSL(Math.random(), 0.8, 0.7),
+                    transparent: true,
+                    opacity: 0.8
+                });
+                const edgeLines = new THREE.LineSegments(edges, edgeMaterial);
+                crystal.add(edgeLines);
+                
+                scene.add(crystal);
+                objects.push(crystal);
+            }
+
+            // Add point lights with glow
+            for (let i = 0; i < 5; i++) {
+                const light = new THREE.PointLight(
+                    new THREE.Color().setHSL(Math.random(), 0.8, 0.5),
+                    2,
+                    15
+                );
+                light.position.set(
+                    (Math.random() - 0.5) * 8,
+                    (Math.random() - 0.5) * 8,
+                    (Math.random() - 0.5) * 8
+                );
+                
+                // Add light glow
+                const glowGeometry = new THREE.SphereGeometry(0.5, 16, 16);
+                const glowMaterial = new THREE.MeshBasicMaterial({
+                    color: light.color,
+                    transparent: true,
+                    opacity: 0.3,
+                    blending: THREE.AdditiveBlending
+                });
+                const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+                light.add(glow);
+                
+                scene.add(light);
+                objects.push(light);
+            }
+
+            // Add ambient light
+            const ambientLight = new THREE.AmbientLight(0x404040, 0.5);
+            scene.add(ambientLight);
+            objects.push(ambientLight);
+        }
+
         function animate() {
             requestAnimationFrame(animate);
             const delta = clock.getDelta();
@@ -557,6 +1154,113 @@
                         }
                     }
                     objects[1].geometry.attributes.position.needsUpdate = true;
+                    break;
+                case 'neon':
+                    neonGrid.forEach(grid => {
+                        grid.material.opacity = 0.5 + Math.sin(delta * 2) * 0.2;
+                    });
+                    // Update flying cars with improved trail handling
+                    objects.forEach(obj => {
+                        if (obj.userData.trail) {
+                            // Move car
+                            obj.position.x += Math.sin(delta + obj.position.z) * 0.1;
+                            obj.position.z += Math.cos(delta + obj.position.x) * 0.1;
+                            obj.position.y = 2 + Math.sin(delta * 2 + obj.position.x) * 0.5;
+                            
+                            // Update trail with fade
+                            const trail = obj.userData.trail;
+                            const positions = obj.userData.trailPositions;
+                            const colors = obj.userData.trailColors;
+                            const index = obj.userData.trailIndex;
+                            
+                            // Add new position
+                            positions[index * 3] = obj.position.x;
+                            positions[index * 3 + 1] = obj.position.y;
+                            positions[index * 3 + 2] = obj.position.z;
+                            
+                            // Set color with fade
+                            const color = obj.userData.trailColor;
+                            colors[index * 3] = color.r;
+                            colors[index * 3 + 1] = color.g;
+                            colors[index * 3 + 2] = color.b;
+                            
+                            // Update trail geometry
+                            trail.geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                            trail.geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+                            trail.geometry.attributes.position.needsUpdate = true;
+                            trail.geometry.attributes.color.needsUpdate = true;
+                            
+                            // Update index
+                            obj.userData.trailIndex = (index + 1) % 50;
+                        }
+                    });
+                    break;
+                case 'blackhole':
+                    objects.forEach((obj, i) => {
+                        if (i > 0) { // Skip event horizon
+                            if (obj instanceof THREE.Mesh && obj.material instanceof THREE.ShaderMaterial) {
+                                // Update disk shader
+                                obj.material.uniforms.time.value += delta;
+                            } else if (obj instanceof THREE.Points) {
+                                // Update particles with relativistic effects
+                                const positions = obj.geometry.attributes.position.array;
+                                const velocities = obj.userData.velocities;
+                                
+                                for (let j = 0; j < positions.length; j += 3) {
+                                    const radius = Math.sqrt(positions[j] * positions[j] + positions[j + 2] * positions[j + 2]);
+                                    const angle = Math.atan2(positions[j + 2], positions[j]) + delta * velocities[j / 3];
+                                    
+                                    // More subtle vertical oscillation
+                                    positions[j + 1] = Math.sin(angle * 3) * 0.05;
+                                    
+                                    // Update position with spiral motion and relativistic effects
+                                    const newRadius = radius * (1 - delta * 0.01); // Slow inward spiral
+                                    positions[j] = Math.cos(angle) * newRadius;
+                                    positions[j + 2] = Math.sin(angle) * newRadius;
+                                }
+                                
+                                obj.geometry.attributes.position.needsUpdate = true;
+                            }
+                        }
+                    });
+                    
+                    // Update lensing effect
+                    composer.passes.forEach(pass => {
+                        if (pass.uniforms && pass.uniforms.time) {
+                            pass.uniforms.time.value += delta;
+                            // Update black hole position in screen space
+                            const screenPos = new THREE.Vector3(0, 0, 0).project(camera);
+                            pass.uniforms.blackHolePosition.value.set(
+                                (screenPos.x + 1) * 0.5,
+                                (screenPos.y + 1) * 0.5
+                            );
+                        }
+                    });
+                    break;
+                case 'galaxy':
+                    galaxyParticles.forEach(particles => {
+                        particles.rotation.y += delta * 0.1;
+                    });
+                    break;
+                case 'crystal':
+                    objects.forEach((obj, i) => {
+                        if (i > 0 && !(obj instanceof THREE.PointLight) && !(obj instanceof THREE.AmbientLight)) {
+                            // Rotate crystals
+                            obj.rotation.y += delta * 0.2;
+                            
+                            // Pulse inner glow
+                            if (obj.children.length > 0) {
+                                const innerGlow = obj.children[0];
+                                innerGlow.material.opacity = 0.3 + Math.sin(delta * 2 + i) * 0.2;
+                            }
+                            
+                            // Pulse edge glow
+                            if (obj.children.length > 1) {
+                                const edgeLines = obj.children[1];
+                                edgeLines.material.opacity = 0.6 + Math.sin(delta * 3 + i) * 0.2;
+                            }
+                        }
+                    });
                     break;
             }
 

@@ -40,6 +40,45 @@
             margin-bottom: 1rem;
             flex-wrap: wrap;
             justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .controls.minimized {
+            transform: translateY(-100%);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .controls-toggle {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .controls-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .controls-toggle::before {
+            content: '▼';
+            font-size: 1.2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .controls-toggle.minimized::before {
+            transform: rotate(180deg);
         }
 
         select, button {
@@ -138,15 +177,54 @@
             .game-container {
                 padding: 1rem;
                 width: 90%;
+                max-width: 100%;
+                position: relative;
             }
 
-            #gameCanvas {
-                width: 100%;
-                height: auto;
+            .controls-toggle {
+                display: flex;
             }
 
             .controls {
-                flex-direction: column;
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                background: rgba(26, 26, 26, 0.95);
+                padding: 1rem;
+                margin: 0;
+                border-radius: 0 0 15px 15px;
+                z-index: 5;
+            }
+
+            .controls.minimized {
+                transform: translateY(-100%);
+            }
+
+            select, button {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+                margin: 0.25rem 0;
+            }
+
+            .stats {
+                margin-top: 3rem;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 0.5rem;
+                padding: 0.5rem;
+            }
+
+            .stat-value {
+                font-size: 1.1rem;
+            }
+
+            .stat-label {
+                font-size: 0.7rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+                margin: 0.5rem 0;
             }
         }
     </style>
@@ -155,7 +233,8 @@
     <a href="/playground" class="back-btn">← Back to Playground</a>
     <div class="game-container">
         <h1>Modern Snake</h1>
-        <div class="controls">
+        <button class="controls-toggle" id="controlsToggle"></button>
+        <div class="controls" id="gameControls">
             <select id="gameMode">
                 <option value="classic">Classic Mode</option>
                 <option value="walls">Walls Mode</option>
@@ -204,8 +283,12 @@
                 this.gameMode = 'classic';
                 this.difficulty = 'medium';
                 this.portals = [];
+                this.touchStartX = 0;
+                this.touchStartY = 0;
                 this.setupEventListeners();
                 this.updateHighScore();
+                this.resizeCanvas();
+                this.setupControlsToggle();
             }
 
             setupEventListeners() {
@@ -219,6 +302,94 @@
                     this.difficulty = e.target.value;
                     this.updateSpeed();
                 });
+
+                // Touch event listeners
+                this.canvas.addEventListener('touchstart', this.handleTouchStart.bind(this), { passive: false });
+                this.canvas.addEventListener('touchmove', this.handleTouchMove.bind(this), { passive: false });
+                window.addEventListener('resize', this.resizeCanvas.bind(this));
+            }
+
+            setupControlsToggle() {
+                const toggle = document.getElementById('controlsToggle');
+                const controls = document.getElementById('gameControls');
+                
+                toggle.addEventListener('click', () => {
+                    controls.classList.toggle('minimized');
+                    toggle.classList.toggle('minimized');
+                });
+
+                // Auto-minimize controls after 3 seconds of inactivity
+                let timeout;
+                const resetTimeout = () => {
+                    clearTimeout(timeout);
+                    if (window.innerWidth <= 600) {
+                        timeout = setTimeout(() => {
+                            controls.classList.add('minimized');
+                            toggle.classList.add('minimized');
+                        }, 3000);
+                    }
+                };
+
+                // Reset timeout on user interaction
+                controls.addEventListener('mouseenter', resetTimeout);
+                controls.addEventListener('touchstart', resetTimeout);
+                
+                // Initial timeout
+                resetTimeout();
+            }
+
+            resizeCanvas() {
+                const container = this.canvas.parentElement;
+                const containerWidth = container.clientWidth;
+                const size = Math.min(400, containerWidth - 32); // 32px for padding
+                this.canvas.style.width = `${size}px`;
+                this.canvas.style.height = `${size}px`;
+                this.canvas.width = size;
+                this.canvas.height = size;
+                this.gridSize = Math.floor(size / 20); // Adjust grid size based on canvas size
+                if (this.snake.length > 0) {
+                    this.draw(); // Redraw the game if it's running
+                }
+            }
+
+            handleTouchStart(event) {
+                event.preventDefault();
+                const touch = event.touches[0];
+                this.touchStartX = touch.clientX;
+                this.touchStartY = touch.clientY;
+            }
+
+            handleTouchMove(event) {
+                event.preventDefault();
+                if (!this.touchStartX || !this.touchStartY) return;
+
+                const touch = event.touches[0];
+                const touchEndX = touch.clientX;
+                const touchEndY = touch.clientY;
+
+                const dx = touchEndX - this.touchStartX;
+                const dy = touchEndY - this.touchStartY;
+
+                // Determine the dominant direction
+                if (Math.abs(dx) > Math.abs(dy)) {
+                    // Horizontal swipe
+                    if (dx > 0 && this.direction !== 'left') {
+                        this.nextDirection = 'right';
+                    } else if (dx < 0 && this.direction !== 'right') {
+                        this.nextDirection = 'left';
+                    }
+                } else {
+                    // Vertical swipe
+                    if (dy > 0 && this.direction !== 'up') {
+                        this.nextDirection = 'down';
+                    } else if (dy < 0 && this.direction !== 'down') {
+                        this.nextDirection = 'up';
+                    }
+                }
+
+                // Reset touch coordinates
+                this.touchStartX = null;
+                this.touchStartY = null;
             }
 
             startGame() {

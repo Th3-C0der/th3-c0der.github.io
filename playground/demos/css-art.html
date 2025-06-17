@@ -64,6 +64,7 @@
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            position: relative;
         }
 
         .art-piece:hover {
@@ -120,29 +121,39 @@
             position: absolute;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%);
-            width: 100px;
-            height: 100px;
+            transform: translate(-50%, -50%) rotate(45deg);
+            width: 50px;
+            height: 50px;
             background: #ff4b4b;
-            transform: rotate(45deg);
+            animation: heartbeat 1.2s infinite;
         }
 
         .heart:before,
         .heart:after {
             content: '';
             position: absolute;
-            width: 100px;
-            height: 100px;
+            width: 50px;
+            height: 50px;
             background: #ff4b4b;
             border-radius: 50%;
         }
 
         .heart:before {
-            left: -50px;
+            left: -25px;
+            top: 0;
         }
 
         .heart:after {
-            top: -50px;
+            top: -25px;
+            left: 0;
+        }
+
+        @keyframes heartbeat {
+            0% { transform: translate(-50%, -50%) rotate(45deg) scale(1); }
+            14% { transform: translate(-50%, -50%) rotate(45deg) scale(1.1); }
+            28% { transform: translate(-50%, -50%) rotate(45deg) scale(1); }
+            42% { transform: translate(-50%, -50%) rotate(45deg) scale(1.1); }
+            70% { transform: translate(-50%, -50%) rotate(45deg) scale(1); }
         }
 
         .rainbow {
@@ -182,6 +193,186 @@
                 height: 150px;
             }
         }
+
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.8rem;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .copy-btn.copied {
+            background: #4CAF50;
+        }
+
+        /* 3D Cube Styles */
+        .cube {
+            width: 100px;
+            height: 100px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform-style: preserve-3d;
+            transform: translate(-50%, -50%) rotateX(45deg) rotateZ(45deg);
+            animation: rotate 5s infinite linear;
+        }
+
+        .cube div {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+        }
+
+        .front { transform: translateZ(50px); }
+        .back { transform: translateZ(-50px) rotateY(180deg); }
+        .right { transform: translateX(50px) rotateY(90deg); }
+        .left { transform: translateX(-50px) rotateY(-90deg); }
+        .top { transform: translateY(-50px) rotateX(90deg); }
+        .bottom { transform: translateY(50px) rotateX(-90deg); }
+
+        @keyframes rotate {
+            0% { transform: translate(-50%, -50%) rotateX(45deg) rotateZ(45deg); }
+            100% { transform: translate(-50%, -50%) rotateX(405deg) rotateZ(405deg); }
+        }
+
+        /* New Art Pieces */
+        .butterfly {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 100px;
+        }
+
+        .butterfly:before,
+        .butterfly:after {
+            content: '';
+            position: absolute;
+            width: 50px;
+            height: 80px; /* Elongated oval shape */
+            background: linear-gradient(45deg, #ff69b4, #ff1493);
+            border-radius: 50% 50% 0 50%; /* Teardrop shape */
+            box-shadow: 0 0 20px rgba(255, 105, 180, 0.7); /* Enhanced glow */
+        }
+
+        .butterfly:before {
+            top: 0px;
+            left: 10px; /* Adjust left wing position */
+            transform-origin: 100% 50%; /* Rotate from the right edge */
+            transform: rotate(-30deg); /* Initial rotation */
+            animation: flapLeft 0.8s infinite alternate;
+        }
+
+        .butterfly:after {
+            top: 10px; /* Slightly lower to create overlap */
+            left: 40px; /* Adjust right wing position */
+            transform-origin: 0% 50%; /* Rotate from the left edge */
+            transform: rotate(30deg); /* Initial rotation */
+            animation: flapRight 0.8s infinite alternate;
+        }
+
+        @keyframes flapLeft {
+            0% { transform: rotate(-30deg); }
+            100% { transform: rotate(-50deg); }
+        }
+
+        @keyframes flapRight {
+            0% { transform: rotate(30deg); }
+            100% { transform: rotate(50deg); }
+        }
+
+        /* Twinkling Star */
+        .star {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 100px;
+            background: #ffd700;
+            clip-path: polygon(
+                50% 0%,
+                61% 35%,
+                98% 35%,
+                68% 57%,
+                79% 91%,
+                50% 70%,
+                21% 91%,
+                32% 57%,
+                2% 35%,
+                39% 35%
+            );
+            box-shadow: 0 0 30px #ffd700, 0 0 50px #ffc107; /* Enhanced glow */
+            animation: twinkle 1.5s infinite alternate;
+        }
+
+        /* Remove previous star pseudo-elements */
+        .star:before,
+        .star:after {
+            content: none;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0.5; transform: translate(-50%, -50%) scale(0.8); }
+            100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .moon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 100px;
+            background: #f0f0f0;
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        .moon:before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            width: 20px;
+            height: 20px;
+            background: #2a2a2a;
+            border-radius: 50%;
+            box-shadow: 40px 10px 0 -5px #2a2a2a,
+                       20px 40px 0 -3px #2a2a2a,
+                       50px 40px 0 -2px #2a2a2a;
+        }
+
+        .loader {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s infinite linear;
+        }
+
+        @keyframes spin {
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -193,6 +384,7 @@
             </div>
             <h3>Pulsing Sun</h3>
             <p>A glowing sun with a pulsing animation using radial gradients and keyframes.</p>
+            <button class="copy-btn" onclick="copyCSS(this, '.sun')">Copy CSS</button>
         </div>
 
         <div class="art-piece">
@@ -201,6 +393,7 @@
             </div>
             <h3>CSS Heart</h3>
             <p>A heart shape created using pure CSS with pseudo-elements.</p>
+            <button class="copy-btn" onclick="copyCSS(this, '.heart')">Copy CSS</button>
         </div>
 
         <div class="art-piece">
@@ -209,6 +402,7 @@
             </div>
             <h3>Moving Rainbow</h3>
             <p>A colorful rainbow bar that moves back and forth using linear gradients.</p>
+            <button class="copy-btn" onclick="copyCSS(this, '.rainbow')">Copy CSS</button>
         </div>
 
         <div class="art-piece">
@@ -224,7 +418,133 @@
             </div>
             <h3>3D Cube</h3>
             <p>A rotating 3D cube created using CSS transforms and animations.</p>
+            <button class="copy-btn" onclick="copyCSS(this, '.cube')">Copy CSS</button>
+        </div>
+
+        <div class="art-piece">
+            <div class="art-container">
+                <div class="butterfly"></div>
+            </div>
+            <h3>Fluttering Butterfly</h3>
+            <p>An animated butterfly with fluttering wings using CSS transforms.</p>
+            <button class="copy-btn" onclick="copyCSS(this, '.butterfly')">Copy CSS</button>
+        </div>
+
+        <div class="art-piece">
+            <div class="art-container">
+                <div class="star"></div>
+            </div>
+            <h3>Twinkling Star</h3>
+            <p>A five-pointed star with a twinkling animation using CSS transforms.</p>
+            <button class="copy-btn" onclick="copyCSS(this, '.star')">Copy CSS</button>
+        </div>
+
+        <div class="art-piece">
+            <div class="art-container">
+                <div class="moon"></div>
+            </div>
+            <h3>Moon with Craters</h3>
+            <p>A realistic moon with crater details using CSS shadows and pseudo-elements.</p>
+            <button class="copy-btn" onclick="copyCSS(this, '.moon')">Copy CSS</button>
+        </div>
+
+        <div class="art-piece">
+            <div class="art-container">
+                <div class="loader"></div>
+            </div>
+            <h3>Loading Spinner</h3>
+            <p>A smooth loading spinner animation using CSS border properties.</p>
+            <button class="copy-btn" onclick="copyCSS(this, '.loader')">Copy CSS</button>
         </div>
     </div>
+
+    <script>
+        function copyCSS(button, selector) {
+            // Get all style elements
+            const styleSheets = document.styleSheets;
+            let cssText = '';
+            let foundRules = false;
+            
+            try {
+                // Loop through all stylesheets
+                for (let sheet of styleSheets) {
+                    try {
+                        const rules = sheet.cssRules || sheet.rules;
+                        if (!rules) continue;
+
+                        // Get all rules including keyframes
+                        for (let rule of rules) {
+                            // Check for the main selector
+                            if (rule.selectorText && rule.selectorText.includes(selector)) {
+                                cssText += rule.cssText + '\n';
+                                foundRules = true;
+                            }
+                            
+                            // Check for keyframes that might be used by this selector
+                            if (rule.type === CSSRule.KEYFRAMES_RULE) {
+                                const keyframesName = rule.name;
+                                // Check if any rule uses these keyframes
+                                for (let checkRule of rules) {
+                                    if (checkRule.selectorText && 
+                                        checkRule.selectorText.includes(selector) && 
+                                        checkRule.style.animation && 
+                                        checkRule.style.animation.includes(keyframesName)) {
+                                        cssText += rule.cssText + '\n';
+                                        foundRules = true;
+                                    }
+                                }
+                            }
+                        }
+                    } catch (e) {
+                        console.warn('Could not access rules from stylesheet:', e);
+                    }
+                }
+
+                if (!foundRules) {
+                    // Fallback: Get the computed styles
+                    const element = document.querySelector(selector);
+                    if (element) {
+                        const styles = window.getComputedStyle(element);
+                        cssText = `${selector} {\n`;
+                        for (let prop of styles) {
+                            if (styles[prop]) {
+                                cssText += `  ${prop}: ${styles[prop]};\n`;
+                            }
+                        }
+                        cssText += '}\n';
+                        foundRules = true;
+                    }
+                }
+
+                if (!foundRules) {
+                    alert('No CSS rules found for this element.');
+                    return;
+                }
+
+                // Create a temporary textarea element
+                const textarea = document.createElement('textarea');
+                textarea.value = cssText;
+                document.body.appendChild(textarea);
+                textarea.select();
+                
+                try {
+                    document.execCommand('copy');
+                    button.textContent = 'Copied!';
+                    button.classList.add('copied');
+                    setTimeout(() => {
+                        button.textContent = 'Copy CSS';
+                        button.classList.remove('copied');
+                    }, 2000);
+                } catch (err) {
+                    alert('Failed to copy CSS. Please try again.');
+                }
+                
+                document.body.removeChild(textarea);
+            } catch (error) {
+                console.error('Error accessing stylesheet:', error);
+                alert('Error accessing stylesheet. Please try again.');
+            }
+        }
+    </script>
 </body>
 </html> 

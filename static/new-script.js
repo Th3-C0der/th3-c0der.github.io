@@ -30,6 +30,11 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
 
 // Wait for DOM
 document.addEventListener('DOMContentLoaded', () => {
+    // Initialize EmailJS
+    if (typeof emailjs !== 'undefined') {
+        emailjs.init("qm4Ipv_8cl8leemjc");
+    }
+
     initEnhancedCursor();
     initParticleBackground();
     initNavigation();
@@ -44,6 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initThemeToggle();
     initSmoothScroll();
     initScrollProgress();
+    initContactModal();
 });
 
 /**
@@ -105,6 +111,26 @@ function initEnhancedCursor() {
             border-color: var(--accent-primary, #00ff9d);
         }
         
+        body.cursor-text #cursor-dot {
+            width: 2px;
+            height: 24px;
+            border-radius: 1px;
+            background: var(--accent-primary, #00ff9d);
+            transform: translate(-50%, -50%);
+            mix-blend-mode: normal;
+        }
+        
+        body.cursor-text #cursor-outline {
+            width: 30px;
+            height: 30px;
+            border-color: var(--accent-primary, #00ff9d);
+            opacity: 0.5;
+        }
+
+        input:not([type="submit"]), textarea {
+            cursor: none !important;
+        }
+        
         body.cursor-click #cursor-outline {
             transform: translate(-50%, -50%) scale(0.9);
         }
@@ -140,15 +166,23 @@ function initEnhancedCursor() {
     // Hover detection - use event delegation
     document.addEventListener('mouseover', (e) => {
         const target = e.target.closest('a, button, .magnetic-btn, .project-card, .pg-card, .social-link');
+        const textTarget = e.target.closest('input:not([type="submit"]), textarea');
+
         if (target) {
             document.body.classList.add('cursor-hover');
+        } else if (textTarget) {
+            document.body.classList.add('cursor-text');
         }
     }, { passive: true });
 
     document.addEventListener('mouseout', (e) => {
         const target = e.target.closest('a, button, .magnetic-btn, .project-card, .pg-card, .social-link');
+        const textTarget = e.target.closest('input:not([type="submit"]), textarea');
+
         if (target) {
             document.body.classList.remove('cursor-hover');
+        } else if (textTarget) {
+            document.body.classList.remove('cursor-text');
         }
     }, { passive: true });
 
@@ -694,7 +728,6 @@ function initProjectCards() {
  */
 function initContactSection() {
     const form = document.getElementById('contact-form');
-
     if (!form) return;
 
     // Form field animations
@@ -704,15 +737,15 @@ function initContactSection() {
         const input = group.querySelector('input, textarea');
         if (!input) return;
 
-        input.addEventListener('focus', () => {
-            group.classList.add('focused');
-        });
-
-        input.addEventListener('blur', () => {
+        const handleFocus = () => group.classList.add('focused');
+        const handleBlur = () => {
             if (!input.value) {
                 group.classList.remove('focused');
             }
-        });
+        };
+
+        input.addEventListener('focus', handleFocus);
+        input.addEventListener('blur', handleBlur);
 
         // Check initial state
         if (input.value) {
@@ -726,27 +759,119 @@ function initContactSection() {
 
         const submitBtn = form.querySelector('.submit-btn');
         const btnText = submitBtn.querySelector('.btn-text');
-        const originalText = btnText.textContent;
+        const originalText = btnText ? btnText.textContent : submitBtn.textContent;
 
         submitBtn.classList.add('loading');
-        btnText.textContent = 'Sending...';
+        if (btnText) btnText.textContent = 'Sending...';
+        submitBtn.disabled = true;
 
-        // Simulate sending (replace with actual EmailJS)
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        try {
+            if (typeof emailjs === 'undefined') {
+                throw new Error('EmailJS not loaded');
+            }
 
-        submitBtn.classList.remove('loading');
-        submitBtn.classList.add('success');
-        btnText.textContent = 'Message Sent!';
+            const formData = new FormData(form);
+            const templateParams = {
+                from_name: formData.get('name'),
+                from_email: formData.get('email'),
+                subject: formData.get('subject'),
+                message: formData.get('message')
+            };
 
-        // Reset form
-        form.reset();
-        formGroups.forEach(g => g.classList.remove('focused'));
+            await emailjs.send(
+                'Th3', // Service ID
+                'template_kf11l6s', // Template ID
+                templateParams
+            );
 
-        // Reset button after delay
-        setTimeout(() => {
-            submitBtn.classList.remove('success');
-            btnText.textContent = originalText;
-        }, 3000);
+            submitBtn.classList.remove('loading');
+            submitBtn.classList.add('success');
+            if (btnText) btnText.textContent = 'Message Sent!';
+
+            // Reset form
+            form.reset();
+            formGroups.forEach(g => g.classList.remove('focused'));
+
+            // If in modal, close after delay
+            const modal = document.getElementById('contact-modal');
+            if (modal && modal.classList.contains('active')) {
+                setTimeout(() => {
+                    modal.classList.remove('active');
+                    document.body.style.overflow = '';
+                }, 2000);
+            }
+
+        } catch (error) {
+            console.error('Contact form error:', error);
+            submitBtn.classList.remove('loading');
+            submitBtn.classList.add('error');
+            if (btnText) btnText.textContent = 'Failed to send';
+        } finally {
+            // Reset button after delay
+            setTimeout(() => {
+                submitBtn.classList.remove('success', 'error', 'loading');
+                if (btnText) btnText.textContent = originalText;
+                submitBtn.disabled = false;
+            }, 3000);
+        }
+    });
+}
+
+/**
+ * ============================================
+ * CONTACT MODAL
+ * ============================================
+ */
+function initContactModal() {
+    const trigger = document.getElementById('contact-trigger');
+    const modal = document.getElementById('contact-modal');
+    const closeBtn = document.getElementById('modal-close');
+
+    if (!modal) return;
+
+    const openModal = () => {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+
+        // Staggered field animation
+        const formGroups = modal.querySelectorAll('.form-group');
+        anime({
+            targets: formGroups,
+            opacity: [0, 1],
+            translateY: [20, 0],
+            delay: anime.stagger(100, { start: 300 }),
+            duration: 600,
+            easing: 'easeOutCubic'
+        });
+    };
+
+    const closeModal = () => {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    };
+
+    if (trigger) {
+        trigger.addEventListener('click', (e) => {
+            e.preventDefault();
+            openModal();
+        });
+    }
+
+    if (closeBtn) {
+        closeBtn.addEventListener('click', closeModal);
+    }
+
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            closeModal();
+        }
+    });
+
+    // ESC key to close
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('active')) {
+            closeModal();
+        }
     });
 }
 

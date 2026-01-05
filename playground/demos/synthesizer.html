@@ -1,12 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Web Synthesizer - Th3-C0der Playground</title>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718"
-        crossorigin="anonymous"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718" crossorigin="anonymous"></script>
     <style>
         body {
             margin: 0;
@@ -15,7 +13,6 @@
             font-family: Arial, sans-serif;
             color: white;
         }
-
         .controls {
             position: fixed;
             bottom: 20px;
@@ -33,7 +30,6 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-
         .control-group {
             display: flex;
             flex-direction: column;
@@ -43,9 +39,7 @@
             border-radius: 8px;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-
-        .controls button,
-        .controls select {
+        .controls button, .controls select {
             background: rgba(255, 255, 255, 0.15);
             border: 1px solid rgba(255, 255, 255, 0.2);
             padding: 12px 15px;
@@ -58,18 +52,13 @@
             text-align: center;
             font-weight: 500;
         }
-
-        .controls button:hover,
-        .controls select:hover {
+        .controls button:hover, .controls select:hover {
             background: rgba(255, 255, 255, 0.25);
             transform: translateY(-1px);
         }
-
-        .controls button:active,
-        .controls select:active {
+        .controls button:active, .controls select:active {
             transform: translateY(1px);
         }
-
         .controls input[type="range"] {
             width: 100%;
             margin: 8px 0;
@@ -77,10 +66,8 @@
             height: 8px;
             border-radius: 4px;
             -webkit-appearance: none;
-            appearance: none;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-
         .controls input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
             width: 18px;
@@ -90,14 +77,12 @@
             cursor: pointer;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
-
         .controls label {
             color: white;
             font-size: 14px;
             margin-bottom: 5px;
             font-weight: 500;
         }
-
         .back-btn {
             position: fixed;
             top: 20px;
@@ -113,12 +98,10 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             font-weight: 500;
         }
-
         .back-btn:hover {
             background: rgba(255, 255, 255, 0.15);
             transform: translateY(-1px);
         }
-
         .instructions {
             position: fixed;
             top: 20px;
@@ -134,18 +117,15 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-
         .instructions h3 {
             margin-top: 0;
             margin-bottom: 10px;
             font-size: 16px;
         }
-
         .instructions p {
             margin: 5px 0;
             line-height: 1.4;
         }
-
         .loading {
             position: fixed;
             top: 50%;
@@ -155,7 +135,6 @@
             font-size: 24px;
             z-index: 1000;
         }
-
         .keyboard {
             position: fixed;
             bottom: 200px;
@@ -171,7 +150,6 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-
         .key {
             width: 40px;
             height: 120px;
@@ -182,7 +160,6 @@
             position: relative;
             border: 1px solid #ccc;
         }
-
         .key.black {
             width: 30px;
             height: 80px;
@@ -192,19 +169,14 @@
             z-index: 2;
             border: 1px solid #444;
         }
-
-        .key:active,
-        .key.active {
+        .key:active, .key.active {
             background: #e0e0e0;
             transform: translateY(2px);
         }
-
-        .key.black:active,
-        .key.black.active {
+        .key.black:active, .key.black.active {
             background: #444;
             transform: translateY(2px);
         }
-
         .visualizer {
             position: fixed;
             top: 0;
@@ -214,7 +186,6 @@
             z-index: 1;
             background: #000;
         }
-
         .recording-controls {
             position: fixed;
             top: 20px;
@@ -230,7 +201,6 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-
         .recording-controls button {
             background: rgba(255, 255, 255, 0.15);
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -242,42 +212,24 @@
             font-weight: 500;
             min-width: 120px;
         }
-
         .recording-controls button:hover {
             background: rgba(255, 255, 255, 0.25);
             transform: translateY(-1px);
         }
-
         .recording-controls button:active {
             transform: translateY(1px);
         }
-
         .recording-controls button:disabled {
             background: rgba(255, 255, 255, 0.05);
             cursor: not-allowed;
             opacity: 0.5;
         }
-
-        button.recording {
+        .recording-controls button.recording {
             background: rgba(255, 0, 0, 0.3);
             border-color: rgba(255, 0, 0, 0.5);
         }
-
-        .ad-overlay-bottom {
-            position: fixed;
-            bottom: 0px;
-            left: 0;
-            width: 100%;
-            z-index: 1000;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(5px);
-            padding: 10px 0;
-            display: flex;
-            justify-content: center;
-        }
     </style>
 </head>
-
 <body>
     <div class="loading">Loading Web Synthesizer...</div>
     <a href="/playground" class="back-btn">← Back to Playground</a>
@@ -340,10 +292,10 @@
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
             masterGain = audioContext.createGain();
             filter = audioContext.createBiquadFilter();
-
+            
             masterGain.connect(filter);
             filter.connect(audioContext.destination);
-
+            
             // Set initial values
             masterGain.gain.value = 0.5;
             filter.type = 'none';
@@ -361,11 +313,11 @@
                 key.className = `key ${note.includes('#') ? 'black' : ''}`;
                 key.dataset.note = note;
                 key.dataset.frequency = getFrequency(note, octave);
-
+                
                 key.addEventListener('mousedown', () => playNote(note, octave));
                 key.addEventListener('mouseup', () => stopNote(note, octave));
                 key.addEventListener('mouseleave', () => stopNote(note, octave));
-
+                
                 keyboard.appendChild(key);
             });
         }
@@ -384,24 +336,24 @@
             const frequency = getFrequency(note, octave);
             const oscillator = audioContext.createOscillator();
             const gainNode = audioContext.createGain();
-
+            
             oscillator.type = document.getElementById('waveform').value;
             oscillator.frequency.value = frequency;
-
+            
             const attack = parseFloat(document.getElementById('attack').value);
             const release = parseFloat(document.getElementById('release').value);
-
+            
             gainNode.gain.setValueAtTime(0, audioContext.currentTime);
             gainNode.gain.linearRampToValueAtTime(1, audioContext.currentTime + attack);
-
+            
             oscillator.connect(gainNode);
             gainNode.connect(masterGain);
-
+            
             oscillator.start();
-
+            
             const noteId = `${note}${octave}`;
             activeNotes.set(noteId, { oscillator, gainNode });
-
+            
             if (isRecording) {
                 recordedNotes.push({
                     note,
@@ -409,7 +361,7 @@
                     time: audioContext.currentTime - startTime
                 });
             }
-
+            
             // Visual feedback
             const key = document.querySelector(`[data-note="${note}"]`);
             if (key) key.classList.add('active');
@@ -419,17 +371,17 @@
         function stopNote(note, octave) {
             const noteId = `${note}${octave}`;
             const noteData = activeNotes.get(noteId);
-
+            
             if (noteData) {
                 const { oscillator, gainNode } = noteData;
                 const release = parseFloat(document.getElementById('release').value);
-
+                
                 gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + release);
                 oscillator.stop(audioContext.currentTime + release);
-
+                
                 activeNotes.delete(noteId);
             }
-
+            
             // Visual feedback
             const key = document.querySelector(`[data-note="${note}"]`);
             if (key) key.classList.remove('active');
@@ -439,45 +391,45 @@
         function initVisualizer() {
             const canvas = document.getElementById('visualizer');
             const ctx = canvas.getContext('2d');
-
+            
             function resize() {
                 canvas.width = window.innerWidth;
                 canvas.height = window.innerHeight;
             }
-
+            
             window.addEventListener('resize', resize);
             resize();
-
+            
             function draw() {
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
-
+                
                 if (audioContext) {
                     const analyser = audioContext.createAnalyser();
                     masterGain.connect(analyser);
                     analyser.fftSize = 2048;
-
+                    
                     const bufferLength = analyser.frequencyBinCount;
                     const dataArray = new Uint8Array(bufferLength);
                     analyser.getByteFrequencyData(dataArray);
-
+                    
                     const barWidth = canvas.width / bufferLength;
                     let x = 0;
-
+                    
                     for (let i = 0; i < bufferLength; i++) {
                         const barHeight = (dataArray[i] / 255) * canvas.height;
-
+                        
                         const hue = i / bufferLength * 360;
                         ctx.fillStyle = `hsl(${hue}, 100%, 50%)`;
-
+                        
                         ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
                         x += barWidth;
                     }
                 }
-
+                
                 requestAnimationFrame(draw);
             }
-
+            
             draw();
         }
 
@@ -485,7 +437,7 @@
         function toggleRecording() {
             isRecording = !isRecording;
             const recordBtn = document.getElementById('recordBtn');
-
+            
             if (isRecording) {
                 recordedNotes = [];
                 startTime = audioContext.currentTime;
@@ -501,17 +453,17 @@
 
         function playRecording() {
             if (recordedNotes.length === 0) return;
-
+            
             const playBtn = document.getElementById('playBtn');
             playBtn.disabled = true;
-
+            
             recordedNotes.forEach(note => {
                 setTimeout(() => {
                     playNote(note.note, note.octave);
                     setTimeout(() => stopNote(note.note, note.octave), 500);
                 }, note.time * 1000);
             });
-
+            
             setTimeout(() => {
                 playBtn.disabled = false;
             }, recordedNotes[recordedNotes.length - 1].time * 1000 + 1000);
@@ -519,23 +471,23 @@
 
         function downloadRecording() {
             if (recordedNotes.length === 0) return;
-
+            
             const data = JSON.stringify(recordedNotes);
             const blob = new Blob([data], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
-
+            
             const a = document.createElement('a');
             a.href = url;
             a.download = 'synthesizer-recording.json';
             a.click();
-
+            
             URL.revokeObjectURL(url);
         }
 
         // Event Listeners
         document.addEventListener('keydown', (e) => {
             if (e.repeat) return;
-
+            
             const keyMap = {
                 'a': ['C', 4], 'w': ['C#', 4],
                 's': ['D', 4], 'e': ['D#', 4],
@@ -546,7 +498,7 @@
                 'j': ['B', 4],
                 'k': ['C', 5]
             };
-
+            
             const note = keyMap[e.key.toLowerCase()];
             if (note) playNote(note[0], note[1]);
         });
@@ -562,13 +514,13 @@
                 'j': ['B', 4],
                 'k': ['C', 5]
             };
-
+            
             const note = keyMap[e.key.toLowerCase()];
             if (note) stopNote(note[0], note[1]);
         });
 
         document.addEventListener('keydown', (e) => {
-            switch (e.code) {
+            switch(e.code) {
                 case 'Space':
                     toggleRecording();
                     break;
@@ -625,17 +577,5 @@
 
         init();
     </script>
-    <div class="ad-overlay-bottom">
-        <div style="width:100%; display:flex; flex-direction:column; align-items:center;">
-            <span class="ad-label" style="color:#aaa; font-size:0.8rem; margin-bottom:5px;">Advertisement</span>
-            <ins class="adsbygoogle" style="display:block; width:100%; height:90px;"
-                data-ad-client="ca-pub-5166575587547718" data-ad-slot="overlay-unit" data-ad-format="auto"
-                data-full-width-responsive="true"></ins>
-            <script>
-                (adsbygoogle = window.adsbygoogle || []).push({});
-            </script>
-        </div>
-    </div>
 </body>
-
-</html>
+</html> 

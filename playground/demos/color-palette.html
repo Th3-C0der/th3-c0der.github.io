@@ -1,12 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Color Palette Generator - Th3-C0der Playground</title>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718"
-        crossorigin="anonymous"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718" crossorigin="anonymous"></script>
     <style>
         body {
             margin: 0;
@@ -62,7 +60,9 @@
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            background: conic-gradient(red, yellow, lime, cyan, blue, magenta, red);
+            background: conic-gradient(
+                red, yellow, lime, cyan, blue, magenta, red
+            );
             position: relative;
             cursor: crosshair;
         }
@@ -140,8 +140,7 @@
             color: rgba(255, 255, 255, 0.8);
         }
 
-        select,
-        button {
+        select, button {
             width: 100%;
             padding: 0.8rem;
             background: rgba(255, 255, 255, 0.1);
@@ -152,8 +151,7 @@
             transition: all 0.3s;
         }
 
-        select:hover,
-        button:hover {
+        select:hover, button:hover {
             background: rgba(255, 255, 255, 0.2);
         }
 
@@ -201,22 +199,8 @@
                 grid-template-columns: 1fr;
             }
         }
-
-        .ad-overlay-bottom {
-            position: fixed;
-            bottom: 0px;
-            left: 0;
-            width: 100%;
-            z-index: 1000;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(5px);
-            padding: 10px 0;
-            display: flex;
-            justify-content: center;
-        }
     </style>
 </head>
-
 <body>
     <a href="/playground" class="back-btn">← Back to Playground</a>
     <div class="container">
@@ -481,17 +465,5 @@
         // Initialize the color palette generator
         const generator = new ColorPaletteGenerator();
     </script>
-    <div class="ad-overlay-bottom" style="z-index: 1000;">
-        <div style="width:100%; display:flex; flex-direction:column; align-items:center;">
-            <span class="ad-label" style="color:#aaa;">Advertisement</span>
-            <ins class="adsbygoogle" style="display:block; width:100%; height:90px;"
-                data-ad-client="ca-pub-5166575587547718" data-ad-slot="overlay-unit" data-ad-format="auto"
-                data-full-width-responsive="true"></ins>
-            <script>
-                (adsbygoogle = window.adsbygoogle || []).push({});
-            </script>
-        </div>
-    </div>
 </body>
-
-</html>
+</html> 

@@ -1,12 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Advanced Particle Physics Sandbox - Th3-C0der Playground</title>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718"
-        crossorigin="anonymous"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718" crossorigin="anonymous"></script>
     <style>
         body {
             margin: 0;
@@ -138,7 +136,7 @@
 
         .stats {
             position: fixed;
-            bottom: 120px;
+            bottom: 20px;
             left: 20px;
             background: rgba(255, 255, 255, 0.1);
             padding: 1rem;
@@ -176,22 +174,8 @@
             font-size: 0.8rem;
             padding: 0.3rem 0.5rem;
         }
-
-        .ad-overlay-bottom {
-            position: fixed;
-            bottom: 0px;
-            left: 0;
-            width: 100%;
-            z-index: 1000;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(5px);
-            padding: 10px 0;
-            display: flex;
-            justify-content: center;
-        }
     </style>
 </head>
-
 <body>
     <a href="/playground" class="back-btn">← Back to Playground</a>
     <div class="container">
@@ -288,13 +272,13 @@
             }
 
             calculateMomentOfInertia() {
-                switch (this.shape) {
+                switch(this.shape) {
                     case 'circle':
                         return 0.5 * this.mass * this.size * this.size;
                     case 'square':
-                        return (1 / 6) * this.mass * (this.size * 2) * (this.size * 2);
+                        return (1/6) * this.mass * (this.size * 2) * (this.size * 2);
                     case 'triangle':
-                        return (1 / 12) * this.mass * (this.size * 2) * (this.size * 2);
+                        return (1/12) * this.mass * (this.size * 2) * (this.size * 2);
                     default:
                         return 0.5 * this.mass * this.size * this.size;
                 }
@@ -303,7 +287,7 @@
             applyForce(fx, fy, pointX = this.x, pointY = this.y) {
                 this.fx += fx;
                 this.fy += fy;
-
+                
                 // Calculate torque
                 const dx = pointX - this.x;
                 const dy = pointY - this.y;
@@ -340,7 +324,7 @@
                 ctx.rotate(this.rotation);
                 ctx.fillStyle = this.color;
 
-                switch (this.shape) {
+                switch(this.shape) {
                     case 'circle':
                         ctx.beginPath();
                         ctx.arc(0, 0, this.size, 0, Math.PI * 2);
@@ -470,7 +454,7 @@
 
                     // Get nearby particles from spatial grid
                     const nearby = this.grid.query(p1);
-
+                    
                     // Apply particle interactions
                     for (const p2 of nearby) {
                         if (p1 === p2) continue;
@@ -502,12 +486,12 @@
                             const impulseX = impulse * dx;
                             const impulseY = impulse * dy;
 
-                            p1.applyForce(-impulseX * p2.mass / (p1.mass + p2.mass) * p1.elasticity,
-                                -impulseY * p2.mass / (p1.mass + p2.mass) * p1.elasticity,
-                                p1.x, p1.y);
+                            p1.applyForce(-impulseX * p2.mass / (p1.mass + p2.mass) * p1.elasticity, 
+                                        -impulseY * p2.mass / (p1.mass + p2.mass) * p1.elasticity,
+                                        p1.x, p1.y);
                             p2.applyForce(impulseX * p1.mass / (p1.mass + p2.mass) * p2.elasticity,
-                                impulseY * p1.mass / (p1.mass + p2.mass) * p2.elasticity,
-                                p2.x, p2.y);
+                                        impulseY * p1.mass / (p1.mass + p2.mass) * p2.elasticity,
+                                        p2.x, p2.y);
                         } else {
                             // Apply attraction/repulsion
                             const force = (attraction - repulsion) / (distance * distance);
@@ -523,7 +507,7 @@
                     p1.update(dt);
 
                     // Boundary handling
-                    switch (boundaryType) {
+                    switch(boundaryType) {
                         case 'bounce':
                             this.handleBounceBoundary(p1, boundaryElasticity);
                             break;
@@ -545,7 +529,7 @@
                     this.lastFpsUpdate = now;
                     document.getElementById('fps').textContent = this.fps;
                     document.getElementById('particleCount').textContent = this.particles.length;
-                    document.getElementById('energy').textContent =
+                    document.getElementById('energy').textContent = 
                         this.particles.reduce((sum, p) => sum + p.getEnergy(), 0).toFixed(2);
                 }
             }
@@ -649,11 +633,11 @@
                 const centerX = this.canvas.width / 2;
                 const centerY = this.canvas.height / 2;
 
-                switch (preset) {
+                switch(preset) {
                     case 'solar':
                         // Create sun
                         this.particles.push(new Particle(centerX, centerY, 20, 1000, 0.8, 0.01, '#ffd700', 'circle'));
-
+                        
                         // Create planets
                         for (let i = 0; i < 5; i++) {
                             const angle = (i / 5) * Math.PI * 2;
@@ -662,8 +646,8 @@
                             const y = centerY + Math.sin(angle) * distance;
                             const size = 5 + i * 2;
                             const mass = 10 + i * 5;
-                            const vx = Math.cos(angle + Math.PI / 2) * 2;
-                            const vy = Math.sin(angle + Math.PI / 2) * 2;
+                            const vx = Math.cos(angle + Math.PI/2) * 2;
+                            const vy = Math.sin(angle + Math.PI/2) * 2;
                             const planet = new Particle(x, y, size, mass, 0.8, 0.01, `hsl(${i * 72}, 70%, 50%)`, 'circle');
                             planet.vx = vx;
                             planet.vy = vy;
@@ -706,8 +690,8 @@
                             const y = centerY + Math.sin(angle) * distance;
                             const particle = new Particle(x, y, 2, 1, 0.8, 0.01, '#ff00ff', 'circle');
                             const speed = 2 + distance * 0.02;
-                            particle.vx = Math.cos(angle + Math.PI / 2) * speed;
-                            particle.vy = Math.sin(angle + Math.PI / 2) * speed;
+                            particle.vx = Math.cos(angle + Math.PI/2) * speed;
+                            particle.vy = Math.sin(angle + Math.PI/2) * speed;
                             this.particles.push(particle);
                         }
                         break;
@@ -760,20 +744,20 @@
             query(particle) {
                 const key = this.getCellKey(particle.x, particle.y);
                 const nearby = new Set();
-
+                
                 // Check current cell and 8 surrounding cells
                 for (let dx = -1; dx <= 1; dx++) {
                     for (let dy = -1; dy <= 1; dy++) {
                         const cellX = Math.floor(particle.x / this.cellSize) + dx;
                         const cellY = Math.floor(particle.y / this.cellSize) + dy;
                         const cellKey = `${cellX},${cellY}`;
-
+                        
                         if (this.grid.has(cellKey)) {
                             this.grid.get(cellKey).forEach(p => nearby.add(p));
                         }
                     }
                 }
-
+                
                 return nearby;
             }
 
@@ -786,17 +770,5 @@
         const canvas = document.getElementById('physicsCanvas');
         const simulation = new PhysicsSimulation(canvas);
     </script>
-    <div class="ad-overlay-bottom" style="z-index: 1000;">
-        <div style="width:100%; display:flex; flex-direction:column; align-items:center;">
-            <span class="ad-label" style="color:#aaa;">Advertisement</span>
-            <ins class="adsbygoogle" style="display:block; width:100%; height:90px;"
-                data-ad-client="ca-pub-5166575587547718" data-ad-slot="overlay-unit" data-ad-format="auto"
-                data-full-width-responsive="true"></ins>
-            <script>
-                (adsbygoogle = window.adsbygoogle || []).push({});
-            </script>
-        </div>
-    </div>
 </body>
-
-</html>
+</html> 

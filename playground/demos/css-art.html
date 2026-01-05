@@ -1,12 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CSS Art Gallery - Th3-C0der Playground</title>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718"
-        crossorigin="anonymous"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718" crossorigin="anonymous"></script>
     <style>
         body {
             margin: 0;
@@ -114,17 +112,9 @@
         }
 
         @keyframes pulse {
-            0% {
-                transform: translate(-50%, -50%) scale(1);
-            }
-
-            50% {
-                transform: translate(-50%, -50%) scale(1.1);
-            }
-
-            100% {
-                transform: translate(-50%, -50%) scale(1);
-            }
+            0% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.1); }
+            100% { transform: translate(-50%, -50%) scale(1); }
         }
 
         .heart {
@@ -159,25 +149,11 @@
         }
 
         @keyframes heartbeat {
-            0% {
-                transform: translate(-50%, -50%) rotate(45deg) scale(1);
-            }
-
-            14% {
-                transform: translate(-50%, -50%) rotate(45deg) scale(1.1);
-            }
-
-            28% {
-                transform: translate(-50%, -50%) rotate(45deg) scale(1);
-            }
-
-            42% {
-                transform: translate(-50%, -50%) rotate(45deg) scale(1.1);
-            }
-
-            70% {
-                transform: translate(-50%, -50%) rotate(45deg) scale(1);
-            }
+            0% { transform: translate(-50%, -50%) rotate(45deg) scale(1); }
+            14% { transform: translate(-50%, -50%) rotate(45deg) scale(1.1); }
+            28% { transform: translate(-50%, -50%) rotate(45deg) scale(1); }
+            42% { transform: translate(-50%, -50%) rotate(45deg) scale(1.1); }
+            70% { transform: translate(-50%, -50%) rotate(45deg) scale(1); }
         }
 
         .rainbow {
@@ -187,29 +163,23 @@
             transform: translate(-50%, -50%);
             width: 200px;
             height: 20px;
-            background: linear-gradient(to right,
-                    #ff0000,
-                    #ff7f00,
-                    #ffff00,
-                    #00ff00,
-                    #0000ff,
-                    #4b0082,
-                    #8b00ff);
+            background: linear-gradient(
+                to right,
+                #ff0000,
+                #ff7f00,
+                #ffff00,
+                #00ff00,
+                #0000ff,
+                #4b0082,
+                #8b00ff
+            );
             animation: move 3s infinite;
         }
 
         @keyframes move {
-            0% {
-                transform: translate(-50%, -50%) translateX(-50px);
-            }
-
-            50% {
-                transform: translate(-50%, -50%) translateX(50px);
-            }
-
-            100% {
-                transform: translate(-50%, -50%) translateX(-50px);
-            }
+            0% { transform: translate(-50%, -50%) translateX(-50px); }
+            50% { transform: translate(-50%, -50%) translateX(50px); }
+            100% { transform: translate(-50%, -50%) translateX(-50px); }
         }
 
         @media (max-width: 768px) {
@@ -266,38 +236,16 @@
             border: 2px solid rgba(255, 255, 255, 0.4);
         }
 
-        .front {
-            transform: translateZ(50px);
-        }
-
-        .back {
-            transform: translateZ(-50px) rotateY(180deg);
-        }
-
-        .right {
-            transform: translateX(50px) rotateY(90deg);
-        }
-
-        .left {
-            transform: translateX(-50px) rotateY(-90deg);
-        }
-
-        .top {
-            transform: translateY(-50px) rotateX(90deg);
-        }
-
-        .bottom {
-            transform: translateY(50px) rotateX(-90deg);
-        }
+        .front { transform: translateZ(50px); }
+        .back { transform: translateZ(-50px) rotateY(180deg); }
+        .right { transform: translateX(50px) rotateY(90deg); }
+        .left { transform: translateX(-50px) rotateY(-90deg); }
+        .top { transform: translateY(-50px) rotateX(90deg); }
+        .bottom { transform: translateY(50px) rotateX(-90deg); }
 
         @keyframes rotate {
-            0% {
-                transform: translate(-50%, -50%) rotateX(45deg) rotateZ(45deg);
-            }
-
-            100% {
-                transform: translate(-50%, -50%) rotateX(405deg) rotateZ(405deg);
-            }
+            0% { transform: translate(-50%, -50%) rotateX(45deg) rotateZ(45deg); }
+            100% { transform: translate(-50%, -50%) rotateX(405deg) rotateZ(405deg); }
         }
 
         /* New Art Pieces */
@@ -315,56 +263,36 @@
             content: '';
             position: absolute;
             width: 50px;
-            height: 80px;
-            /* Elongated oval shape */
+            height: 80px; /* Elongated oval shape */
             background: linear-gradient(45deg, #ff69b4, #ff1493);
-            border-radius: 50% 50% 0 50%;
-            /* Teardrop shape */
-            box-shadow: 0 0 20px rgba(255, 105, 180, 0.7);
-            /* Enhanced glow */
+            border-radius: 50% 50% 0 50%; /* Teardrop shape */
+            box-shadow: 0 0 20px rgba(255, 105, 180, 0.7); /* Enhanced glow */
         }
 
         .butterfly:before {
             top: 0px;
-            left: 10px;
-            /* Adjust left wing position */
-            transform-origin: 100% 50%;
-            /* Rotate from the right edge */
-            transform: rotate(-30deg);
-            /* Initial rotation */
+            left: 10px; /* Adjust left wing position */
+            transform-origin: 100% 50%; /* Rotate from the right edge */
+            transform: rotate(-30deg); /* Initial rotation */
             animation: flapLeft 0.8s infinite alternate;
         }
 
         .butterfly:after {
-            top: 10px;
-            /* Slightly lower to create overlap */
-            left: 40px;
-            /* Adjust right wing position */
-            transform-origin: 0% 50%;
-            /* Rotate from the left edge */
-            transform: rotate(30deg);
-            /* Initial rotation */
+            top: 10px; /* Slightly lower to create overlap */
+            left: 40px; /* Adjust right wing position */
+            transform-origin: 0% 50%; /* Rotate from the left edge */
+            transform: rotate(30deg); /* Initial rotation */
             animation: flapRight 0.8s infinite alternate;
         }
 
         @keyframes flapLeft {
-            0% {
-                transform: rotate(-30deg);
-            }
-
-            100% {
-                transform: rotate(-50deg);
-            }
+            0% { transform: rotate(-30deg); }
+            100% { transform: rotate(-50deg); }
         }
 
         @keyframes flapRight {
-            0% {
-                transform: rotate(30deg);
-            }
-
-            100% {
-                transform: rotate(50deg);
-            }
+            0% { transform: rotate(30deg); }
+            100% { transform: rotate(50deg); }
         }
 
         /* Twinkling Star */
@@ -376,18 +304,19 @@
             width: 100px;
             height: 100px;
             background: #ffd700;
-            clip-path: polygon(50% 0%,
-                    61% 35%,
-                    98% 35%,
-                    68% 57%,
-                    79% 91%,
-                    50% 70%,
-                    21% 91%,
-                    32% 57%,
-                    2% 35%,
-                    39% 35%);
-            box-shadow: 0 0 30px #ffd700, 0 0 50px #ffc107;
-            /* Enhanced glow */
+            clip-path: polygon(
+                50% 0%,
+                61% 35%,
+                98% 35%,
+                68% 57%,
+                79% 91%,
+                50% 70%,
+                21% 91%,
+                32% 57%,
+                2% 35%,
+                39% 35%
+            );
+            box-shadow: 0 0 30px #ffd700, 0 0 50px #ffc107; /* Enhanced glow */
             animation: twinkle 1.5s infinite alternate;
         }
 
@@ -398,15 +327,8 @@
         }
 
         @keyframes twinkle {
-            0% {
-                opacity: 0.5;
-                transform: translate(-50%, -50%) scale(0.8);
-            }
-
-            100% {
-                opacity: 1;
-                transform: translate(-50%, -50%) scale(1);
-            }
+            0% { opacity: 0.5; transform: translate(-50%, -50%) scale(0.8); }
+            100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
         }
 
         .moon {
@@ -431,8 +353,8 @@
             background: #2a2a2a;
             border-radius: 50%;
             box-shadow: 40px 10px 0 -5px #2a2a2a,
-                20px 40px 0 -3px #2a2a2a,
-                50px 40px 0 -2px #2a2a2a;
+                       20px 40px 0 -3px #2a2a2a,
+                       50px 40px 0 -2px #2a2a2a;
         }
 
         .loader {
@@ -449,26 +371,10 @@
         }
 
         @keyframes spin {
-            100% {
-                transform: translate(-50%, -50%) rotate(360deg);
-            }
-        }
-
-        .ad-overlay-bottom {
-            position: fixed;
-            bottom: 0px;
-            left: 0;
-            width: 100%;
-            z-index: 1000;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(5px);
-            padding: 10px 0;
-            display: flex;
-            justify-content: center;
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
         }
     </style>
 </head>
-
 <body>
     <a href="/playground" class="back-btn">← Back to Playground</a>
     <div class="gallery">
@@ -558,7 +464,7 @@
             const styleSheets = document.styleSheets;
             let cssText = '';
             let foundRules = false;
-
+            
             try {
                 // Loop through all stylesheets
                 for (let sheet of styleSheets) {
@@ -573,15 +479,15 @@
                                 cssText += rule.cssText + '\n';
                                 foundRules = true;
                             }
-
+                            
                             // Check for keyframes that might be used by this selector
                             if (rule.type === CSSRule.KEYFRAMES_RULE) {
                                 const keyframesName = rule.name;
                                 // Check if any rule uses these keyframes
                                 for (let checkRule of rules) {
-                                    if (checkRule.selectorText &&
-                                        checkRule.selectorText.includes(selector) &&
-                                        checkRule.style.animation &&
+                                    if (checkRule.selectorText && 
+                                        checkRule.selectorText.includes(selector) && 
+                                        checkRule.style.animation && 
                                         checkRule.style.animation.includes(keyframesName)) {
                                         cssText += rule.cssText + '\n';
                                         foundRules = true;
@@ -620,7 +526,7 @@
                 textarea.value = cssText;
                 document.body.appendChild(textarea);
                 textarea.select();
-
+                
                 try {
                     document.execCommand('copy');
                     button.textContent = 'Copied!';
@@ -632,7 +538,7 @@
                 } catch (err) {
                     alert('Failed to copy CSS. Please try again.');
                 }
-
+                
                 document.body.removeChild(textarea);
             } catch (error) {
                 console.error('Error accessing stylesheet:', error);
@@ -640,17 +546,5 @@
             }
         }
     </script>
-    <div class="ad-overlay-bottom" style="z-index: 1000;">
-        <div style="width:100%; display:flex; flex-direction:column; align-items:center;">
-            <span class="ad-label" style="color:#aaa;">Advertisement</span>
-            <ins class="adsbygoogle" style="display:block; width:100%; height:90px;"
-                data-ad-client="ca-pub-5166575587547718" data-ad-slot="overlay-unit" data-ad-format="auto"
-                data-full-width-responsive="true"></ins>
-            <script>
-                (adsbygoogle = window.adsbygoogle || []).push({});
-            </script>
-        </div>
-    </div>
 </body>
-
-</html>
+</html> 

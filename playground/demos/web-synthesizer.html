@@ -1,12 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Web Synthesizer - Th3-C0der Playground</title>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718"
-        crossorigin="anonymous"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718" crossorigin="anonymous"></script>
     <style>
         body {
             margin: 0;
@@ -65,8 +63,7 @@
             color: white;
         }
 
-        .controls button,
-        .controls select {
+        .controls button, .controls select {
             background: rgba(255, 255, 255, 0.15);
             border: 1px solid rgba(255, 255, 255, 0.2);
             padding: 12px 15px;
@@ -80,14 +77,12 @@
             font-weight: 500;
         }
 
-        .controls button:hover,
-        .controls select:hover {
+        .controls button:hover, .controls select:hover {
             background: rgba(255, 255, 255, 0.25);
             transform: translateY(-1px);
         }
 
-        .controls button:active,
-        .controls select:active {
+        .controls button:active, .controls select:active {
             transform: translateY(1px);
         }
 
@@ -98,7 +93,6 @@
             border-radius: 4px;
             height: 6px;
             -webkit-appearance: none;
-            appearance: none;
         }
 
         .back-btn {
@@ -181,14 +175,12 @@
             border-radius: 0 0 4px 4px;
         }
 
-        .key:active,
-        .key.active {
+        .key:active, .key.active {
             background: #ddd;
             transform: translateY(2px);
         }
 
-        .key.black:active,
-        .key.black.active {
+        .key.black:active, .key.black.active {
             background: #222;
         }
 
@@ -221,22 +213,8 @@
                 margin-right: -10px;
             }
         }
-
-        .ad-overlay-bottom {
-            position: fixed;
-            bottom: 0px;
-            left: 0;
-            width: 100%;
-            z-index: 1000;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(5px);
-            padding: 10px 0;
-            display: flex;
-            justify-content: center;
-        }
     </style>
 </head>
-
 <body>
     <a href="/playground" class="back-btn">← Back to Playground</a>
     <div class="container">
@@ -528,17 +506,5 @@
         // Initialize the synthesizer
         const synth = new Synthesizer();
     </script>
-    <div class="ad-overlay-bottom">
-        <div style="width:100%; display:flex; flex-direction:column; align-items:center;">
-            <span class="ad-label" style="color:#aaa; font-size:0.8rem; margin-bottom:5px;">Advertisement</span>
-            <ins class="adsbygoogle" style="display:block; width:100%; height:90px;"
-                data-ad-client="ca-pub-5166575587547718" data-ad-slot="overlay-unit" data-ad-format="auto"
-                data-full-width-responsive="true"></ins>
-            <script>
-                (adsbygoogle = window.adsbygoogle || []).push({});
-            </script>
-        </div>
-    </div>
 </body>
-
-</html>
+</html> 

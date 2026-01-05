@@ -1,12 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fractal Tree Generator - Th3-C0der Playground</title>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718"
-        crossorigin="anonymous"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718" crossorigin="anonymous"></script>
     <style>
         body {
             margin: 0;
@@ -65,7 +63,6 @@
             border-radius: 4px;
             height: 6px;
             -webkit-appearance: none;
-            appearance: none;
         }
 
         input[type="range"]::-webkit-slider-thumb {
@@ -152,22 +149,8 @@
                 height: auto;
             }
         }
-
-        .ad-overlay-bottom {
-            position: fixed;
-            bottom: 0px;
-            left: 0;
-            width: 100%;
-            z-index: 1000;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(5px);
-            padding: 10px 0;
-            display: flex;
-            justify-content: center;
-        }
     </style>
 </head>
-
 <body>
     <a href="/playground" class="back-btn">← Back to Playground</a>
     <div class="container">
@@ -247,7 +230,7 @@
                     controls.thickness.value = Math.floor(Math.random() * 20) + 1;
                     controls.color1.value = this.getRandomColor();
                     controls.color2.value = this.getRandomColor();
-
+                    
                     // Trigger input events to update displays and redraw
                     Object.values(controls).forEach(control => {
                         control.dispatchEvent(new Event('input'));
@@ -264,12 +247,12 @@
             }
 
             getRandomColor() {
-                return '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
+                return '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
             }
 
             draw() {
                 this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
+                
                 const iterations = parseInt(document.getElementById('iterations').value);
                 const angle = parseInt(document.getElementById('angle').value) * Math.PI / 180;
                 const length = parseFloat(document.getElementById('length').value);
@@ -288,10 +271,10 @@
 
                 const branchLength = this.canvas.height * 0.3 * Math.pow(length, depth);
                 const lineWidth = thickness * Math.pow(0.7, depth);
-
+                
                 this.ctx.lineWidth = lineWidth;
                 this.ctx.strokeStyle = depth === 0 ? color1 : color2;
-
+                
                 this.ctx.beginPath();
                 this.ctx.moveTo(0, 0);
                 this.ctx.lineTo(0, -branchLength);
@@ -299,13 +282,13 @@
 
                 if (depth < maxDepth) {
                     this.ctx.translate(0, -branchLength);
-
+                    
                     // Left branch
                     this.ctx.save();
                     this.ctx.rotate(-angle);
                     this.drawBranch(depth + 1, maxDepth, angle, length, thickness, color1, color2);
                     this.ctx.restore();
-
+                    
                     // Right branch
                     this.ctx.save();
                     this.ctx.rotate(angle);
@@ -318,17 +301,5 @@
         // Initialize the fractal tree
         const tree = new FractalTree();
     </script>
-    <div class="ad-overlay-bottom" style="z-index: 1000;">
-        <div style="width:100%; display:flex; flex-direction:column; align-items:center;">
-            <span class="ad-label" style="color:#aaa;">Advertisement</span>
-            <ins class="adsbygoogle" style="display:block; width:100%; height:90px;"
-                data-ad-client="ca-pub-5166575587547718" data-ad-slot="overlay-unit" data-ad-format="auto"
-                data-full-width-responsive="true"></ins>
-            <script>
-                (adsbygoogle = window.adsbygoogle || []).push({});
-            </script>
-        </div>
-    </div>
 </body>
-
-</html>
+</html> 

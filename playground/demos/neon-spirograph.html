@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Neon Spirograph - Th3-C0der Playground</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718"
+        crossorigin="anonymous"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #050510;
+            color: #fff;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            font-family: 'Segoe UI', sans-serif;
+            height: 100vh;
+        }
+
+        .canvas-container {
+            flex-grow: 1;
+            position: relative;
+            background: radial-gradient(circle at center, #1a1a2e 0%, #000 100%);
+        }
+
+        canvas {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .controls {
+            width: 300px;
+            background: rgba(10, 10, 15, 0.95);
+            border-left: 1px solid #333;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            backdrop-filter: blur(10px);
+            z-index: 10;
+            padding-bottom: 100px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 20px;
+            transition: color 0.3s;
+        }
+
+        .back-btn:hover {
+            color: #fff;
+        }
+
+        h2 {
+            margin: 0 0 10px 0;
+            color: #00ffcc;
+            font-size: 1.5rem;
+            letter-spacing: 1px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        label {
+            font-size: 0.85rem;
+            color: #aaa;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 4px;
+            background: #333;
+            border-radius: 2px;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            background: #00ffcc;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        button {
+            flex: 1;
+            padding: 10px;
+            background: transparent;
+            border: 1px solid #00ffcc;
+            color: #00ffcc;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background: rgba(0, 255, 204, 0.1);
+            box-shadow: 0 0 10px rgba(0, 255, 204, 0.2);
+        }
+
+        button.danger {
+            border-color: #ff0055;
+            color: #ff0055;
+        }
+
+        button.danger:hover {
+            background: rgba(255, 0, 85, 0.1);
+            box-shadow: 0 0 10px rgba(255, 0, 85, 0.2);
+        }
+
+        .stats {
+            text-align: center;
+        }
+
+        .ad-overlay-bottom {
+            position: fixed;
+            bottom: 0px;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            padding: 10px 0;
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="canvas-container">
+        <canvas id="trailCanvas"></canvas>
+        <canvas id="armCanvas"></canvas>
+    </div>
+
+    <div class="controls">
+        <a href="/playground" class="back-btn"><i class="fas fa-arrow-left"></i> Back</a>
+        <h2>NEON SPIRO</h2>
+
+        <div class="control-group">
+            <label>Speed <span>x<span id="speedVal">1</span></span></label>
+            <input type="range" id="speed" min="0" max="5" step="0.1" value="1">
+        </div>
+
+        <div class="control-group">
+            <label>Resolution <span><span id="resVal">High</span></span></label>
+            <input type="range" id="resolution" min="1" max="10" value="1">
+        </div>
+
+        <div class="control-group">
+            <label>Radius 1</label>
+            <input type="range" id="r1" min="10" max="200" value="100">
+        </div>
+
+        <div class="control-group">
+            <label>Speed 1</label>
+            <input type="range" id="s1" min="-10" max="10" step="0.1" value="1">
+        </div>
+
+        <div class="control-group">
+            <label>Radius 2</label>
+            <input type="range" id="r2" min="10" max="200" value="70">
+        </div>
+
+        <div class="control-group">
+            <label>Speed 2</label>
+            <input type="range" id="s2" min="-20" max="20" step="0.1" value="-3">
+        </div>
+
+        <div class="control-group">
+            <label>Radius 3</label>
+            <input type="range" id="r3" min="0" max="100" value="30">
+        </div>
+
+        <div class="control-group">
+            <label>Speed 3</label>
+            <input type="range" id="s3" min="-50" max="50" step="1" value="10">
+        </div>
+
+        <div class="control-group">
+            <label>Color HSL Hue</label>
+            <input type="range" id="hue" min="0" max="360" value="180">
+        </div>
+
+        <div class="control-group">
+            <label for="autoColor">
+                Auto Color Cycle
+                <input type="checkbox" id="autoColor" checked>
+            </label>
+        </div>
+
+        <div class="btn-row">
+            <button id="pauseBtn"><i class="fas fa-pause"></i> Pause</button>
+            <button id="clearBtn" class="danger"><i class="fas fa-trash"></i> Clear</button>
+        </div>
+
+        <div class="stats">
+            Points: <span id="pointCount">0</span>
+        </div>
+    </div>
+
+    <script>
+        const trailCanvas = document.getElementById('trailCanvas');
+        const armCanvas = document.getElementById('armCanvas');
+        const tCtx = trailCanvas.getContext('2d');
+        const aCtx = armCanvas.getContext('2d');
+
+        let width, height, cx, cy;
+        let time = 0;
+        let points = [];
+        let isPaused = false;
+
+        // Params
+        const params = {
+            speed: 1,
+            steps: 1, // Draw steps per frame
+            r1: 100, s1: 0.01,
+            r2: 70, s2: -0.05,
+            r3: 30, s3: 0.1,
+            hue: 180,
+            autoColor: true
+        };
+
+        let lastX = 0, lastY = 0;
+        let pointCounter = 0;
+
+        function resize() {
+            const container = document.querySelector('.canvas-container');
+            width = container.clientWidth;
+            height = container.clientHeight;
+
+            trailCanvas.width = width;
+            trailCanvas.height = height;
+            armCanvas.width = width;
+            armCanvas.height = height;
+
+            cx = width / 2;
+            cy = height / 2;
+
+            // Re-center logic would require clearing or transforming existing canvas
+            // We just clear for simplicity on resize
+            clearCanvas();
+        }
+        window.addEventListener('resize', resize);
+
+        function clearCanvas() {
+            tCtx.clearRect(0, 0, width, height);
+            points = [];
+            pointCounter = 0;
+            // Reset position to center to avoid jump line?
+            // Actually drawing lines requires continuity.
+            // On clear, we just stop drawing the segment from valid last
+            lastX = null;
+        }
+
+        function drawArm(x1, y1, x2, y2, x3, y3, x4, y4) {
+            aCtx.clearRect(0, 0, width, height);
+
+            aCtx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+            aCtx.lineWidth = 1;
+
+            // Center Circle
+            aCtx.beginPath();
+            aCtx.arc(cx, cy, 3, 0, Math.PI * 2);
+            aCtx.fillStyle = '#fff';
+            aCtx.fill();
+
+            // Arm 1
+            aCtx.beginPath();
+            aCtx.moveTo(cx, cy);
+            aCtx.lineTo(x2, y2);
+            aCtx.stroke();
+
+            // Joint 1
+            aCtx.beginPath();
+            aCtx.arc(x2, y2, 3, 0, Math.PI * 2);
+            aCtx.fill();
+
+            // Arm 2
+            aCtx.beginPath();
+            aCtx.moveTo(x2, y2);
+            aCtx.lineTo(x3, y3);
+            aCtx.stroke();
+
+            // Joint 2
+            aCtx.beginPath();
+            aCtx.arc(x3, y3, 3, 0, Math.PI * 2);
+            aCtx.fill();
+
+            // Arm 3
+            if (params.r3 > 0) {
+                aCtx.beginPath();
+                aCtx.moveTo(x3, y3);
+                aCtx.lineTo(x4, y4);
+                aCtx.stroke();
+
+                // Pen tip
+                aCtx.fillStyle = '#00ffcc';
+                aCtx.beginPath();
+                aCtx.arc(x4, y4, 4, 0, Math.PI * 2);
+                aCtx.fill();
+            } else {
+                // Pen tip at joint 2
+                aCtx.fillStyle = '#00ffcc';
+                aCtx.beginPath();
+                aCtx.arc(x3, y3, 4, 0, Math.PI * 2);
+                aCtx.fill();
+            }
+        }
+
+        function update() {
+            if (isPaused) return;
+
+            // Multiple steps for smooth lines at high speed
+            for (let i = 0; i < params.steps; i++) {
+                time += params.speed * 0.05;
+
+                // Calculate positions
+                // Arm 1
+                const ang1 = time * params.s1;
+                const x2 = cx + Math.cos(ang1) * params.r1;
+                const y2 = cy + Math.sin(ang1) * params.r1;
+
+                // Arm 2 (Relative to Arm 1 end)
+                const ang2 = time * params.s2;
+                const x3 = x2 + Math.cos(ang2) * params.r2;
+                const y3 = y2 + Math.sin(ang2) * params.r2;
+
+                // Arm 3 (Relative to Arm 2 end)
+                const ang3 = time * params.s3;
+                const x4 = x3 + Math.cos(ang3) * params.r3;
+                const y4 = y3 + Math.sin(ang3) * params.r3;
+
+                const finalX = params.r3 > 0 ? x4 : x3;
+                const finalY = params.r3 > 0 ? y4 : y3;
+
+                // Draw Trail
+                if (lastX !== null && lastX !== undefined) {
+                    tCtx.beginPath();
+
+                    let hue = params.hue;
+                    if (params.autoColor) {
+                        hue = (time * 5) % 360;
+                        // update slider visual just so user sees it? Nah dragging UI while drawing is slow
+                    }
+
+                    tCtx.strokeStyle = `hsl(${hue}, 100%, 50%)`;
+                    tCtx.lineWidth = 1;
+                    tCtx.globalAlpha = 0.5; // stacking alpha
+                    tCtx.moveTo(lastX, lastY);
+                    tCtx.lineTo(finalX, finalY);
+                    tCtx.stroke();
+
+                    pointCounter++;
+                }
+
+                lastX = finalX;
+                lastY = finalY;
+
+                // Only draw arm on last step to save perf
+                if (i === params.steps - 1) {
+                    drawArm(cx, cy, x2, y2, x3, y3, x4, y4);
+                }
+            }
+
+            document.getElementById('pointCount').innerText = pointCounter;
+
+            requestAnimationFrame(update);
+        }
+
+        // Init
+        resize();
+        requestAnimationFrame(update);
+
+        // UI Bindings
+        const inputMap = {
+            'speed': (v) => params.speed = parseFloat(v),
+            'resolution': (v) => params.steps = parseInt(v) * 2, // 1 -> 20 steps
+            'r1': (v) => { params.r1 = parseInt(v); lastX = null; },
+            's1': (v) => params.s1 = parseFloat(v) * 0.01,
+            'r2': (v) => { params.r2 = parseInt(v); lastX = null; },
+            's2': (v) => params.s2 = parseFloat(v) * 0.01,
+            'r3': (v) => { params.r3 = parseInt(v); lastX = null; },
+            's3': (v) => params.s3 = parseFloat(v) * 0.01,
+            'hue': (v) => params.hue = parseInt(v)
+        };
+
+        for (const [id, handler] of Object.entries(inputMap)) {
+            const el = document.getElementById(id);
+            if (el) {
+                // Initialize state from default HTML values
+                handler(el.value);
+
+                el.addEventListener('input', e => {
+                    handler(e.target.value);
+                    const valDisplay = document.getElementById(id + 'Val');
+                    if (valDisplay) valDisplay.innerText = e.target.value;
+                });
+            }
+        }
+
+        document.getElementById('autoColor').addEventListener('change', e => {
+            params.autoColor = e.target.checked;
+        });
+
+        document.getElementById('clearBtn').addEventListener('click', clearCanvas);
+
+        const pauseBtn = document.getElementById('pauseBtn');
+        pauseBtn.addEventListener('click', () => {
+            isPaused = !isPaused;
+            pauseBtn.innerHTML = isPaused ? '<i class="fas fa-play"></i> Play' : '<i class="fas fa-pause"></i> Pause';
+            if (!isPaused) update();
+        });
+
+    </script>
+    <div class="ad-overlay-bottom" style="z-index: 1000;">
+        <div style="width:100%; display:flex; flex-direction:column; align-items:center;">
+            <span class="ad-label" style="color:#aaa;">Advertisement</span>
+            <ins class="adsbygoogle" style="display:block; width:100%; height:90px;"
+                data-ad-client="ca-pub-5166575587547718" data-ad-slot="overlay-unit" data-ad-format="auto"
+                data-full-width-responsive="true"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+    </div>
+</body>
+
+</html>

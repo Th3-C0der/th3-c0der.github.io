@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fluid Simulation - Th3-C0der Playground</title>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718" crossorigin="anonymous"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718"
+        crossorigin="anonymous"></script>
     <style>
         body {
             margin: 0;
@@ -37,7 +39,7 @@
 
         .controls {
             position: fixed;
-            bottom: 20px;
+            bottom: 120px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 2;
@@ -65,7 +67,8 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .controls button, .controls select {
+        .controls button,
+        .controls select {
             background: rgba(255, 255, 255, 0.15);
             border: 1px solid rgba(255, 255, 255, 0.2);
             padding: 12px 15px;
@@ -79,12 +82,14 @@
             font-weight: 500;
         }
 
-        .controls button:hover, .controls select:hover {
+        .controls button:hover,
+        .controls select:hover {
             background: rgba(255, 255, 255, 0.25);
             transform: translateY(-1px);
         }
 
-        .controls button:active, .controls select:active {
+        .controls button:active,
+        .controls select:active {
             transform: translateY(1px);
         }
 
@@ -95,6 +100,7 @@
             border-radius: 4px;
             height: 6px;
             -webkit-appearance: none;
+            appearance: none;
         }
 
         .back-btn {
@@ -144,7 +150,7 @@
 
         .stats {
             position: fixed;
-            bottom: 20px;
+            bottom: 120px;
             right: 20px;
             background: rgba(255, 255, 255, 0.1);
             color: white;
@@ -169,8 +175,22 @@
                 display: none;
             }
         }
+
+        .ad-overlay-bottom {
+            position: fixed;
+            bottom: 0px;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            padding: 10px 0;
+            display: flex;
+            justify-content: center;
+        }
     </style>
 </head>
+
 <body>
     <div class="loading">Loading Fluid Simulation...</div>
     <a href="/playground" class="back-btn">← Back to Playground</a>
@@ -228,25 +248,25 @@
         function init() {
             canvas = document.getElementById('canvas');
             ctx = canvas.getContext('2d');
-            
+
             function resize() {
                 width = canvas.width = window.innerWidth;
                 height = canvas.height = window.innerHeight;
                 initFields();
             }
-            
+
             window.addEventListener('resize', resize);
             resize();
-            
+
             // Initialize Fields
             initFields();
-            
+
             // Event Listeners
             setupEventListeners();
-            
+
             // Start Animation
             requestAnimationFrame(update);
-            
+
             document.querySelector('.loading').style.display = 'none';
         }
 
@@ -284,7 +304,7 @@
             });
 
             document.addEventListener('keydown', (e) => {
-                switch(e.code) {
+                switch (e.code) {
                     case 'Space':
                         isPaused = !isPaused;
                         break;
@@ -336,7 +356,7 @@
         function addForce(x, y, fx, fy) {
             const force = parseFloat(document.getElementById('force').value);
             const index = Math.floor(y) * width + Math.floor(x);
-            
+
             if (index >= 0 && index < width * height) {
                 velocityField.x[index] += fx * force;
                 velocityField.y[index] += fy * force;
@@ -366,8 +386,8 @@
                 if (isMouseDown) {
                     const dx = mouseX - prevMouseX;
                     const dy = mouseY - prevMouseY;
-                    
-                    switch(simulationMode) {
+
+                    switch (simulationMode) {
                         case 'flow':
                             addForce(mouseX, mouseY, dx * 0.1, dy * 0.1);
                             break;
@@ -383,18 +403,18 @@
                             break;
                     }
                 }
-                
+
                 // Update Fields
                 updateVelocityField();
                 updateDensityField();
-                
+
                 // Render
                 render();
             }
-            
+
             prevMouseX = mouseX;
             prevMouseY = mouseY;
-            
+
             requestAnimationFrame(update);
         }
 
@@ -402,12 +422,12 @@
         function updateVelocityField() {
             const viscosity = parseFloat(document.getElementById('viscosity').value);
             const pressure = parseFloat(document.getElementById('pressure').value);
-            
+
             for (let i = 0; i < width * height; i++) {
                 // Apply Viscosity
                 velocityField.x[i] *= (1 - viscosity);
                 velocityField.y[i] *= (1 - viscosity);
-                
+
                 // Apply Pressure
                 if (i > 0 && i < width * height - 1) {
                     velocityField.x[i] += (velocityField.x[i + 1] - velocityField.x[i - 1]) * pressure;
@@ -419,22 +439,22 @@
         // Update Density Field
         function updateDensityField() {
             const dissipation = parseFloat(document.getElementById('dissipation').value);
-            
+
             for (let i = 0; i < width * height; i++) {
                 // Apply Velocity
                 const x = i % width;
                 const y = Math.floor(i / width);
                 const vx = velocityField.x[i];
                 const vy = velocityField.y[i];
-                
+
                 const newX = Math.floor(x + vx);
                 const newY = Math.floor(y + vy);
-                
+
                 if (newX >= 0 && newX < width && newY >= 0 && newY < height) {
                     const newIndex = newY * width + newX;
                     densityField[newIndex] = densityField[i];
                 }
-                
+
                 // Apply Dissipation
                 densityField[i] *= dissipation;
             }
@@ -444,14 +464,14 @@
         function render() {
             const imageData = ctx.createImageData(width, height);
             const data = imageData.data;
-            
+
             for (let i = 0; i < width * height; i++) {
                 const density = densityField[i];
                 const velocity = Math.sqrt(velocityField.x[i] * velocityField.x[i] + velocityField.y[i] * velocityField.y[i]);
-                
+
                 let r, g, b;
-                
-                switch(colorMode) {
+
+                switch (colorMode) {
                     case 'rainbow':
                         const hue = (velocity * 360) % 360;
                         const [hR, hG, hB] = hslToRgb(hue / 360, 1, 0.5);
@@ -475,46 +495,58 @@
                         b = density * Math.sin(velocity * 10 + 4) * 255;
                         break;
                 }
-                
+
                 const index = i * 4;
                 data[index] = r;
                 data[index + 1] = g;
                 data[index + 2] = b;
                 data[index + 3] = density * 255;
             }
-            
+
             ctx.putImageData(imageData, 0, 0);
         }
 
         // Helper Functions
         function hslToRgb(h, s, l) {
             let r, g, b;
-            
+
             if (s === 0) {
                 r = g = b = l;
             } else {
                 const hue2rgb = (p, q, t) => {
                     if (t < 0) t += 1;
                     if (t > 1) t -= 1;
-                    if (t < 1/6) return p + (q - p) * 6 * t;
-                    if (t < 1/2) return q;
-                    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                    if (t < 1 / 6) return p + (q - p) * 6 * t;
+                    if (t < 1 / 2) return q;
+                    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
                     return p;
                 };
-                
+
                 const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
                 const p = 2 * l - q;
-                
-                r = hue2rgb(p, q, h + 1/3);
+
+                r = hue2rgb(p, q, h + 1 / 3);
                 g = hue2rgb(p, q, h);
-                b = hue2rgb(p, q, h - 1/3);
+                b = hue2rgb(p, q, h - 1 / 3);
             }
-            
+
             return [r * 255, g * 255, b * 255];
         }
 
         // Initialize
         init();
     </script>
+    <div class="ad-overlay-bottom" style="z-index: 1000;">
+        <div style="width:100%; display:flex; flex-direction:column; align-items:center;">
+            <span class="ad-label" style="color:#aaa;">Advertisement</span>
+            <ins class="adsbygoogle" style="display:block; width:100%; height:90px;"
+                data-ad-client="ca-pub-5166575587547718" data-ad-slot="overlay-unit" data-ad-format="auto"
+                data-full-width-responsive="true"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+    </div>
 </body>
-</html> 
+
+</html>

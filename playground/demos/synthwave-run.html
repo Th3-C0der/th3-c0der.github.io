@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Synthwave Run - Th3-C0der Playground</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        .ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 10px 20px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 0, 255, 0.4);
+            text-shadow: 0 0 10px #f0f;
+            transition: all 0.3s;
+            pointer-events: auto;
+            z-index: 100;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .back-btn:hover {
+            color: #fff;
+            background: rgba(255, 0, 255, 0.2);
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.6);
+            transform: scale(1.05);
+        }
+
+        .vhs-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%,
+                    rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg,
+                    rgba(255, 0, 0, 0.06),
+                    rgba(0, 255, 0, 0.02),
+                    rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* Scanline animation */
+        .scanline {
+            width: 100%;
+            height: 100px;
+            z-index: 10;
+            background: linear-gradient(0deg, rgba(0, 0, 0, 0) 0%, rgba(255, 255, 255, 0.1) 50%, rgba(0, 0, 0, 0) 100%);
+            opacity: 0.1;
+            position: absolute;
+            bottom: 100%;
+            animation: scanline 10s linear infinite;
+        }
+
+        @keyframes scanline {
+            0% {
+                bottom: 100%;
+            }
+
+            100% {
+                bottom: -100px;
+            }
+        }
+
+        .ad-overlay-bottom {
+            position: fixed;
+            bottom: 0px;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            padding: 10px 0;
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718"
+        crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <div class="vhs-overlay"></div>
+    <div class="scanline"></div>
+
+    <div class="ui-layer">
+        <a href="/playground" class="back-btn"><i class="fas fa-arrow-left"></i> BACK</a>
+    </div>
+
+    <canvas id="canvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        let width, height;
+        let time = 0;
+
+        // Constants
+        const COLOR_BG = '#050011';
+        const COLOR_GRID_NEAR = '#ff00ff';
+        const COLOR_GRID_FAR = '#00ffff';
+        const COLOR_SUN_TOP = '#ffdd00';
+        const COLOR_SUN_BOT = '#ff0055';
+
+        let cx, cy;
+
+        // Sim State
+        let speed = 0.5;
+        let roadParams = {
+            zOffset: 0,
+            xOffset: 0,
+            curve: 0,
+            hill: 0
+        };
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            width = canvas.width;
+            height = canvas.height;
+            cx = width / 2;
+            cy = height / 2;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        // Starfield
+        const stars = [];
+        for (let i = 0; i < 150; i++) {
+            stars.push({
+                x: Math.random(),
+                y: Math.random() * 0.6, // Top 60% only
+                size: Math.random() * 1.5,
+                blink: Math.random()
+            });
+        }
+
+        // Terrain Generation
+        // We'll generate a "height map" slice on the fly
+
+        function drawSun() {
+            const sunSize = Math.min(width, height) * 0.25;
+            const sunY = cy * 0.8;
+
+            // Glow
+            ctx.save();
+            ctx.shadowBlur = 60;
+            ctx.shadowColor = '#ff0055';
+
+            // Gradient
+            const grad = ctx.createLinearGradient(0, sunY - sunSize, 0, sunY + sunSize);
+            grad.addColorStop(0, COLOR_SUN_TOP);
+            grad.addColorStop(0.6, COLOR_SUN_BOT);
+
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(cx, sunY, sunSize, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+
+            // Stripes (Retro Cutout)
+            ctx.fillStyle = COLOR_BG;
+            const stripeStart = sunY + sunSize * 0.2;
+            const stripeEnd = sunY + sunSize;
+            const steps = 8;
+
+            for (let i = 0; i < steps; i++) {
+                const y = stripeStart + (steps - i) * (steps - i) * 1.5; // Exponential spacing
+                const h = 2 + i; // Getting thicker
+
+                if (y < stripeEnd) {
+                    ctx.fillRect(cx - sunSize - 10, y, sunSize * 2 + 20, h);
+                }
+            }
+        }
+
+        function drawGrid() {
+            const horizon = cy;
+            const fov = 350;
+            const gridWidth = width * 4;
+            const gridDepth = 2000;
+
+            // Movement
+            roadParams.zOffset = (roadParams.zOffset + 20 * speed) % 200; // 200 is segment length
+
+            // Vertical Lines (Perspective)
+            ctx.lineWidth = 1;
+            // Draw lighter near horizon, brighter near bottom
+
+            // We draw a plane from Z=10 to Z=gridDepth
+            // X goes from -gridWidth to +gridWidth
+
+            // Horizon Glow
+            const glowHeight = 150;
+            const hGrad = ctx.createLinearGradient(0, horizon - glowHeight / 2, 0, horizon);
+            hGrad.addColorStop(0, 'rgba(0,255,255,0)');
+            hGrad.addColorStop(1, 'rgba(0,255,255,0.2)');
+            ctx.fillStyle = hGrad;
+            ctx.fillRect(0, horizon - glowHeight / 2, width, glowHeight / 2);
+
+            const gGrad = ctx.createLinearGradient(0, horizon, 0, height);
+            gGrad.addColorStop(0, 'rgba(255,0,255,0)');
+            gGrad.addColorStop(0.1, 'rgba(255,0,255,0.1)');
+            gGrad.addColorStop(1, 'rgba(255,0,255,0.4)');
+            ctx.fillStyle = gGrad;
+            ctx.fillRect(0, horizon, width, height - horizon);
+
+            // Lines
+            ctx.beginPath();
+            // Fan out lines
+            const numLines = 40;
+            const space = gridWidth / numLines;
+
+            // Curved Road Logic
+            const curveAmount = Math.sin(time * 0.01) * 500;
+
+            for (let i = 0; i <= numLines; i++) {
+                const xWorld = -gridWidth / 2 + i * space;
+
+                // Project 'far' point
+                // xFar should be vanishing point + curve
+                const xFar = cx + (xWorld * (fov / gridDepth));
+                const yFar = horizon;
+
+                // Project 'near' point
+                const xNear = cx + xWorld * (fov / 100);
+                // Add curve offset to near point makes it look like we are turning? 
+                // No, curve shifts the vanishing point relative to grid.
+
+                // Simple perspective lines
+                // We'll just draw basic perspective manually for stability
+                // x = screenX + (xWorld / z) * fov
+
+                const factor = (xWorld / (width)); // -2 to 2 roughly
+
+                // Gradient stroke
+                const grad = ctx.createLinearGradient(cx, horizon, cx, height);
+                grad.addColorStop(0, 'rgba(0,255,255,0)');
+                grad.addColorStop(1, 'rgba(255,0,255,0.8)');
+                ctx.strokeStyle = grad;
+
+                ctx.moveTo(cx, horizon);
+                // Actually, lines shouldn't converge to a single pixel if they are parallel lines.
+                // They align to the vanishing point.
+
+                // Let's use 3D projection for real
+                const p1 = project(xWorld, 0, gridDepth); // Far
+                const p2 = project(xWorld, 0, 10); // Near
+
+                ctx.moveTo(p1.x, p1.y);
+                ctx.lineTo(p2.x, p2.y);
+            }
+            ctx.stroke();
+
+            // Horizontal moving lines
+            const numH = 30;
+            for (let i = 0; i < numH; i++) {
+                // Exponential Z distance for uniform screen spacing look
+                // z = near * (far/near) ^ (i/n)
+
+                // Or linear Z and project
+                // Linear Z looks bunched up at horizon (correct)
+
+                let z = 10 + i * 100 - roadParams.zOffset;
+                if (z < 10) z += 3000; // recycle
+
+                // Just regular intervals
+                // Actually let's draw fixed Z world lines
+
+                // We iterate world Z
+                const segLen = 100;
+                const maxZ = 2000;
+
+                // Draw all segments
+                const startZ = Math.floor(roadParams.zOffset);
+                // Wait, logic: We drag the texture.
+
+                // Let's just draw lines at screen Y coords calculated from Z
+                // y = horizon + (height * 100) / z
+
+            }
+            // Re-doing horizontal lines loop properly
+
+            ctx.beginPath();
+            let zPos = 2000;
+            while (zPos > 10) {
+                // Apply scrolling
+                let drawZ = zPos - roadParams.zOffset;
+                if (drawZ < 10) { zPos -= 150; continue; } // Shift
+
+                const p1 = project(-gridWidth, 0, drawZ);
+                const p2 = project(gridWidth, 0, drawZ);
+
+                // Fade alpha by distance
+                const alpha = Math.min(1, 400 / drawZ);
+                ctx.strokeStyle = `rgba(0, 255, 255, ${alpha})`;
+
+                ctx.moveTo(p1.x, p1.y);
+                ctx.lineTo(p2.x, p2.y);
+
+                zPos -= 100;
+            }
+            ctx.stroke();
+        }
+
+        function project(x, y, z) {
+            const scale = 300 / (z || 1);
+            const x2d = cx + x * scale;
+            const y2d = cy + 100 * scale; // Camera height offset
+            return { x: x2d, y: y2d };
+        }
+
+        function drawCity() {
+            // Silhouette City
+            const cityColor = '#020005';
+            const edgeColor = '#220033';
+
+            ctx.fillStyle = cityColor;
+            ctx.beginPath();
+            ctx.moveTo(0, height);
+            ctx.lineTo(0, cy);
+
+            // Procedural skyline
+            const segments = 100;
+            const segWidth = width / segments;
+
+            for (let i = 0; i <= segments; i++) {
+                const x = i * segWidth;
+                // Scroll the noise
+                const noiseX = i + time * 0.05;
+
+                // mix frequencies
+                let h = Math.sin(noiseX * 0.5) * 20 +
+                    Math.sin(noiseX * 2) * 10 +
+                    Math.abs(Math.sin(noiseX * 0.1)) * 50;
+
+                // Flatten valleys
+                h = Math.max(0, h);
+
+                ctx.lineTo(x, cy - h);
+            }
+
+            ctx.lineTo(width, cy);
+            ctx.lineTo(width, height);
+            ctx.fill();
+
+            // Add a subtle glowing line on top of city
+            ctx.strokeStyle = '#5500aa';
+            ctx.lineWidth = 2;
+            ctx.shadowColor = '#f0f';
+            ctx.shadowBlur = 10;
+            ctx.stroke();
+        }
+
+        function drawStars() {
+            ctx.fillStyle = '#fff';
+            ctx.shadowBlur = 4;
+            ctx.shadowColor = '#fff';
+
+            stars.forEach(star => {
+                if (Math.random() > 0.95) star.blink = Math.random();
+
+                const alpha = 0.5 + 0.5 * Math.sin(time * 0.1 + star.blink * 10);
+                ctx.globalAlpha = alpha;
+
+                ctx.beginPath();
+                ctx.arc(star.x * width, star.y * height, star.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            ctx.globalAlpha = 1;
+            ctx.shadowBlur = 0;
+        }
+
+        function loop() {
+            time++;
+
+            // Clear & BG
+            ctx.fillStyle = COLOR_BG;
+            ctx.fillRect(0, 0, width, height);
+
+            drawStars();
+            drawSun();
+            drawCity();
+
+            // Black out ground below horizon before drawing grid overlay
+            // to cover bottom half of sun/stars
+            ctx.fillStyle = '#120020';
+            ctx.fillRect(0, cy, width, height - cy);
+
+            drawGrid();
+
+            requestAnimationFrame(loop);
+        }
+
+        loop();
+
+    </script>
+    <div class="ad-overlay-bottom">
+        <div style="width:100%; display:flex; flex-direction:column; align-items:center;">
+            <span class="ad-label" style="color:#aaa; font-size:0.8rem; margin-bottom:5px;">Advertisement</span>
+            <ins class="adsbygoogle" style="display:block; width:100%; height:90px;"
+                data-ad-client="ca-pub-5166575587547718" data-ad-slot="overlay-unit" data-ad-format="auto"
+                data-full-width-responsive="true"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+    </div>
+</body>
+
+</html>

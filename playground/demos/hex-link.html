@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Hex Link - Th3-C0der Playground</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718"
+        crossorigin="anonymous"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #111;
+            color: #fff;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Segoe UI', sans-serif;
+            user-select: none;
+        }
+
+        .game-wrapper {
+            position: relative;
+            text-align: center;
+        }
+
+        canvas {
+            background: #1a1a1a;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            cursor: pointer;
+        }
+
+        .ui-panel {
+            position: absolute;
+            top: -60px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .back-btn {
+            color: #888;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+
+        .back-btn:hover {
+            color: #fff;
+        }
+
+        .level-info {
+            color: #00ddee;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .win-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 30px;
+            border: 2px solid #00ddee;
+            border-radius: 10px;
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+            box-shadow: 0 0 30px #00ddee;
+        }
+
+        button {
+            background: transparent;
+            color: #00ddee;
+            border: 2px solid #00ddee;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 1rem;
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #00ddee;
+            color: #000;
+        }
+
+        .tooltip {
+            color: #666;
+            font-size: 0.8rem;
+        }
+
+        .ad-overlay-bottom {
+            position: fixed;
+            bottom: 0px;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            padding: 10px 0;
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="game-wrapper">
+        <div class="ui-panel">
+            <a href="/playground" class="back-btn"><i class="fas fa-arrow-left"></i> EXIT</a>
+            <div class="level-info">Energy Grid <span id="lvlNum">1</span></div>
+            <div class="back-btn" onclick="resetLevel()"><i class="fas fa-redo"></i></div>
+        </div>
+
+        <canvas id="hexCanvas"></canvas>
+        <div class="tooltip">Click pieces to rotate. Connect Source (S) to Core (C).</div>
+
+        <div id="winModal" class="win-overlay">
+            <h2>SYSTEM ONLINE</h2>
+            <button id="nextBtn">Next Sector</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('hexCanvas');
+        const ctx = canvas.getContext('2d');
+        const winModal = document.getElementById('winModal');
+        const nextBtn = document.getElementById('nextBtn');
+        const lvlNum = document.getElementById('lvlNum');
+
+        // Hex Math
+        const HEX_SIZE = 40;
+        const HEX_W = Math.sqrt(3) * HEX_SIZE;
+        const HEX_H = 2 * HEX_SIZE;
+
+        let cols = 5;
+        let rows = 5;
+
+        let grid = []; // {q, r, type, rotation, active}
+        let level = 1;
+
+        // Pipe Types: 0:Empty, 1:Line, 2:Angle, 3:Y, 4:X (Start), 5:O (End)
+        // Connections bitmask: Top(1), TR(2), BR(4), Bot(8), BL(16), TL(32)
+        // Not used directly, we determine based on rotation
+
+        // Let's simpler logic:
+        // Each piece has connections list [0,1,2,3,4,5] (sides) based on type.
+        // Rotating shifts the connections.
+
+        // SOURCE: Center
+        // ENDPoints: Edges
+
+        function resize() {
+            // Static size for gameboard consistency
+            canvas.width = HEX_W * (cols + 0.5) + 20;
+            canvas.height = Math.min(HEX_H * 0.75 * (rows + 1) + 20, window.innerHeight - 150); // Constrain height
+        }
+
+        class Hex {
+            constructor(q, r, type) {
+                this.q = q;
+                this.r = r; // Axial coords
+                this.type = type; // 'line', 'curve', 'tri', 'source', 'sink'
+                this.rotation = Math.floor(Math.random() * 6); // 0 to 5
+                this.active = false;
+
+                // Base connections (0=N, 1=NE, 2=SE, 3=S, 4=SW, 5=NW)
+                if (type === 'source' || type === 'sink') {
+                    this.conns = [0, 1, 2, 3, 4, 5]; // All sides for ease? Or 1 side?
+                    // Let's say source/sink connect to ALL sides to make it "Hub" style
+                } else if (type === 'line') {
+                    this.conns = [0, 3]; // North-South
+                } else if (type === 'curve') {
+                    this.conns = [0, 2]; // Wide angle
+                } else if (type === 'sharp') {
+                    this.conns = [0, 1]; // Sharp angle neighbor
+                } else if (type === 'tri') {
+                    this.conns = [0, 2, 4]; // Triangle
+                } else if (type === 'cross') {
+                    this.conns = [0, 1, 3, 4]; // X shape
+                } else {
+                    this.conns = [];
+                }
+            }
+
+            getRotatedConns() {
+                return this.conns.map(c => (c + this.rotation) % 6);
+            }
+
+            draw(cx, cy) {
+                // Draw Hexagon BG
+                ctx.beginPath();
+                for (let i = 0; i < 6; i++) {
+                    const ang = Math.PI / 3 * i - Math.PI / 6;
+                    const x = cx + Math.cos(ang) * (HEX_SIZE - 2);
+                    const y = cy + Math.sin(ang) * (HEX_SIZE - 2);
+                    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+                }
+                ctx.closePath();
+                ctx.fillStyle = '#222';
+                if (this.active) ctx.fillStyle = '#112233';
+                ctx.fill();
+                ctx.strokeStyle = '#444';
+                if (this.active) ctx.strokeStyle = '#00ddee';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // Draw Pipes
+                const conns = this.getRotatedConns();
+
+                ctx.beginPath();
+                ctx.strokeStyle = this.active ? '#00ffff' : '#555';
+                ctx.lineWidth = 6;
+                ctx.lineCap = 'round';
+
+                if (this.type === 'source') {
+                    ctx.fillStyle = '#00ff00';
+                    ctx.beginPath(); ctx.arc(cx, cy, 15, 0, Math.PI * 2); ctx.fill();
+                    ctx.fillStyle = '#fff';
+                    ctx.font = '16px Arial';
+                    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                    ctx.fillText('S', cx, cy);
+                } else if (this.type === 'sink') {
+                    ctx.fillStyle = this.active ? '#00ffff' : '#555';
+                    ctx.beginPath(); ctx.arc(cx, cy, 15, 0, Math.PI * 2); ctx.fill();
+                    ctx.fillStyle = '#000';
+                    ctx.font = '16px Arial';
+                    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                    ctx.fillText('C', cx, cy);
+                } else {
+                    conns.forEach(c => {
+                        const ang = Math.PI / 3 * c - Math.PI / 6; // -30deg for N (0) alignment? 
+                        // Wait, flat topped hex:
+                        // 0 is Top (Up). 
+                        // Math.PI/3 * i - Math.PI/2 for Pointy top conventions
+                        // Let's align 0 to -90deg (Up).
+
+                        const theta = (c * 60 - 90) * Math.PI / 180;
+                        const px = cx + Math.cos(theta) * (HEX_SIZE * 0.6);
+                        const py = cy + Math.sin(theta) * (HEX_SIZE * 0.6);
+
+                        ctx.moveTo(cx, cy);
+                        ctx.lineTo(px, py);
+                    });
+
+                    // Center Hub
+                    if (conns.length > 0) {
+                        ctx.moveTo(cx, cy);
+                        ctx.arc(cx, cy, 4, 0, Math.PI * 2);
+                    }
+                    ctx.stroke();
+                }
+            }
+        }
+
+        // Axial to Pixel
+        function hexToPixel(q, r) {
+            const x = HEX_SIZE * (Math.sqrt(3) * q + Math.sqrt(3) / 2 * r);
+            const y = HEX_SIZE * (3 / 2 * r);
+            return { x: x + HEX_SIZE + 20, y: y + HEX_SIZE + 20 }; // offset
+        }
+
+        // Pixel to Axial
+        function pixelToHex(x, y) {
+            x -= (HEX_SIZE + 20);
+            y -= (HEX_SIZE + 20);
+            const q = (Math.sqrt(3) / 3 * x - 1 / 3 * y) / HEX_SIZE;
+            const r = (2 / 3 * y) / HEX_SIZE;
+            return hexRound(q, r);
+        }
+
+        function hexRound(x, y) {
+            let z = -x - y;
+            let rx = Math.round(x);
+            let ry = Math.round(y);
+            let rz = Math.round(z);
+
+            const x_diff = Math.abs(rx - x);
+            const y_diff = Math.abs(ry - y);
+            const z_diff = Math.abs(rz - z);
+
+            if (x_diff > y_diff && x_diff > z_diff) rx = -ry - rz;
+            else if (y_diff > z_diff) ry = -rx - rz;
+            return { q: rx, r: ry };
+        }
+
+        function generateLevel() {
+            grid = [];
+            // Simple honeycomb shape or rect
+            // Rect coords for axial:
+            // r from 0 to rows
+            // q from 0 - floor(r/2) to cols - floor(r/2)
+
+            for (let r = 0; r < rows; r++) {
+                let r_offset = Math.floor(r / 2);
+                for (let q = -r_offset; q < cols - r_offset; q++) {
+                    // Random types
+                    const types = ['line', 'curve', 'sharp', 'tri'];
+                    const t = types[Math.floor(Math.random() * types.length)];
+                    grid.push(new Hex(q, r, t));
+                }
+            }
+
+            // Set Source and Sink
+            // Center is Source
+            const centerIdx = Math.floor(grid.length / 2);
+            grid[centerIdx].type = 'source';
+            grid[centerIdx].active = true;
+            grid[centerIdx].rotation = 0; // lock rotation?
+
+            // Random Sink at edge
+            let sinkIdx = 0;
+            // ensure not center
+            do {
+                sinkIdx = Math.floor(Math.random() * grid.length);
+            } while (sinkIdx === centerIdx);
+
+            grid[sinkIdx].type = 'sink';
+        }
+
+        function resetLevel() {
+            generateLevel();
+            winModal.style.display = 'none';
+            checkFlow();
+            draw();
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            grid.forEach(h => {
+                const pos = hexToPixel(h.q, h.r);
+                h.draw(pos.x, pos.y);
+            });
+        }
+
+        function getHexAt(q, r) {
+            return grid.find(h => h.q === q && h.r === r);
+        }
+
+        function getNeighbor(hex, dir) {
+            // directions: 0:N, 1:NE, 2:SE, 3:S, 4:SW, 5:NW
+            // Axial neighbor rules:
+            // 0 (N) -> ?? Axial doesn't have N. It has NE, E, SE, SW, W, NW?
+            // Actually standard Flat Top Axial directions:
+            // 0: +1q, 0r ??? No wait.
+
+            // Let's use the standard neighbor vectors
+            // Cube coords (x,y,z) is cleaner but let's stick to axial (q,r)
+            //  (0,-1) Top-Right?? No.
+
+            // Flat Top Directions:
+            // 0 (N): (0, -1)
+            // 1 (NE): (+1, -1)
+            // 2 (SE): (+1, 0)
+            // 3 (S): (0, +1)
+            // 4 (SW): (-1, +1)
+            // 5 (NW): (-1, 0)
+
+            const dirs = [
+                { q: 0, r: -1 }, { q: 1, r: -1 }, { q: 1, r: 0 },
+                { q: 0, r: 1 }, { q: -1, r: 1 }, { q: -1, r: 0 }
+            ];
+
+            // Wait, my visual drawing used (c * 60 - 90). 
+            // 0 is -90deg (Up).
+            // 1 is -30deg (NE).
+            // 2 is +30deg (SE).
+            // 3 is +90deg (Down).
+            // etc. 
+            // Yes dirs match visual.
+
+            const vec = dirs[dir];
+            return getHexAt(hex.q + vec.q, hex.r + vec.r);
+        }
+
+        function checkFlow() {
+            // Reset Active
+            grid.forEach(h => {
+                if (h.type !== 'source') h.active = false;
+            });
+
+            let sources = grid.filter(h => h.type === 'source');
+            let dirty = true;
+
+            // Iterative flood fill
+            while (dirty) {
+                dirty = false;
+                grid.forEach(h => {
+                    if (h.active) {
+                        // Propagate to connections
+                        const conns = h.getRotatedConns();
+                        conns.forEach(dir => {
+                            const neighbor = getNeighbor(h, dir);
+                            if (neighbor && !neighbor.active) {
+                                // Check if neighbor connects back
+                                // Back direction = (dir + 3) % 6
+                                const backDir = (dir + 3) % 6;
+                                const nConns = neighbor.getRotatedConns();
+                                if (nConns.includes(backDir)) {
+                                    neighbor.active = true;
+                                    dirty = true;
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+
+            // Check Win
+            const sink = grid.find(h => h.type === 'sink');
+            if (sink && sink.active) {
+                win();
+            }
+        }
+
+        function win() {
+            winModal.style.display = 'flex';
+        }
+
+        canvas.addEventListener('mousedown', e => {
+            const rect = canvas.getBoundingClientRect();
+            const ax = pixelToHex(e.clientX - rect.left, e.clientY - rect.top);
+
+            const hex = getHexAt(ax.q, ax.r);
+            if (hex) {
+                hex.rotation = (hex.rotation + 1) % 6;
+                checkFlow();
+                draw();
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            level++;
+            lvlNum.innerText = level;
+            // Increase size?
+            // if(level % 3 === 0) cols++;
+            resetLevel();
+        });
+
+        resize();
+        resetLevel();
+
+    </script>
+    <div class="ad-overlay-bottom" style="z-index: 1000;">
+        <div style="width:100%; display:flex; flex-direction:column; align-items:center;">
+            <span class="ad-label" style="color:#aaa;">Advertisement</span>
+            <ins class="adsbygoogle" style="display:block; width:100%; height:90px;"
+                data-ad-client="ca-pub-5166575587547718" data-ad-slot="overlay-unit" data-ad-format="auto"
+                data-full-width-responsive="true"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+    </div>
+</body>
+
+</html>

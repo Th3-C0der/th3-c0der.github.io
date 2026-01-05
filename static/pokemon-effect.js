@@ -1,258 +1,488 @@
-// Pokemon click effect
-let pokemonCache = [];
-let usedPokemon = new Set(); // Track recently used Pokemon
-const MAX_POKEMON = 1025; // Updated to include all Pokemon up to Gen 9
-const SPRITE_SIZE = 56;
-const MAX_RECENT_POKEMON = 20; // Maximum number of recently used Pokemon to track
-const MAX_CONCURRENT_SPRITES = 15; // Maximum number of sprites on screen at once
-let activeSprites = 0; // Track number of active sprites
-let clickStreak = 0;
-let lastClickTime = 0;
-const CLICK_COOLDOWN = 30;
-const STREAK_THRESHOLD = 2;
+/**
+ * ============================================
+ * POKEMON CLICK EFFECT - REDESIGNED
+ * Using Anime.js for smooth animations
+ * Optimized with sprite pooling & caching
+ * ============================================
+ */
 
-// Sprite pool for recycling
-const spritePool = [];
-const MAX_POOL_SIZE = 30;
-
-// Create a sprite element and add it to the pool
-function createSpriteElement() {
-    const sprite = document.createElement('img');
-    sprite.className = 'pokemon-sprite';
-    sprite.style.cssText = `
-        position: fixed;
-        width: ${SPRITE_SIZE}px;
-        height: ${SPRITE_SIZE}px;
-        pointer-events: none;
-        z-index: 9999;
-        opacity: 0;
-        will-change: transform, opacity;
-    `;
-    return sprite;
-}
-
-// Initialize sprite pool
-function initSpritePool() {
-    for (let i = 0; i < MAX_POOL_SIZE; i++) {
-        spritePool.push(createSpriteElement());
-    }
-}
-
-// Get a sprite from the pool or create a new one
-function getSpriteFromPool() {
-    let sprite = spritePool.pop();
-    if (!sprite) {
-        sprite = createSpriteElement();
-    }
-    document.body.appendChild(sprite);
-    return sprite;
-}
-
-// Return a sprite to the pool
-function returnSpriteToPool(sprite) {
-    if (spritePool.length < MAX_POOL_SIZE) {
-        sprite.remove();
-        spritePool.push(sprite);
-    } else {
-        sprite.remove();
-    }
-}
-
-// Preload more Pokemon sprites with better variety
-async function preloadPokemonSprites() {
-    const preloadCount = 100;
-    const promises = [];
-    const usedIds = new Set();
-    
-    for (let i = 0; i < preloadCount; i++) {
-        let randomId;
-        do {
-            randomId = Math.floor(Math.random() * MAX_POKEMON) + 1;
-        } while (usedIds.has(randomId));
-        
-        usedIds.add(randomId);
-        promises.push(
-            fetch(`https://pokeapi.co/api/v2/pokemon/${randomId}`)
-                .then(response => response.json())
-                .then(data => {
-                    const spriteUrl = data.sprites.other['official-artwork'].front_default || 
-                                    data.sprites.front_default;
-                    if (spriteUrl) {
-                        pokemonCache.push({
-                            url: spriteUrl,
-                            id: randomId,
-                            name: data.name
-                        });
-                    }
-                })
-                .catch(error => console.error('Error preloading Pokemon:', error))
-        );
-    }
-    
-    await Promise.all(promises);
-}
-
-// Get a random Pokemon that hasn't been used recently
-function getRandomPokemon() {
-    if (pokemonCache.length === 0) {
-        const randomId = Math.floor(Math.random() * MAX_POKEMON) + 1;
-        return {
-            url: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${randomId}.png`,
-            id: randomId
+class PokemonEffect {
+    constructor() {
+        // Configuration
+        this.config = {
+            maxPokemon: 1025,
+            spriteSize: 64,
+            maxPoolSize: 25,
+            maxActiveSprites: 25, // Increased limit
+            maxRecentPokemon: 30,
+            clickCooldown: 30, // Reduced cooldown
+            preloadCount: 80
         };
+
+        // State
+        this.pokemonCache = [];
+        this.usedPokemon = new Set();
+        this.spritePool = [];
+        this.activeSpriteQueue = []; // New queue for FIFO
+        this.activeSprites = 0;
+        this.lastClickTime = 0;
+        this.clickStreak = 0;
+        this.isHolding = false;
+        this.holdInterval = null;
+        this.mousePos = { x: 0, y: 0 };
+
+        // Initialize
+        this.init();
     }
 
-    const availablePokemon = pokemonCache.filter(pokemon => !usedPokemon.has(pokemon.id));
-    
-    if (availablePokemon.length === 0) {
-        usedPokemon.clear();
-        return pokemonCache[Math.floor(Math.random() * pokemonCache.length)];
+    init() {
+        this.createStyles();
+        this.initSpritePool();
+        this.preloadPokemonSprites();
+        this.bindEvents();
     }
 
-    const randomPokemon = availablePokemon[Math.floor(Math.random() * availablePokemon.length)];
-    usedPokemon.add(randomPokemon.id);
-    
-    if (usedPokemon.size > MAX_RECENT_POKEMON) {
-        const firstItem = usedPokemon.values().next().value;
-        usedPokemon.delete(firstItem);
+    // Inject styles for Pokemon sprites
+    createStyles() {
+        const style = document.createElement('style');
+        style.textContent = `
+            .pokemon-sprite {
+                position: fixed;
+                pointer-events: none;
+                z-index: 10000;
+                image-rendering: -webkit-optimize-contrast;
+                image-rendering: crisp-edges;
+                filter: drop-shadow(0 4px 12px rgba(0, 255, 157, 0.4))
+                        drop-shadow(0 0 20px rgba(0, 255, 157, 0.2));
+                will-change: transform, opacity;
+            }
+            
+            .pokemon-sprite.shiny {
+                filter: drop-shadow(0 4px 12px rgba(255, 215, 0, 0.6))
+                        drop-shadow(0 0 25px rgba(255, 215, 0, 0.4));
+            }
+            
+            .pokemon-sparkle {
+                position: fixed;
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                pointer-events: none;
+                z-index: 9999;
+                background: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, transparent 70%);
+                will-change: transform, opacity;
+            }
+            
+            .pokemon-ring {
+                position: fixed;
+                border: 2px solid rgba(0, 255, 157, 0.6);
+                border-radius: 50%;
+                pointer-events: none;
+                z-index: 9998;
+                will-change: transform, opacity;
+            }
+        `;
+        document.head.appendChild(style);
     }
 
-    return randomPokemon;
-}
+    // Create sprite element
+    createSpriteElement() {
+        const sprite = document.createElement('img');
+        sprite.className = 'pokemon-sprite';
+        sprite.style.width = `${this.config.spriteSize}px`;
+        sprite.style.height = `${this.config.spriteSize}px`;
+        sprite.style.opacity = '0';
+        return sprite;
+    }
 
-// Get random position with more spread
-function getRandomPosition() {
-    const padding = SPRITE_SIZE;
-    const spread = 300;
-    return {
-        x: padding + Math.random() * (window.innerWidth - padding * 2),
-        y: padding + Math.random() * (window.innerHeight - padding * 2),
-        spreadX: (Math.random() - 0.5) * spread,
-        spreadY: (Math.random() - 0.5) * spread
-    };
-}
+    // Initialize sprite pool
+    initSpritePool() {
+        for (let i = 0; i < this.config.maxPoolSize; i++) {
+            this.spritePool.push(this.createSpriteElement());
+        }
+    }
 
-// Create Pokemon sprite with optimized animations
-function createPokemonSprite(x, y, isRandom = false) {
-    if (activeSprites >= MAX_CONCURRENT_SPRITES) return;
+    // Get sprite from pool
+    getSpriteFromPool() {
+        let sprite = this.spritePool.pop();
+        if (!sprite) {
+            sprite = this.createSpriteElement();
+        }
+        document.body.appendChild(sprite);
+        return sprite;
+    }
 
-    const position = isRandom ? getRandomPosition() : { x, y, spreadX: 0, spreadY: 0 };
-    const sprite = getSpriteFromPool();
-    activeSprites++;
+    // Return sprite to pool
+    returnSpriteToPool(sprite) {
+        sprite.style.opacity = '0';
+        sprite.classList.remove('shiny');
+        if (sprite.parentNode) {
+            sprite.remove();
+        }
+        if (this.spritePool.length < this.config.maxPoolSize) {
+            this.spritePool.push(sprite);
+        }
+    }
 
-    const pokemon = getRandomPokemon();
-    sprite.src = pokemon.url;
-    
-    // Update sprite position
-    sprite.style.left = `${position.x - SPRITE_SIZE/2}px`;
-    sprite.style.top = `${position.y - SPRITE_SIZE/2}px`;
-    sprite.style.transform = `scale(0.5) rotate(${Math.random() * 360}deg)`;
-    sprite.style.filter = 'drop-shadow(0 0 8px rgba(0, 255, 157, 0.4))';
+    // Preload Pokemon sprites
+    async preloadPokemonSprites() {
+        const usedIds = new Set();
+        const promises = [];
 
-    const randomScale = 0.8 + Math.random() * 0.4;
-    const randomRotation = Math.random() * 360;
-    const randomDuration = 0.4 + Math.random() * 0.2;
-    const randomDelay = Math.random() * 0.2;
+        for (let i = 0; i < this.config.preloadCount; i++) {
+            let randomId;
+            do {
+                randomId = Math.floor(Math.random() * this.config.maxPokemon) + 1;
+            } while (usedIds.has(randomId));
 
-    // Optimized animation sequence
-    gsap.to(sprite, {
-        opacity: 0.9,
-        scale: randomScale,
-        rotation: randomRotation,
-        duration: randomDuration,
-        ease: "elastic.out(1, 0.5)",
-        delay: randomDelay,
-        onComplete: () => {
-            gsap.to(sprite, {
-                y: position.spreadY - 50,
-                x: position.spreadX,
-                rotation: randomRotation + 180,
-                duration: 1.5,
-                ease: "power1.inOut",
-                onComplete: () => {
-                    gsap.to(sprite, {
-                        opacity: 0,
-                        scale: 0.5,
-                        duration: 0.8,
-                        ease: "power2.in",
-                        onComplete: () => {
-                            activeSprites--;
-                            returnSpriteToPool(sprite);
-                        }
+            usedIds.add(randomId);
+
+            // Use GitHub raw sprites for faster loading
+            const spriteUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${randomId}.png`;
+
+            // Preload image
+            const promise = new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => {
+                    this.pokemonCache.push({
+                        url: spriteUrl,
+                        id: randomId,
+                        loaded: true
                     });
-                }
+                    resolve();
+                };
+                img.onerror = () => resolve();
+                img.src = spriteUrl;
+            });
+
+            promises.push(promise);
+        }
+
+        await Promise.all(promises);
+        console.log(`🎮 Pokemon Effect: Loaded ${this.pokemonCache.length} sprites`);
+    }
+
+    // Get random Pokemon
+    getRandomPokemon() {
+        if (this.pokemonCache.length === 0) {
+            const randomId = Math.floor(Math.random() * this.config.maxPokemon) + 1;
+            return {
+                url: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${randomId}.png`,
+                id: randomId
+            };
+        }
+
+        const availablePokemon = this.pokemonCache.filter(p => !this.usedPokemon.has(p.id));
+
+        if (availablePokemon.length === 0) {
+            this.usedPokemon.clear();
+            return this.pokemonCache[Math.floor(Math.random() * this.pokemonCache.length)];
+        }
+
+        const pokemon = availablePokemon[Math.floor(Math.random() * availablePokemon.length)];
+        this.usedPokemon.add(pokemon.id);
+
+        if (this.usedPokemon.size > this.config.maxRecentPokemon) {
+            const firstItem = this.usedPokemon.values().next().value;
+            this.usedPokemon.delete(firstItem);
+        }
+
+        return pokemon;
+    }
+
+    // Create click ring effect
+    createRingEffect(x, y) {
+        const ring = document.createElement('div');
+        ring.className = 'pokemon-ring';
+        ring.style.left = `${x}px`;
+        ring.style.top = `${y}px`;
+        ring.style.width = '20px';
+        ring.style.height = '20px';
+        ring.style.transform = 'translate(-50%, -50%)';
+        document.body.appendChild(ring);
+
+        anime({
+            targets: ring,
+            width: ['20px', '100px'],
+            height: ['20px', '100px'],
+            opacity: [0.8, 0],
+            borderWidth: ['2px', '0px'],
+            duration: 600,
+            easing: 'easeOutExpo',
+            complete: () => ring.remove()
+        });
+    }
+
+    // Create sparkle particles
+    createSparkles(x, y, count = 6) {
+        for (let i = 0; i < count; i++) {
+            const sparkle = document.createElement('div');
+            sparkle.className = 'pokemon-sparkle';
+            sparkle.style.left = `${x}px`;
+            sparkle.style.top = `${y}px`;
+            document.body.appendChild(sparkle);
+
+            const angle = (i / count) * Math.PI * 2;
+            const distance = 50 + Math.random() * 50;
+            const moveX = Math.cos(angle) * distance;
+            const moveY = Math.sin(angle) * distance;
+
+            anime({
+                targets: sparkle,
+                translateX: [0, moveX],
+                translateY: [0, moveY - 30],
+                scale: [1, 0],
+                opacity: [1, 0],
+                duration: 600 + Math.random() * 200,
+                delay: i * 30,
+                easing: 'easeOutCubic',
+                complete: () => sparkle.remove()
             });
         }
-    });
-}
+    }
 
-// Enhanced click handler with optimized spawning
-function handlePokemonSpawn(e) {
-    const currentTime = Date.now();
-    if (currentTime - lastClickTime < CLICK_COOLDOWN || activeSprites >= MAX_CONCURRENT_SPRITES) return;
-    
-    lastClickTime = currentTime;
-    const x = e.clientX || (e.touches && e.touches[0].clientX);
-    const y = e.clientY || (e.touches && e.touches[0].clientY);
-    
-    if (x && y) {
-        clickStreak++;
-        createPokemonSprite(x, y);
-        
-        if (clickStreak >= STREAK_THRESHOLD) {
-            const extraSprites = Math.min(3, clickStreak - STREAK_THRESHOLD + 1);
-            for (let i = 0; i < extraSprites; i++) {
-                if (activeSprites < MAX_CONCURRENT_SPRITES) {
-                    setTimeout(() => createPokemonSprite(null, null, true), i * 100);
-                }
+    // Create Pokemon sprite with animation
+    createPokemonSprite(x, y, options = {}) {
+        // FIFO Logic: If at capacity, remove oldest
+        if (this.activeSpriteQueue.length >= this.config.maxActiveSprites) {
+            const oldestSprite = this.activeSpriteQueue.shift();
+            anime.remove(oldestSprite); // Stop animation
+            this.returnSpriteToPool(oldestSprite);
+        }
+
+        const sprite = this.getSpriteFromPool();
+        const pokemon = this.getRandomPokemon();
+        const isShiny = Math.random() < 0.05; // 5% chance for shiny effect
+
+        // Track active sprite
+        this.activeSpriteQueue.push(sprite);
+
+        // Set sprite properties
+        // Set sprite properties
+        if (isShiny) {
+            sprite.classList.add('shiny');
+            // Use 'home' sprites for shiny version (high quality)
+            sprite.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/${pokemon.id}.png`;
+        } else {
+            sprite.src = pokemon.url;
+        }
+
+        // Random variations
+        const size = this.config.spriteSize * (0.8 + Math.random() * 0.5);
+        const startRotation = (Math.random() - 0.5) * 30;
+        const endRotation = (Math.random() - 0.5) * 20;
+
+        // Position offset
+        // Always add some random spread to prevent perfect stacking
+        const baseSpread = options.spread ? 200 : 120;
+
+        const offsetX = (Math.random() - 0.5) * baseSpread;
+        const offsetY = (Math.random() - 0.5) * baseSpread;
+
+        sprite.style.width = `${size}px`;
+        sprite.style.height = `${size}px`;
+        sprite.style.left = `${x + offsetX - size / 2}px`;
+        sprite.style.top = `${y + offsetY - size / 2}px`;
+
+        // Entry animation
+        anime({
+            targets: sprite,
+            opacity: [0, 1],
+            scale: [0.3, 1.1, 1],
+            rotate: [startRotation - 10, startRotation],
+            duration: 500,
+            easing: 'easeOutBack',
+            complete: () => {
+                // Float animation
+                anime({
+                    targets: sprite,
+                    translateY: [0, -60, -30],
+                    translateX: [0, (Math.random() - 0.5) * 60],
+                    rotate: [startRotation, endRotation],
+                    duration: 2000,
+                    easing: 'easeInOutSine',
+                    complete: () => {
+                        // Exit animation
+                        anime({
+                            targets: sprite,
+                            opacity: [1, 0],
+                            scale: [1, 0.5],
+                            translateY: '-=50',
+                            duration: 500,
+                            easing: 'easeInCubic',
+                            complete: () => {
+                                // Remove from queue if finished naturally
+                                const index = this.activeSpriteQueue.indexOf(sprite);
+                                if (index > -1) {
+                                    this.activeSpriteQueue.splice(index, 1);
+                                    this.returnSpriteToPool(sprite);
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+        });
+
+        // Create sparkles for shiny Pokemon
+        if (isShiny) {
+            this.createSparkles(x + offsetX, y + offsetY, 10);
+        }
+    }
+
+    // Handle click/touch
+    handleClick(e) {
+        const currentTime = Date.now();
+        // Reduced cooldown for more fun
+        if (currentTime - this.lastClickTime < 30) return;
+        // Limit check removed for FIFO
+
+        this.lastClickTime = currentTime;
+
+        const x = e.clientX || (e.touches && e.touches[0]?.clientX);
+        const y = e.clientY || (e.touches && e.touches[0]?.clientY);
+
+        if (!x || !y) return;
+
+        // Create effects
+        this.createRingEffect(x, y);
+        // Add minimal spread to single clicks too
+        this.createPokemonSprite(x, y, { spread: false }); // Using spread:false but it has base spread now
+        this.createSparkles(x, y, 4);
+
+        // Click streak for bonus Pokemon
+        this.clickStreak++;
+
+        // Easier to trigger streak
+        if (this.clickStreak >= 2) {
+            const extraCount = Math.min(3, Math.floor(this.clickStreak / 2));
+            for (let i = 0; i < extraCount; i++) {
+                setTimeout(() => {
+                    this.createPokemonSprite(x, y, { spread: true });
+                }, (i + 1) * 60);
             }
         }
-        
+
+        // Reset streak after delay
         setTimeout(() => {
-            clickStreak = Math.max(0, clickStreak - 1);
-        }, 800);
+            this.clickStreak = Math.max(0, this.clickStreak - 1);
+        }, 500);
+    }
+
+    // Handle hold start
+    handleHoldStart(e) {
+        // Don't spawn if clicking on interactive elements or text
+        if (e.target.closest('a, button, input, textarea, select, details, summary')) return;
+
+        // Also check if clicking on text content that might be selected
+        if (e.target.closest('p, h1, h2, h3, h4, h5, h6, span, code, pre')) {
+            // But allow if it's just the body or a container
+            // We want to allow text selection, so we don't start holding immediately
+            // The user wants text selection to work normally.
+            return;
+        }
+
+        this.isHolding = true;
+        this.mousePos.x = e.clientX || (e.touches && e.touches[0]?.clientX) || 0;
+        this.mousePos.y = e.clientY || (e.touches && e.touches[0]?.clientY) || 0;
+
+        // Start spawning Pokemon while holding
+        // Clear any existing interval just in case
+        if (this.holdInterval) clearInterval(this.holdInterval);
+
+        this.holdInterval = setInterval(() => {
+            // Check if user is selecting text
+            const selection = window.getSelection();
+            if (selection && selection.type === 'Range' && !selection.isCollapsed) {
+                this.isHolding = false;
+                clearInterval(this.holdInterval);
+                return;
+            }
+
+            if (this.isHolding) {
+                // Large spread for holding
+                const spreadRange = 250;
+
+                const offsetX = (Math.random() - 0.5) * spreadRange;
+                const offsetY = (Math.random() - 0.5) * spreadRange;
+
+                // Use the calculated offset directly since we want full control
+                // But createPokemonSprite adds its own spread too, so we'll pass the base center
+                // Actually, let's pass the randomized position and let 'spread: false' handle standard jitter
+                this.createPokemonSprite(
+                    this.mousePos.x + offsetX,
+                    this.mousePos.y + offsetY,
+                    { spread: false }
+                );
+            }
+        }, 100); // Faster spawn rate for holding
+    }
+
+    // Handle hold end
+    handleHoldEnd() {
+        this.isHolding = false;
+        if (this.holdInterval) {
+            clearInterval(this.holdInterval);
+            this.holdInterval = null;
+        }
+    }
+
+    // Handle mouse move during hold
+    handleMouseMove(e) {
+        // If selecting text, stop holding
+        const selection = window.getSelection();
+        if (selection && selection.type === 'Range' && !selection.isCollapsed) {
+            if (this.isHolding) {
+                this.isHolding = false;
+                if (this.holdInterval) clearInterval(this.holdInterval);
+            }
+            return;
+        }
+
+        if (this.isHolding) {
+            this.mousePos.x = e.clientX || (e.touches && e.touches[0]?.clientX) || this.mousePos.x;
+            this.mousePos.y = e.clientY || (e.touches && e.touches[0]?.clientY) || this.mousePos.y;
+        }
+    }
+
+    // Bind event listeners
+    bindEvents() {
+        // Click events
+        document.addEventListener('click', (e) => this.handleClick(e));
+        document.addEventListener('touchstart', (e) => this.handleClick(e), { passive: true });
+
+        // Hold events
+        document.addEventListener('mousedown', (e) => this.handleHoldStart(e));
+        document.addEventListener('touchstart', (e) => this.handleHoldStart(e), { passive: true });
+
+        document.addEventListener('mouseup', () => this.handleHoldEnd());
+        document.addEventListener('touchend', () => this.handleHoldEnd());
+        document.addEventListener('mouseleave', () => this.handleHoldEnd());
+
+        // Move during hold
+        document.addEventListener('mousemove', (e) => this.handleMouseMove(e));
+        document.addEventListener('touchmove', (e) => this.handleMouseMove(e), { passive: true });
     }
 }
 
-// Optimized continuous spawn effect
-let spawnInterval;
-function startContinuousSpawn(x, y) {
-    if (spawnInterval) return;
-    
-    spawnInterval = setInterval(() => {
-        if (activeSprites < MAX_CONCURRENT_SPRITES) {
-            const isRandom = Math.random() > 0.3;
-            createPokemonSprite(x, y, isRandom);
-        }
-    }, 200); // Increased interval to reduce spawn rate
+// Initialize Pokemon Effect
+function initPokemonEffect() {
+    // Check if anime.js is loaded
+    if (typeof anime === 'undefined') {
+        console.warn('Pokemon Effect: anime.js not loaded, waiting...');
+        setTimeout(initPokemonEffect, 100);
+        return;
+    }
+
+    window.pokemonEffect = new PokemonEffect();
 }
 
-// Initialize Pokemon effect
-export function initPokemonEffect() {
-    initSpritePool();
-    preloadPokemonSprites();
-    
-    // Event listeners
-    document.addEventListener('click', handlePokemonSpawn);
-    document.addEventListener('touchstart', handlePokemonSpawn);
-    document.addEventListener('mousedown', (e) => startContinuousSpawn(e.clientX, e.clientY));
-    document.addEventListener('touchstart', (e) => startContinuousSpawn(e.touches[0].clientX, e.touches[0].clientY));
-    document.addEventListener('mouseup', () => {
-        if (spawnInterval) {
-            clearInterval(spawnInterval);
-            spawnInterval = null;
-        }
-    });
-    document.addEventListener('touchend', () => {
-        if (spawnInterval) {
-            clearInterval(spawnInterval);
-            spawnInterval = null;
-        }
-    });
-    document.addEventListener('mouseleave', () => {
-        if (spawnInterval) {
-            clearInterval(spawnInterval);
-            spawnInterval = null;
-        }
-    });
-} 
+// Export for ES modules
+export { initPokemonEffect, PokemonEffect };
+
+// Auto-initialize when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initPokemonEffect);
+} else {
+    initPokemonEffect();
+}

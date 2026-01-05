@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Cyber Defense - Th3-C0der Playground</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718"
+        crossorigin="anonymous"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #000;
+            font-family: 'Courier New', Courier, monospace;
+            color: #0f0;
+            cursor: crosshair;
+        }
+
+        #gameCanvas {
+            display: block;
+        }
+
+        .ui-layer {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        h1 {
+            margin: 0;
+            text-shadow: 0 0 10px #0f0;
+            font-size: 24px;
+        }
+
+        .stats {
+            margin-top: 10px;
+            font-size: 18px;
+            text-shadow: 0 0 5px #0f0;
+        }
+
+        .health-bar-container {
+            width: 200px;
+            height: 20px;
+            border: 2px solid #0f0;
+            margin-top: 5px;
+            border-radius: 4px;
+            background: rgba(0, 255, 0, 0.1);
+        }
+
+        .health-bar {
+            width: 100%;
+            height: 100%;
+            background: #0f0;
+            box-shadow: 0 0 10px #0f0;
+            transition: width 0.2s;
+        }
+
+        .game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            display: none;
+            background: rgba(0, 0, 0, 0.85);
+            padding: 40px;
+            border: 2px solid #0f0;
+            box-shadow: 0 0 30px #0f0;
+            border-radius: 10px;
+            z-index: 20;
+            pointer-events: auto;
+        }
+
+        .game-over h2 {
+            font-size: 40px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            color: #f00;
+            text-shadow: 0 0 20px #f00;
+        }
+
+        .restart-btn {
+            background: transparent;
+            color: #0f0;
+            border: 2px solid #0f0;
+            padding: 15px 30px;
+            font-size: 20px;
+            cursor: pointer;
+            font-family: inherit;
+            text-transform: uppercase;
+            transition: all 0.2s;
+        }
+
+        .restart-btn:hover {
+            background: #0f0;
+            color: #000;
+            box-shadow: 0 0 20px #0f0;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            color: #0f0;
+            padding: 10px 20px;
+            border: 1px solid #0f0;
+            text-decoration: none;
+            backdrop-filter: blur(5px);
+            z-index: 100;
+            pointer-events: auto;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #0f0;
+            color: #000;
+        }
+
+        #startScreen {
+            display: flex;
+        }
+
+        .ad-overlay-bottom {
+            position: fixed;
+            bottom: 0px;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            padding: 10px 0;
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<body>
+    <a href="/playground" class="back-btn">Exit</a>
+
+    <div class="ui-layer">
+        <h1>CYBER DEFENSE SYSTEM v1.0</h1>
+        <div class="stats">
+            SCORE: <span id="scoreVal">0</span> | WAVE: <span id="waveVal">1</span>
+            <div class="health-bar-container">
+                <div class="health-bar" id="healthBar"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="game-over" id="startScreen">
+        <h2>System Ready</h2>
+        <p style="color: #fff; margin-bottom: 20px;">Protect the mainframe from incoming viruses.<br>Click to shoot.
+            Don't let them reach the bottom.</p>
+        <button class="restart-btn" id="startBtn">Initialize Defense</button>
+    </div>
+
+    <div class="game-over" id="gameOverScreen">
+        <h2>System Failure</h2>
+        <p style="color: #fff; margin-bottom: 20px;">Final Score: <span id="finalScore">0</span></p>
+        <button class="restart-btn" id="restartBtn">Reboot System</button>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let width, height;
+        let animationId;
+        let lastTime = 0;
+        let score = 0;
+        let wave = 1;
+        let health = 100;
+        let isGameOver = false;
+        let isPlaying = false;
+
+        // Game Entities
+        let projectiles = [];
+        let enemies = [];
+        let particles = [];
+        let stars = [];
+
+        // Formatting
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight - 90; // Reserve space for AdSense
+            initStars();
+        }
+        window.addEventListener('resize', resize);
+
+        // Input
+        canvas.addEventListener('mousedown', (e) => {
+            if (!isPlaying) return;
+            shoot(e.clientX, e.clientY);
+        });
+
+        canvas.addEventListener('touchstart', (e) => {
+            if (!isPlaying) return;
+            e.preventDefault();
+            shoot(e.touches[0].clientX, e.touches[0].clientY);
+        }, { passive: false });
+
+        function shoot(targetX, targetY) {
+            const startX = width / 2;
+            const startY = height - 50;
+
+            const angle = Math.atan2(targetY - startY, targetX - startX);
+            const speed = 15;
+
+            projectiles.push({
+                x: startX,
+                y: startY,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed,
+                color: '#0ff'
+            });
+
+            // Recoil effect or sound here
+        }
+
+        // Entity Classes logic (simplified as plain objects for perf)
+
+        function initStars() {
+            stars = [];
+            for (let i = 0; i < 100; i++) {
+                stars.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    size: Math.random() * 2,
+                    alpha: Math.random()
+                });
+            }
+        }
+
+        function spawnEnemy() {
+            const size = 20 + Math.random() * 20;
+            const x = Math.random() * (width - size);
+            enemies.push({
+                x: x,
+                y: -size,
+                size: size,
+                speed: 1 + (Math.random() * 1.5) + (wave * 0.1),
+                hp: 1 + Math.floor(wave / 3),
+                color: `hsl(${Math.random() * 60 + 300}, 100%, 50%)` // Pinks/Purples
+            });
+        }
+
+        function createExplosion(x, y, color, count) {
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: (Math.random() - 0.5) * 10,
+                    vy: (Math.random() - 0.5) * 10,
+                    life: 1.0,
+                    color: color
+                });
+            }
+        }
+
+        let enemySpawnTimer = 0;
+        let currentSpawnRate = 1000;
+
+        function update(timestamp) {
+            if (!lastTime) lastTime = timestamp;
+            const deltaTime = timestamp - lastTime;
+            lastTime = timestamp;
+
+            if (!isPlaying) return;
+
+            // Clear Screen
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.2)'; // Trails
+            ctx.fillRect(0, 0, width, height);
+
+            // Draw Stars
+            ctx.fillStyle = '#fff';
+            stars.forEach(s => {
+                ctx.globalAlpha = s.alpha;
+                ctx.fillText('.', s.x, s.y);
+            });
+            ctx.globalAlpha = 1;
+
+            // Base
+            ctx.fillStyle = '#0f0';
+            ctx.fillRect(width / 2 - 40, height - 60, 80, 60);
+
+            // Spawning
+            enemySpawnTimer += deltaTime;
+            if (enemySpawnTimer > currentSpawnRate) {
+                spawnEnemy();
+                enemySpawnTimer = 0;
+                // Ramp up difficulty
+                if (currentSpawnRate > 300) currentSpawnRate -= 5;
+            }
+
+            // Update Projectiles
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = '#0ff';
+            ctx.fillStyle = '#0ff';
+            for (let i = projectiles.length - 1; i >= 0; i--) {
+                const p = projectiles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+                ctx.fill();
+
+                if (p.x < 0 || p.x > width || p.y < 0 || p.y > height) {
+                    projectiles.splice(i, 1);
+                }
+            }
+            ctx.shadowBlur = 0;
+
+            // Update Enemies
+            for (let i = enemies.length - 1; i >= 0; i--) {
+                const e = enemies[i];
+                e.y += e.speed;
+
+                // Draw Enemy (Glitchy Rect)
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = e.color;
+                ctx.strokeStyle = e.color;
+                ctx.lineWidth = 2;
+                ctx.strokeRect(e.x, e.y, e.size, e.size);
+
+                // Inner distinct shape
+                ctx.fillStyle = e.color;
+                ctx.globalAlpha = 0.3;
+                ctx.fillRect(e.x, e.y, e.size, e.size);
+                ctx.globalAlpha = 1;
+                ctx.shadowBlur = 0;
+
+                // Base Collision
+                if (e.y > height - 60) {
+                    health -= 10;
+                    enemies.splice(i, 1);
+                    createExplosion(e.x + e.size / 2, height - 20, '#f00', 20);
+                    updateHealth();
+                    if (health <= 0) gameOver();
+                    continue;
+                }
+
+                // Projectile Collision
+                for (let j = projectiles.length - 1; j >= 0; j--) {
+                    const p = projectiles[j];
+                    if (p.x > e.x && p.x < e.x + e.size &&
+                        p.y > e.y && p.y < e.y + e.size) {
+
+                        // Hit
+                        projectiles.splice(j, 1);
+                        e.hp--;
+                        createExplosion(p.x, p.y, '#fff', 5);
+
+                        if (e.hp <= 0) {
+                            enemies.splice(i, 1);
+                            createExplosion(e.x + e.size / 2, e.y + e.size / 2, e.color, 15);
+                            score += 100;
+                            updateScore();
+                            // Check wave
+                            if (score % 1000 === 0) {
+                                wave++;
+                                document.getElementById('waveVal').innerText = wave;
+                                showWaveText();
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+
+            // Update Particles
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life -= 0.02;
+
+                if (p.life <= 0) {
+                    particles.splice(i, 1);
+                    continue;
+                }
+
+                ctx.globalAlpha = p.life;
+                ctx.fillStyle = p.color;
+                ctx.fillRect(p.x, p.y, 2, 2);
+                ctx.globalAlpha = 1;
+            }
+
+            animationId = requestAnimationFrame(update);
+        }
+
+        function showWaveText() {
+            // Can add floating text logic here
+        }
+
+        function updateScore() {
+            document.getElementById('scoreVal').innerText = score;
+        }
+
+        function updateHealth() {
+            const bar = document.getElementById('healthBar');
+            bar.style.width = Math.max(0, health) + '%';
+            if (health < 30) bar.style.backgroundColor = '#f00';
+            else bar.style.backgroundColor = '#0f0';
+        }
+
+        function gameOver() {
+            isPlaying = false;
+            isGameOver = true;
+            document.getElementById('gameOverScreen').style.display = 'block';
+            document.getElementById('finalScore').innerText = score;
+        }
+
+        function initGame() {
+            score = 0;
+            health = 100;
+            wave = 1;
+            currentSpawnRate = 1000;
+            enemies = [];
+            projectiles = [];
+            particles = [];
+
+            updateScore();
+            updateHealth();
+            document.getElementById('waveVal').innerText = 1;
+            document.getElementById('healthBar').style.backgroundColor = '#0f0';
+
+            isPlaying = true;
+            isGameOver = false;
+            lastTime = 0;
+
+            animate();
+        }
+
+        function animate() {
+            if (isPlaying) {
+                animationId = requestAnimationFrame(update);
+            }
+        }
+
+        // Setup
+        resize();
+        document.getElementById('startBtn').addEventListener('click', () => {
+            document.getElementById('startScreen').style.display = 'none';
+            initGame();
+        });
+
+        document.getElementById('restartBtn').addEventListener('click', () => {
+            document.getElementById('gameOverScreen').style.display = 'none';
+            initGame();
+        });
+
+    </script>
+    <div class="ad-overlay-bottom" style="z-index: 1000;">
+        <div style="width:100%; display:flex; flex-direction:column; align-items:center;">
+            <span class="ad-label" style="color:#aaa;">Advertisement</span>
+            <ins class="adsbygoogle" style="display:block; width:100%; height:90px;"
+                data-ad-client="ca-pub-5166575587547718" data-ad-slot="overlay-unit" data-ad-format="auto"
+                data-full-width-responsive="true"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+    </div>
+</body>
+
+</html>

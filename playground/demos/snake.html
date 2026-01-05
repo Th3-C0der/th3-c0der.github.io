@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Modern Snake - Th3-C0der Playground</title>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718" crossorigin="anonymous"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718"
+        crossorigin="anonymous"></script>
     <style>
         body {
             margin: 0;
@@ -81,7 +83,8 @@
             transform: rotate(180deg);
         }
 
-        select, button {
+        select,
+        button {
             padding: 0.8rem 1.5rem;
             border: none;
             border-radius: 8px;
@@ -92,7 +95,8 @@
             font-size: 1rem;
         }
 
-        select:hover, button:hover {
+        select:hover,
+        button:hover {
             background: rgba(255, 255, 255, 0.2);
             transform: translateY(-1px);
         }
@@ -155,8 +159,15 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
-            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
         }
 
         .power-up {
@@ -168,9 +179,17 @@
         }
 
         @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.2);
+            }
+
+            100% {
+                transform: scale(1);
+            }
         }
 
         @media (max-width: 600px) {
@@ -201,7 +220,8 @@
                 transform: translateY(-100%);
             }
 
-            select, button {
+            select,
+            button {
                 padding: 0.5rem 1rem;
                 font-size: 0.9rem;
                 margin: 0.25rem 0;
@@ -227,8 +247,22 @@
                 margin: 0.5rem 0;
             }
         }
+
+        .ad-overlay-bottom {
+            position: fixed;
+            bottom: 0px;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            padding: 10px 0;
+            display: flex;
+            justify-content: center;
+        }
     </style>
 </head>
+
 <body>
     <a href="/playground" class="back-btn">← Back to Playground</a>
     <div class="game-container">
@@ -312,7 +346,7 @@
             setupControlsToggle() {
                 const toggle = document.getElementById('controlsToggle');
                 const controls = document.getElementById('gameControls');
-                
+
                 toggle.addEventListener('click', () => {
                     controls.classList.toggle('minimized');
                     toggle.classList.toggle('minimized');
@@ -333,7 +367,7 @@
                 // Reset timeout on user interaction
                 controls.addEventListener('mouseenter', resetTimeout);
                 controls.addEventListener('touchstart', resetTimeout);
-                
+
                 // Initial timeout
                 resetTimeout();
             }
@@ -527,7 +561,7 @@
 
             checkWallCollision(head) {
                 return head.x < 0 || head.x >= this.canvas.width / this.gridSize ||
-                       head.y < 0 || head.y >= this.canvas.height / this.gridSize;
+                    head.y < 0 || head.y >= this.canvas.height / this.gridSize;
             }
 
             checkCollision(head) {
@@ -554,7 +588,7 @@
                         type: Math.random() < 0.5 ? 'speed' : 'points'
                     };
                 } while (this.snake.some(segment => segment.x === newPowerUp.x && segment.y === newPowerUp.y) ||
-                        (this.food && this.food.x === newPowerUp.x && this.food.y === newPowerUp.y));
+                    (this.food && this.food.x === newPowerUp.x && this.food.y === newPowerUp.y));
                 this.powerUp = newPowerUp;
             }
 
@@ -668,5 +702,17 @@
         // Initialize game
         const game = new SnakeGame();
     </script>
+    <div class="ad-overlay-bottom">
+        <div style="width:100%; display:flex; flex-direction:column; align-items:center;">
+            <span class="ad-label" style="color:#aaa;">Advertisement</span>
+            <ins class="adsbygoogle" style="display:block; width:100%; height:90px;"
+                data-ad-client="ca-pub-5166575587547718" data-ad-slot="overlay-unit" data-ad-format="auto"
+                data-full-width-responsive="true"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+    </div>
 </body>
-</html> 
+
+</html>

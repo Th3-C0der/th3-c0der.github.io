@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Particle Vortex - Th3-C0der Playground</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718"
+        crossorigin="anonymous"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #000;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        .ui-layer {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            pointer-events: none;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-family: 'Segoe UI', sans-serif;
+            font-weight: 500;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px 20px;
+            border-radius: 30px;
+            pointer-events: auto;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .back-btn:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .controls {
+            position: absolute;
+            bottom: 120px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 15px 30px;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            gap: 20px;
+            pointer-events: auto;
+        }
+
+        .mode-btn {
+            background: transparent;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .mode-btn:hover,
+        .mode-btn.active {
+            color: #fff;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+            transform: scale(1.1);
+        }
+
+        .mode-btn::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #222;
+            color: #fff;
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            border-radius: 4px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            margin-bottom: 10px;
+            white-space: nowrap;
+        }
+
+        .mode-btn:hover::after {
+            opacity: 1;
+        }
+
+        .ad-overlay-bottom {
+            position: fixed;
+            bottom: 0px;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            padding: 10px 0;
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="ui-layer">
+        <a href="/playground" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Playground</a>
+    </div>
+
+    <canvas id="canvas"></canvas>
+
+    <div class="controls">
+        <button class="mode-btn active" data-mode="attract" data-tooltip="Gravity Well (Left Click)"><i
+                class="fas fa-magnet"></i></button>
+        <button class="mode-btn" data-mode="repel" data-tooltip="Repulsor (Right Click)"><i
+                class="fas fa-expand-arrows-alt"></i></button>
+        <button class="mode-btn" data-mode="spiral" data-tooltip="Vortex"><i
+                class="fas fa-spin fa-circle-notch"></i></button>
+        <button class="mode-btn" id="clearBtn" data-tooltip="Reset Particles"><i class="fas fa-sync-alt"></i></button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        let width, height;
+        let particles = [];
+        const PARTICLE_COUNT = 3000;
+
+        // Mouse State
+        let mouse = { x: 0, y: 0, isDown: false, button: 0 };
+        let currentMode = 'attract';
+
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 2;
+                this.vy = (Math.random() - 0.5) * 2;
+                this.friction = 0.96;
+                this.baseColor = `hsl(${Math.random() * 60 + 200}, 100%, 50%)`; // Blue/Cyan-ish
+            }
+
+            update() {
+                // Physics
+                this.vx *= this.friction;
+                this.vy *= this.friction;
+
+                // Mouse Interaction
+                if (mouse.isDown) {
+                    const dx = mouse.x - this.x;
+                    const dy = mouse.y - this.y;
+                    const distSq = dx * dx + dy * dy;
+                    const dist = Math.sqrt(distSq);
+
+                    if (dist > 5) { // Prevent singularity
+                        let force = 1000 / distSq;
+                        force = Math.min(force, 5); // Cap force
+
+                        let angle = Math.atan2(dy, dx);
+
+                        if (mouse.button === 2 || currentMode === 'repel') { // Right Click = Repel
+                            this.vx -= Math.cos(angle) * force * 2;
+                            this.vy -= Math.sin(angle) * force * 2;
+                        } else if (currentMode === 'spiral') {
+                            this.vx += Math.cos(angle + Math.PI / 2) * force * 3;
+                            this.vy += Math.sin(angle + Math.PI / 2) * force * 3;
+                            // Slight pull in
+                            this.vx += Math.cos(angle) * force * 0.5;
+                            this.vy += Math.sin(angle) * force * 0.5;
+                        } else { // Attract
+                            this.vx += Math.cos(angle) * force;
+                            this.vy += Math.sin(angle) * force;
+                        }
+                    }
+                }
+
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // Boundaries (Bounce)
+                if (this.x < 0 || this.x > width) {
+                    this.vx *= -1;
+                    this.x = Math.max(0, Math.min(width, this.x));
+                }
+                if (this.y < 0 || this.y > height) {
+                    this.vy *= -1;
+                    this.y = Math.max(0, Math.min(height, this.y));
+                }
+            }
+
+            draw() {
+                const speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+                const alpha = Math.min(speed * 0.3, 1);
+
+                ctx.fillStyle = this.baseColor;
+                ctx.globalAlpha = alpha;
+                ctx.fillRect(this.x, this.y, 2, 2);
+            }
+        }
+
+        function init() {
+            resize();
+            particles = [];
+            for (let i = 0; i < PARTICLE_COUNT; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            width = canvas.width;
+            height = canvas.height;
+        }
+
+        function loop() {
+            // Trail effect
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+            ctx.fillRect(0, 0, width, height);
+
+            ctx.globalCompositeOperation = 'lighter'; // Additive blending for glow
+
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+
+            ctx.globalCompositeOperation = 'source-over';
+            requestAnimationFrame(loop);
+        }
+
+        // Event Listeners
+        window.addEventListener('resize', resize);
+
+        canvas.addEventListener('mousedown', e => {
+            mouse.isDown = true;
+            mouse.button = e.button;
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+        });
+
+        window.addEventListener('mouseup', () => mouse.isDown = false);
+
+        canvas.addEventListener('mousemove', e => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+        });
+
+        canvas.addEventListener('contextmenu', e => e.preventDefault());
+
+        // UI Controls
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                if (btn.id === 'clearBtn') {
+                    particles.forEach(p => p.reset());
+                    return;
+                }
+
+                document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentMode = btn.dataset.mode;
+            });
+        });
+
+        init();
+        loop();
+
+    </script>
+    <div class="ad-overlay-bottom" style="z-index: 1000;">
+        <div style="width:100%; display:flex; flex-direction:column; align-items:center;">
+            <span class="ad-label" style="color:#aaa;">Advertisement</span>
+            <ins class="adsbygoogle" style="display:block; width:100%; height:90px;"
+                data-ad-client="ca-pub-5166575587547718" data-ad-slot="overlay-unit" data-ad-format="auto"
+                data-full-width-responsive="true"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+    </div>
+</body>
+
+</html>

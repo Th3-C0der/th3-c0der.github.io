@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Tower Blocks - Th3-C0der Playground</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718"
+        crossorigin="anonymous"></script>
+    <style>
+        body {
+            background-color: #0c0c16;
+            color: #fff;
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #gameCanvas {
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+            background: linear-gradient(to bottom, #10102a, #202040);
+        }
+
+        .ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .header {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .back-btn {
+            pointer-events: auto;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .back-btn:hover {
+            color: #fff;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .score-container {
+            text-align: center;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+
+        .score-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #00ffff;
+        }
+
+        #score {
+            font-size: 3rem;
+            font-weight: bold;
+            line-height: 1;
+        }
+
+        .start-screen {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            pointer-events: auto;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 40px;
+            border-radius: 20px;
+            border: 2px solid #00ffff;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .start-screen h1 {
+            color: #00ffff;
+            margin: 0;
+            text-transform: uppercase;
+            font-size: 2.5rem;
+            text-shadow: 0 0 20px #00ffff;
+        }
+
+        .start-btn {
+            background: transparent;
+            border: 2px solid #ff0055;
+            color: #ff0055;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .start-btn:hover {
+            background: #ff0055;
+            color: #fff;
+            box-shadow: 0 0 20px #ff0055;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .game-over-stats {
+            color: #ccc;
+            margin-bottom: 20px;
+        }
+
+        .ad-overlay-bottom {
+            position: fixed;
+            bottom: 0px;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            padding: 10px 0;
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <div class="ui-layer">
+        <div class="header">
+            <a href="/playground" class="back-btn"><i class="fas fa-arrow-left"></i> Back</a>
+            <div class="score-container">
+                <div class="score-label">Blocks</div>
+                <div id="score">0</div>
+            </div>
+            <div style="width: 80px;"></div> <!-- spacer -->
+        </div>
+    </div>
+
+    <div id="startScreen" class="start-screen">
+        <h1>Tower Blocks</h1>
+        <p>Click or Spacebar to place blocks.</p>
+        <button class="start-btn" id="startBtn">Play Game</button>
+    </div>
+
+    <div id="gameOverScreen" class="start-screen hidden">
+        <h1>Game Over</h1>
+        <div class="game-over-stats">
+            Height: <span id="finalScore" style="color:#fff; font-weight:bold;">0</span>
+        </div>
+        <button class="start-btn" id="restartBtn">Try Again</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreEl = document.getElementById('score');
+        const finalScoreEl = document.getElementById('finalScore');
+        const startScreen = document.getElementById('startScreen');
+        const gameOverScreen = document.getElementById('gameOverScreen');
+
+        // Game Constants
+        const INITIAL_WIDTH = 200;
+        const BLOCK_HEIGHT = 30;
+        const INITIAL_SPEED = 3;
+
+        let width, height;
+        let blocks = [];
+        let currentBlock = null;
+        let score = 0;
+        let cameraY = 0;
+        let isPlaying = false;
+        let speed = INITIAL_SPEED;
+        let direction = 1;
+        let hue = 0;
+
+        function resize() {
+            // Mobile safe aspect ratio
+            const aspect = window.innerHeight / window.innerWidth;
+            if (window.innerWidth < 600) {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            } else {
+                canvas.width = 400;
+                canvas.height = 600;
+            }
+
+            width = canvas.width;
+            height = canvas.height;
+
+            // Re-render only if game inactive?
+            if (!isPlaying && blocks.length > 0) render();
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Block {
+            constructor(x, y, w, h, color) {
+                this.x = x;
+                this.y = y;
+                this.w = w;
+                this.h = h;
+                this.color = color;
+            }
+
+            draw() {
+                // Camera offset
+                const drawY = this.y + cameraY;
+
+                // Hide off-screen
+                if (drawY > height) return;
+
+                ctx.fillStyle = this.color;
+                ctx.fillRect(this.x, drawY, this.w, this.h);
+
+                // 3D effect (Sides)
+                ctx.fillStyle = 'rgba(0,0,0,0.2)';
+                ctx.fillRect(this.x, drawY + this.h - 5, this.w, 5); // Bottom shadow
+
+                // Inner highlight
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = this.color;
+                ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(this.x, drawY, this.w, this.h);
+                ctx.shadowBlur = 0;
+            }
+        }
+
+        function spawnBlock() {
+            const prevBlock = blocks[blocks.length - 1];
+
+            // Starting pos
+            // If even, start left. Odd, start right? No, just swing.
+            // Start at edge 0
+
+            const startX = -INITIAL_WIDTH; // offscreen left
+            const startY = prevBlock ? prevBlock.y - BLOCK_HEIGHT : height - 100;
+
+            let w = prevBlock ? prevBlock.w : INITIAL_WIDTH;
+
+            hue = (hue + 20) % 360;
+            const color = `hsl(${hue}, 100%, 60%)`;
+
+            currentBlock = {
+                x: 0,
+                y: startY,
+                w: w,
+                h: BLOCK_HEIGHT,
+                color: color,
+                // Movement state
+                range: width - w,
+                offset: 0
+            };
+
+            // Random start side
+            if (Math.random() > 0.5) {
+                currentBlock.x = 0;
+                direction = 1;
+            } else {
+                currentBlock.x = width - w;
+                direction = -1;
+            }
+        }
+
+        function placeBlock() {
+            if (!currentBlock) return;
+
+            // Calculate overlap
+            const prevBlock = blocks[blocks.length - 1];
+
+            let slicedW = currentBlock.w;
+            let finalX = currentBlock.x;
+
+            if (prevBlock) {
+                const dist = currentBlock.x - prevBlock.x;
+
+                // Slice logic
+                if (Math.abs(dist) >= currentBlock.w) {
+                    gameOver();
+                    return;
+                }
+
+                // Trim width
+                slicedW = currentBlock.w - Math.abs(dist);
+
+                // Align X
+                if (dist > 0) { // Sliding right overshot
+                    finalX = currentBlock.x; // Keep current x, but width reduced. 
+                    // Wait, visual consistency:
+                    // Only the overlapping part stays.
+                    // Overlap region: [currentBlock.x, prevBlock.x + prevBlock.w]
+                    // Since dist > 0, current.x > prev.x. 
+                    // Overlap starts at current.x.
+                    // Overlap ends at prev.x + prev.w
+                    // So width is prev.x + prev.w - current.x = prev.w - (current.x - prev.x) = w - dist. Correct.
+                } else { // Sliding left overshot or undershot
+                    // dist < 0. current.x < prev.x
+                    // Overlap starts at prev.x
+                    // Overlap ends at current.x + current.w
+                    finalX = prevBlock.x;
+                }
+
+                // Bonus for perfect match?
+                if (Math.abs(dist) < 3) {
+                    slicedW = prevBlock.w; // Restore full width!
+                    finalX = prevBlock.x;
+                    // Effect
+                    flashScreen();
+                }
+
+                // Create debris for the cut part? (Enhancement)
+            } else {
+                // First block always perfect center visually for tutorial? Nah just width
+                finalX = (width - INITIAL_WIDTH) / 2; // Center base
+                slicedW = INITIAL_WIDTH;
+            }
+
+            // Add static block
+            const b = new Block(finalX, currentBlock.y, slicedW, BLOCK_HEIGHT, currentBlock.color);
+            blocks.push(b);
+
+            score++;
+            scoreEl.innerText = score;
+
+            // Increase speed slightly
+            speed += 0.1;
+
+            // Move camera if getting high
+            // Target Y: We want the top block to be at roughly 60% height
+            // currentBlock.y decreases as we go up.
+            // 60% height = height * 0.6
+            // We want (topY + cameraY) = height * 0.6 => cameraY = height * 0.6 - topY
+            const targetCamY = (height * 0.7) - currentBlock.y;
+            // Smooth lerp camera in animate loop? Just set for simple demo
+            // We'll simplistic target approach
+            if (targetCamY > cameraY) {
+                // We will animate this in loop
+            }
+
+            spawnBlock();
+        }
+
+        function gameOver() {
+            isPlaying = false;
+            finalScoreEl.innerText = score;
+            gameOverScreen.classList.remove('hidden');
+        }
+
+        function startGame() {
+            blocks = [];
+            score = 0;
+            speed = INITIAL_SPEED;
+            hue = 0;
+            cameraY = 0;
+            scoreEl.innerText = '0';
+
+            // Base Block
+            // blocks.push(new Block((width - INITIAL_WIDTH)/2, height - 50, INITIAL_WIDTH, BLOCK_HEIGHT, '#fff'));
+            // Actually the game starts by placing the first moving block on a "phantom" base or just ground.
+            // Let's spawn first moving block.
+
+            // Add a base block
+            const base = new Block((width - INITIAL_WIDTH) / 2, height - 100, INITIAL_WIDTH, 50, '#333');
+            blocks.push(base);
+
+            spawnBlock();
+
+            startScreen.classList.add('hidden');
+            gameOverScreen.classList.add('hidden');
+
+            isPlaying = true;
+            animate();
+        }
+
+        function flashScreen() {
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+            ctx.fillRect(0, 0, width, height);
+        }
+
+        function animate() {
+            if (!isPlaying) return;
+
+            ctx.clearRect(0, 0, width, height);
+
+            // Update Camera
+            // Desired cameraY based on latest block
+            let lastB = blocks[blocks.length - 1];
+            if (lastB) {
+                const targetY = (height * 0.6) - lastB.y;
+                if (targetY > cameraY) {
+                    cameraY += (targetY - cameraY) * 0.1;
+                }
+            }
+
+            // Draw blocks
+            blocks.forEach(b => b.draw());
+
+            // Update & Draw Current Block
+            if (currentBlock) {
+                // Move
+                currentBlock.x += speed * direction;
+
+                // Bounce off walls
+                if (currentBlock.x + currentBlock.w > width) {
+                    currentBlock.x = width - currentBlock.w;
+                    direction = -1;
+                } else if (currentBlock.x < 0) {
+                    currentBlock.x = 0;
+                    direction = 1;
+                }
+
+                const drawY = currentBlock.y + cameraY;
+
+                ctx.fillStyle = currentBlock.color;
+                ctx.fillRect(currentBlock.x, drawY, currentBlock.w, currentBlock.h);
+
+                // Glow
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = currentBlock.color;
+                ctx.strokeRect(currentBlock.x, drawY, currentBlock.w, currentBlock.h);
+                ctx.shadowBlur = 0;
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        // Input
+        function handleInput(e) {
+            e.preventDefault();
+            if (!isPlaying) return;
+            placeBlock();
+        }
+
+        document.addEventListener('keydown', e => {
+            if (e.code === 'Space') handleInput(e);
+        });
+
+        canvas.addEventListener('mousedown', handleInput);
+        canvas.addEventListener('touchstart', handleInput, { passive: false });
+
+        document.getElementById('startBtn').addEventListener('click', startGame);
+        document.getElementById('restartBtn').addEventListener('click', startGame);
+
+    </script>
+    <div class="ad-overlay-bottom">
+        <div style="width:100%; display:flex; flex-direction:column; align-items:center;">
+            <span class="ad-label" style="color:#aaa;">Advertisement</span>
+            <ins class="adsbygoogle" style="display:block; width:100%; height:90px;"
+                data-ad-client="ca-pub-5166575587547718" data-ad-slot="overlay-unit" data-ad-format="auto"
+                data-full-width-responsive="true"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+    </div>
+</body>
+
+</html>

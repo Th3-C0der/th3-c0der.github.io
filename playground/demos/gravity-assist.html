@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Gravity Assist - Th3-C0der Playground</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718"
+        crossorigin="anonymous"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #0b0b15;
+            color: #fff;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            height: 100vh;
+            font-family: 'Segoe UI', sans-serif;
+            user-select: none;
+        }
+
+        .hud {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            pointer-events: none;
+        }
+
+        .back-btn {
+            pointer-events: auto;
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #fff;
+            color: #000;
+        }
+
+        .controls {
+            position: absolute;
+            bottom: 120px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            background: rgba(20, 20, 40, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #333;
+            pointer-events: auto;
+        }
+
+        button {
+            background: #334;
+            color: #fff;
+            border: 1px solid #556;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            background: #556;
+            border-color: #fff;
+        }
+
+        button.primary {
+            background: #00ccff;
+            color: #000;
+            border: none;
+            font-weight: bold;
+        }
+
+        button.primary:hover {
+            background: #00eeff;
+            box-shadow: 0 0 15px #00ccff;
+        }
+
+        .level-info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            text-align: right;
+            pointer-events: none;
+        }
+
+        .win-screen {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 40px;
+            border: 2px solid #00ccff;
+            text-align: center;
+            display: none;
+            box-shadow: 0 0 50px rgba(0, 204, 255, 0.3);
+        }
+
+        .ad-overlay-bottom {
+            position: fixed;
+            bottom: 0px;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            padding: 10px 0;
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="hud">
+        <a href="/playground" class="back-btn"><i class="fas fa-arrow-left"></i> EXIT</a>
+    </div>
+
+    <div class="level-info">
+        <h2 style="margin:0; color:#00ccff;">LEVEL <span id="levelNum">1</span></h2>
+        <div style="font-size:0.8rem; color:#888;">Add planets to guide the probe.</div>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <div class="controls">
+        <button id="addPlanetBtn">Place Planet</button>
+        <button id="addMoonBtn">Place Moon</button>
+        <button id="clearBtn" style="color:#ff3366; border-color:#ff3366;">Reset</button>
+        <div style="width:1px; background:#555;"></div>
+        <button id="launchBtn" class="primary">LAUNCH</button>
+    </div>
+
+    <div id="winScreen" class="win-screen">
+        <h1 style="color:#00ccff; margin-top:0;">ORBIT STABLE</h1>
+        <p>Target Reached.</p>
+        <button id="nextLevelBtn" class="primary">Next Sector</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const launchBtn = document.getElementById('launchBtn');
+        const addPlanetBtn = document.getElementById('addPlanetBtn');
+        const addMoonBtn = document.getElementById('addMoonBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const winScreen = document.getElementById('winScreen');
+        const nextLevelBtn = document.getElementById('nextLevelBtn');
+
+        let width, height;
+        let mode = 'view'; // view, place_planet, place_moon
+        let isSimulating = false;
+
+        // Entities
+        let startPos = { x: 100, y: 300 };
+        let targetPos = { x: 800, y: 300 };
+        let startVel = { x: 5, y: -2 }; // Initial launch vector
+
+        let probe = { x: 0, y: 0, vx: 0, vy: 0, active: false, path: [] };
+        let planets = []; // {x, y, mass, radius, fixed}
+
+        let level = 1;
+
+        function resize() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+            draw();
+        }
+        window.addEventListener('resize', resize);
+
+        function initLevel() {
+            isSimulating = false;
+            probe.active = false;
+            userPlanets = [];
+            winScreen.style.display = 'none';
+            launchBtn.innerText = "LAUNCH";
+
+            // Level Config
+            planets = []; // System planets (fixed)
+
+            if (level === 1) {
+                startPos = { x: 100, y: height / 2 };
+                targetPos = { x: width - 100, y: height / 2 };
+                // Obstacle sun in middle
+                planets.push({ x: width / 2, y: height / 2, mass: 2000, radius: 40, type: 'sun', fixed: true });
+            } else if (level === 2) {
+                startPos = { x: 100, y: height - 100 };
+                targetPos = { x: width - 100, y: 100 };
+                planets.push({ x: width / 2, y: height / 2, mass: 3000, radius: 50, type: 'sun', fixed: true });
+            } else {
+                // Random
+                startPos = { x: 100, y: Math.random() * (height - 200) + 100 };
+                targetPos = { x: width - 100, y: Math.random() * (height - 200) + 100 };
+                planets.push({ x: width / 2, y: height / 2, mass: 2500, radius: 45, type: 'sun', fixed: true });
+            }
+
+            document.getElementById('levelNum').innerText = level;
+            draw();
+        }
+
+        function update() {
+            if (!isSimulating) return;
+
+            // Physics Step
+            // Gravity F = G * m1 * m2 / r^2
+            // a = F / m1 = G * m2 / r^2
+
+            const G = 0.5;
+
+            // Apply gravity from all planets
+            for (let p of planets) {
+                const dx = p.x - probe.x;
+                const dy = p.y - probe.y;
+                const distSq = dx * dx + dy * dy;
+                const dist = Math.sqrt(distSq);
+
+                if (dist < p.radius + 5) { // Collision
+                    explode();
+                    return;
+                }
+
+                const force = (G * p.mass) / distSq;
+                const ax = (dx / dist) * force;
+                const ay = (dy / dist) * force;
+
+                probe.vx += ax;
+                probe.vy += ay;
+            }
+
+            probe.x += probe.vx;
+            probe.y += probe.vy;
+
+            probe.path.push({ x: probe.x, y: probe.y });
+            if (probe.path.length > 500) probe.path.shift(); // Trail limit
+
+            // Check Target
+            const dTarget = Math.hypot(probe.x - targetPos.x, probe.y - targetPos.y);
+            if (dTarget < 30) {
+                win();
+            }
+
+            // Bounds
+            if (probe.x < -100 || probe.x > width + 100 || probe.y < -100 || probe.y > height + 100) {
+                stopSim(); // Lost in space
+            }
+        }
+
+        function draw() {
+            ctx.fillStyle = '#0b0b15';
+            ctx.fillRect(0, 0, width, height);
+
+            // Stars
+            // (static for perf)
+
+            // Goal Area
+            ctx.beginPath();
+            ctx.arc(targetPos.x, targetPos.y, 30, 0, Math.PI * 2);
+            ctx.strokeStyle = '#00ffaa';
+            ctx.setLineDash([5, 5]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.fillStyle = 'rgba(0, 255, 170, 0.2)';
+            ctx.fill();
+            ctx.fillStyle = '#fff';
+            ctx.font = '12px Arial';
+            ctx.fillText('TARGET', targetPos.x - 20, targetPos.y + 45);
+
+            // Start Area
+            ctx.beginPath();
+            ctx.arc(startPos.x, startPos.y, 10, 0, Math.PI * 2);
+            ctx.fillStyle = '#aaa';
+            ctx.fill();
+
+            // Planets
+            for (let p of planets) {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                if (p.type === 'sun') {
+                    ctx.fillStyle = '#ffaa00';
+                    ctx.shadowColor = '#ffaa00';
+                    ctx.shadowBlur = 20;
+                } else if (p.type === 'moon') {
+                    ctx.fillStyle = '#888';
+                    ctx.shadowBlur = 0;
+                } else {
+                    ctx.fillStyle = '#00bbff'; // User planet
+                    ctx.shadowColor = '#00bbff';
+                    ctx.shadowBlur = 10;
+                }
+                ctx.fill();
+                ctx.shadowBlur = 0;
+
+                // Gravity Well Visual (Subtle)
+                ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+                ctx.beginPath(); ctx.arc(p.x, p.y, p.radius + 20, 0, Math.PI * 2); ctx.stroke();
+                ctx.beginPath(); ctx.arc(p.x, p.y, p.radius + 50, 0, Math.PI * 2); ctx.stroke();
+            }
+
+            // Probe
+            if (probe.active) {
+                // Trail
+                ctx.beginPath();
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 1;
+                for (let i = 0; i < probe.path.length; i++) {
+                    if (i === 0) ctx.moveTo(probe.path[i].x, probe.path[i].y);
+                    else ctx.lineTo(probe.path[i].x, probe.path[i].y);
+                }
+                ctx.stroke();
+
+                // Body
+                ctx.fillStyle = '#fff';
+                ctx.beginPath();
+                ctx.arc(probe.x, probe.y, 4, 0, Math.PI * 2);
+                ctx.fill();
+            } else {
+                // Draw launch vector preview?
+                // Or just show position
+                ctx.fillStyle = '#fff';
+                ctx.beginPath();
+                ctx.arc(startPos.x, startPos.y, 4, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Ghost preview of placement
+            if (mode === 'place_planet' || mode === 'place_moon') {
+                // handled in mousemove?
+            }
+        }
+
+        function loop() {
+            update();
+            draw();
+            if (isSimulating) requestAnimationFrame(loop);
+            else draw(); // Redraw once on stop
+        }
+
+        function play() {
+            probe.x = startPos.x;
+            probe.y = startPos.y;
+            // Launch vector: roughly towards target initially but user can adjust?
+            // Fixed launch for demo simplicity
+            const angle = Math.atan2(targetPos.y - startPos.y, targetPos.x - startPos.x); // Aim direct
+            // Add slight offset for puzzle?
+            // Let's launch at a fixed speed roughly towards center
+
+            // To make it a puzzle, Launch is FIXED. User must place planets to defect.
+            // Launch angle is always 0 (Right) or toward target?
+            // Let's say Launch is always Horizontal Right at fixed speed 4.
+
+            probe.vx = 4;
+            probe.vy = 0;
+
+            // If Level 1, Sun is in middle. Direct path hits Sun.
+            // User must place planet to pull it around.
+
+            probe.active = true;
+            probe.path = [];
+            isSimulating = true;
+            launchBtn.innerText = "ABORT";
+            loop();
+        }
+
+        function stopSim() {
+            isSimulating = false;
+            probe.active = false;
+            launchBtn.innerText = "LAUNCH";
+            draw();
+        }
+
+        function explode() {
+            stopSim();
+            // Explosion fx?
+        }
+
+        function win() {
+            stopSim();
+            winScreen.style.display = 'block';
+        }
+
+        // Init
+        resize();
+        initLevel();
+
+        // UI Events
+        launchBtn.addEventListener('click', () => {
+            if (isSimulating) stopSim();
+            else play();
+        });
+
+        addPlanetBtn.addEventListener('click', () => mode = 'place_planet');
+        addMoonBtn.addEventListener('click', () => mode = 'place_moon');
+
+        clearBtn.addEventListener('click', () => {
+            // Remove user planets (keep system ones)
+            planets = planets.filter(p => p.fixed);
+            draw();
+        });
+
+        nextLevelBtn.addEventListener('click', () => {
+            level++;
+            initLevel();
+        });
+
+        canvas.addEventListener('click', e => {
+            if (mode === 'view') return;
+
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            if (mode === 'place_planet') {
+                planets.push({ x: x, y: y, mass: 600, radius: 20, type: 'planet' });
+            } else if (mode === 'place_moon') {
+                planets.push({ x: x, y: y, mass: 200, radius: 10, type: 'moon' });
+            }
+
+            mode = 'view';
+            draw();
+        });
+
+    </script>
+    <div class="ad-overlay-bottom" style="z-index: 1000;">
+        <div style="width:100%; display:flex; flex-direction:column; align-items:center;">
+            <span class="ad-label" style="color:#aaa;">Advertisement</span>
+            <ins class="adsbygoogle" style="display:block; width:100%; height:90px;"
+                data-ad-client="ca-pub-5166575587547718" data-ad-slot="overlay-unit" data-ad-format="auto"
+                data-full-width-responsive="true"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+    </div>
+</body>
+
+</html>

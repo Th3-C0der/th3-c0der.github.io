@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Fractal Grove - Th3-C0der Playground</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718"
+        crossorigin="anonymous"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #050505;
+            color: #fff;
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        .ui-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 300px;
+            background: rgba(10, 10, 10, 0.85);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 8px 15px;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        h2 {
+            margin: 0 0 20px 0;
+            font-weight: 300;
+            letter-spacing: 2px;
+            text-align: center;
+            color: #00ff9d;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        .control-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: #ccc;
+            margin-bottom: 5px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            -webkit-appearance: none;
+            appearance: none;
+            background: transparent;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 14px;
+            width: 14px;
+            border-radius: 50%;
+            background: #00ff9d;
+            cursor: pointer;
+            margin-top: -5px;
+        }
+
+        input[type="range"]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+
+        input[type="checkbox"] {
+            accent-color: #00ff9d;
+        }
+
+        .ad-overlay-bottom {
+            position: fixed;
+            bottom: 0px;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            padding: 10px 0;
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <a href="/playground" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Playground</a>
+    <canvas id="canvas"></canvas>
+
+    <div class="ui-container">
+        <h2>FRACTAL GROVE</h2>
+
+        <div class="control-group">
+            <div class="control-header">
+                <span>Branch Angle</span>
+                <span id="angleVal">25°</span>
+            </div>
+            <input type="range" id="angle" min="0" max="180" value="25">
+        </div>
+
+        <div class="control-group">
+            <div class="control-header">
+                <span>Length Decay</span>
+                <span id="decayVal">0.7</span>
+            </div>
+            <input type="range" id="decay" min="0.5" max="0.85" step="0.01" value="0.7">
+        </div>
+
+        <div class="control-group">
+            <div class="control-header">
+                <span>Depth</span>
+                <span id="depthVal">10</span>
+            </div>
+            <input type="range" id="depth" min="1" max="14" step="1" value="10">
+        </div>
+
+        <div class="control-group">
+            <div class="control-header">
+                <span>Branch Width</span>
+                <span id="widthVal">10</span>
+            </div>
+            <input type="range" id="width" min="1" max="30" step="1" value="10">
+        </div>
+
+        <div class="checkbox-group">
+            <input type="checkbox" id="animate" checked>
+            <label for="animate">Animate (Wind)</label>
+        </div>
+
+        <div class="checkbox-group">
+            <input type="checkbox" id="psychedelic">
+            <label for="psychedelic">RGB Mode</label>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        let width, height;
+
+        // Params
+        let angle = 25 * Math.PI / 180;
+        let decay = 0.7;
+        let maxDepth = 10;
+        let startWidth = 10;
+        let animate = true;
+        let rgbMode = false;
+
+        let time = 0;
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            width = canvas.width;
+            height = canvas.height;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        function drawTree(x, y, len, angle, depth, branchWidth) {
+            ctx.beginPath();
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(angle); // -PI/2 is up
+
+            // Set Color
+            // Decay color based on depth
+            if (rgbMode) {
+                const hue = (time * 50 + depth * 20) % 360;
+                ctx.strokeStyle = `hsl(${hue}, 100%, 60%)`;
+                ctx.shadowColor = `hsl(${hue}, 100%, 60%)`;
+            } else {
+                // Classic Green/Brown or Neon? Let's go Neon Cyan/Green
+                // Base: Brownish, Tips: Green/Glowing
+                const r = 255 - depth * 20;
+                const g = 50 + depth * 20;
+                const b = 100 + depth * 10;
+                ctx.strokeStyle = `rgb(${r * 0.2}, ${g}, ${b})`;
+                ctx.shadowColor = `rgb(${r * 0.2}, ${g}, ${b})`;
+            }
+
+            ctx.shadowBlur = depth < 3 ? 0 : 10; // Glow only smaller branches for performance
+            ctx.lineWidth = branchWidth;
+            ctx.lineCap = 'round';
+
+            ctx.moveTo(0, 0);
+            ctx.lineTo(0, -len);
+            ctx.stroke();
+
+            if (depth < maxDepth) {
+                // Animate angle slightly if leaf/small branch
+                let windOffset = 0;
+                if (animate) {
+                    // Simple sine wave wind
+                    windOffset = Math.sin(time * 0.05 + depth) * 0.05 * (depth * 0.5);
+                }
+
+                ctx.translate(0, -len);
+
+                // Right Branch
+                drawTree(0, 0, len * decay, angle + this.angle + windOffset, depth + 1, branchWidth * 0.7);
+                // Left Branch (restore context logic is implicit in recursion structure if we didn't translate back, 
+                // but since we translated forward, we need to save/restore or translate back)
+                // Actually my recursive standard is usually `save` at top.
+            }
+
+            ctx.restore();
+        }
+
+        // Optimized Recursive Function
+        function branch(len, branchAngle, depth, curWidth) {
+            if (depth > maxDepth) return;
+
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(0, -len);
+
+            if (rgbMode) {
+                const hue = (time * 20 + depth * 30) % 360;
+                ctx.strokeStyle = `hsl(${hue}, 80%, 60%)`;
+                ctx.shadowColor = `hsl(${hue}, 80%, 60%)`;
+            } else {
+                // Gradient from dark purple to neon green
+                const r = 50;
+                const g = Math.floor(255 * (depth / maxDepth));
+                const b = Math.floor(200 - 100 * (depth / maxDepth));
+                ctx.strokeStyle = `rgb(${r}, ${g}, ${b})`;
+                ctx.shadowColor = `rgb(${r}, ${g}, ${b})`;
+                ctx.shadowBlur = depth > 7 ? 15 : 0;
+            }
+
+            ctx.lineWidth = curWidth;
+            ctx.stroke();
+
+            ctx.translate(0, -len);
+
+            let wind = 0;
+            if (animate) {
+                wind = Math.sin(time * 0.02 + depth * 0.5) * 0.02 * (depth / 2);
+            }
+
+            if (depth < maxDepth) {
+                ctx.save();
+                ctx.rotate(branchAngle + wind);
+                branch(len * decay, branchAngle, depth + 1, curWidth * 0.7);
+                ctx.restore();
+
+                ctx.save();
+                ctx.rotate(-branchAngle + wind);
+                branch(len * decay, branchAngle, depth + 1, curWidth * 0.7);
+                ctx.restore();
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, width, height);
+
+            // Ground
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = "#111";
+            ctx.fillRect(0, height - 110, width, 110); // Extend ground down
+
+            ctx.save();
+            ctx.translate(width / 2, height - 110);
+
+            // Initial Branch
+            branch(height * 0.25, angle, 0, startWidth);
+
+            ctx.restore();
+        }
+
+        function loop() {
+            if (animate || rgbMode) {
+                time++;
+                draw();
+            }
+            requestAnimationFrame(loop);
+        }
+
+        // Logic binding
+        document.getElementById('angle').addEventListener('input', e => {
+            angle = e.target.value * Math.PI / 180;
+            document.getElementById('angleVal').innerText = e.target.value + "°";
+            if (!animate) draw();
+        });
+
+        document.getElementById('decay').addEventListener('input', e => {
+            decay = parseFloat(e.target.value);
+            document.getElementById('decayVal').innerText = decay;
+            if (!animate) draw();
+        });
+
+        document.getElementById('depth').addEventListener('input', e => {
+            maxDepth = parseInt(e.target.value);
+            document.getElementById('depthVal').innerText = maxDepth;
+            if (!animate) draw();
+        });
+
+        document.getElementById('width').addEventListener('input', e => {
+            startWidth = parseInt(e.target.value);
+            document.getElementById('widthVal').innerText = startWidth;
+            if (!animate) draw();
+        });
+
+        document.getElementById('animate').addEventListener('change', e => {
+            animate = e.target.checked;
+            draw();
+        });
+
+        document.getElementById('psychedelic').addEventListener('change', e => {
+            rgbMode = e.target.checked;
+            draw();
+        });
+
+        // Initialize user values helper
+        function updateAllUI() {
+            angle = document.getElementById('angle').value * Math.PI / 180;
+            // ... others are strictly bound on input, but good practice init
+        }
+
+        loop();
+
+    </script>
+    <div class="ad-overlay-bottom" style="z-index: 1000;">
+        <div style="width:100%; display:flex; flex-direction:column; align-items:center;">
+            <span class="ad-label" style="color:#aaa;">Advertisement</span>
+            <ins class="adsbygoogle" style="display:block; width:100%; height:90px;"
+                data-ad-client="ca-pub-5166575587547718" data-ad-slot="overlay-unit" data-ad-format="auto"
+                data-full-width-responsive="true"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+    </div>
+</body>
+
+</html>

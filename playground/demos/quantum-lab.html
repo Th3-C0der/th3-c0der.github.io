@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Quantum Lab - Th3-C0der Playground</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718"
+        crossorigin="anonymous"></script>
+    <style>
+        body {
+            background-color: #0b0b15;
+            color: #fff;
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 260px;
+            background: #111;
+            border-right: 1px solid #222;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            z-index: 10;
+        }
+
+        .main {
+            flex-grow: 1;
+            position: relative;
+            background: radial-gradient(circle at center, #1a1a2e 0%, #000 100%);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .circuit-area {
+            flex-grow: 1;
+            position: relative;
+            overflow: auto;
+            padding: 40px;
+        }
+
+        .gate-palette {
+            display: flex;
+            gap: 10px;
+            padding: 10px 0;
+            flex-wrap: wrap;
+        }
+
+        .gate-btn {
+            width: 40px;
+            height: 40px;
+            background: #333;
+            border: 1px solid #555;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: grab;
+            user-select: none;
+            font-weight: bold;
+            border-radius: 4px;
+        }
+
+        .gate-btn:hover {
+            background: #444;
+            border-color: #00ddee;
+            color: #00ddee;
+        }
+
+        .circuit-line {
+            height: 2px;
+            background: #444;
+            position: relative;
+            margin: 40px 0;
+            display: flex;
+            align-items: center;
+            padding-left: 60px;
+        }
+
+        .qubit-label {
+            position: absolute;
+            left: 0;
+            width: 50px;
+            text-align: right;
+            font-family: monospace;
+            color: #888;
+        }
+
+        .wire-slot {
+            width: 50px;
+            height: 50px;
+            border: 1px dashed rgba(255, 255, 255, 0.1);
+            margin: 0 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: 0.2s;
+        }
+
+        .wire-slot:hover {
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .gate-instance {
+            width: 40px;
+            height: 40px;
+            background: #1a1a2e;
+            border: 1px solid #00ddee;
+            color: #00ddee;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 221, 238, 0.2);
+        }
+
+        .back-btn {
+            color: #888;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .back-btn:hover {
+            color: #fff;
+        }
+
+        .viz-panel {
+            height: 200px;
+            border-top: 1px solid #222;
+            background: #08080c;
+            padding: 20px;
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+        }
+
+        .bloch-sphere {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 1px solid #333;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #000;
+        }
+
+        .state-vector {
+            position: absolute;
+            width: 2px;
+            height: 50%;
+            background: #ff0055;
+            bottom: 50%;
+            left: 50%;
+            transform-origin: bottom center;
+            transition: transform 0.5s;
+        }
+
+        .prob-bar {
+            width: 40px;
+            background: #111;
+            display: flex;
+            flex-direction: column-reverse;
+            height: 100px;
+            border: 1px solid #333;
+        }
+
+        .prob-fill {
+            background: #00ddee;
+            width: 100%;
+            transition: height 0.5s;
+        }
+
+        .info {
+            font-size: 0.8rem;
+            color: #aaa;
+            text-align: center;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <a href="/playground" class="back-btn"><i class="fas fa-arrow-left"></i> Back</a>
+        <h2>Quantum Lab</h2>
+        <p style="font-size:0.85rem; color:#666;">Drag gates to wires to build a circuit. Visualize qubit states.</p>
+
+        <h3>Gates</h3>
+        <div class="gate-palette">
+            <div class="gate-btn" draggable="true" data-type="X" title="Pauli-X (NOT)">X</div>
+            <div class="gate-btn" draggable="true" data-type="H" title="Hadamard (Superposition)">H</div>
+            <div class="gate-btn" draggable="true" data-type="Z" title="Pauli-Z (Phase)">Z</div>
+            <div class="gate-btn" draggable="true" data-type="M" title="Measure">M</div>
+        </div>
+
+        <button id="runBtn"
+            style="padding:10px; background:#00ddee; border:none; color:#000; font-weight:bold; cursor:pointer;">Run
+            Simulation</button>
+        <button id="clearBtn" Circuit</button>
+
+            <div style="margin-top:auto; width:100%; border-top:1px solid #333; padding-top:10px; text-align:center;">
+                <span style="display:block; font-size:0.6rem; color:#444; margin-bottom:5px;">SPONSORED</span>
+                <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-5166575587547718"
+                    data-ad-slot="sidebar-unit" data-ad-format="auto" data-full-width-responsive="true"></ins>
+                <script>
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
+            </div>
+    </div>
+
+    <div class="main">
+        <div class="circuit-area" id="circuit">
+            <!-- Qubit Lines -->
+            <div class="circuit-line" data-qubit="0">
+                <div class="qubit-label">q[0]</div>
+                <div class="wire-slot"></div>
+                <div class="wire-slot"></div>
+                <div class="wire-slot"></div>
+                <div class="wire-slot"></div>
+                <div class="wire-slot"></div>
+            </div>
+            <div class="circuit-line" data-qubit="1">
+                <div class="qubit-label">q[1]</div>
+                <div class="wire-slot"></div>
+                <div class="wire-slot"></div>
+                <div class="wire-slot"></div>
+                <div class="wire-slot"></div>
+                <div class="wire-slot"></div>
+            </div>
+            <div class="circuit-line" data-qubit="2">
+                <div class="qubit-label">q[2]</div>
+                <div class="wire-slot"></div>
+                <div class="wire-slot"></div>
+                <div class="wire-slot"></div>
+                <div class="wire-slot"></div>
+                <div class="wire-slot"></div>
+            </div>
+        </div>
+
+        <div class="viz-panel" id="viz">
+            <!-- Visualizations injected here -->
+        </div>
+    </div>
+
+    <script>
+        // Simple Simulator relying on state vectors
+        // Just for demo, only supports single qubit gates accurately per line
+        // No entanglement (CNOT complexity) for this simple UI demo unless standard mock
+
+        const numQubits = 3;
+        const numSlots = 5;
+        let circuit = Array(numQubits).fill().map(() => Array(numSlots).fill(null));
+
+        const vizPanel = document.getElementById('viz');
+
+        function initViz() {
+            vizPanel.innerHTML = '';
+            for (let i = 0; i < numQubits; i++) {
+                const div = document.createElement('div');
+                div.innerHTML = `
+                    <div style="display:flex; gap:10px;">
+                        <div>
+                            <div class="bloch-sphere">
+                                <div class="state-vector" id="vec${i}"></div>
+                            </div>
+                            <div class="info">q[${i}] Phase</div>
+                        </div>
+                        <div>
+                            <div class="prob-bar">
+                                <div class="prob-fill" id="prob${i}" style="height:0%"></div>
+                            </div>
+                            <div class="info">|1&gt; Prob</div>
+                        </div>
+                    </div>
+                `;
+                vizPanel.appendChild(div);
+            }
+        }
+
+        initViz();
+
+        // Drag Drop
+        const slots = document.querySelectorAll('.wire-slot');
+        const gates = document.querySelectorAll('.gate-btn');
+        let draggedType = null;
+
+        gates.forEach(g => {
+            g.addEventListener('dragstart', e => {
+                draggedType = g.dataset.type;
+                e.dataTransfer.setData('text/plain', draggedType);
+            });
+        });
+
+        slots.forEach((slot, index) => {
+            slot.addEventListener('dragover', e => e.preventDefault());
+            slot.addEventListener('drop', e => {
+                e.preventDefault();
+                const type = e.dataTransfer.getData('text/plain');
+                if (type) {
+                    // Find coords
+                    // Actually checking DOM index is painful.
+                    // Just set content
+                    slot.innerHTML = `<div class="gate-instance" onclick="this.remove()">${type}</div>`;
+                }
+            });
+
+            // Observer to update model?
+            // Actually 'run' button parses DOM.
+        });
+
+        document.getElementById('runBtn').addEventListener('click', runSimulation);
+        document.getElementById('clearBtn').addEventListener('click', () => {
+            document.querySelectorAll('.wire-slot').forEach(s => s.innerHTML = '');
+            runSimulation();
+        });
+
+        function runSimulation() {
+            // Simplified Simulation
+            // State: [alpha, beta] complex
+            // |0> = [1, 0]
+            // |1> = [0, 1]
+
+            for (let q = 0; q < numQubits; q++) {
+                let alpha = { r: 1, i: 0 }; // |0>
+                let beta = { r: 0, i: 0 };
+
+                // Get row
+                const row = document.querySelector(`.circuit-line[data-qubit="${q}"]`);
+                const gateEls = row.querySelectorAll('.wire-slot');
+
+                gateEls.forEach(slot => {
+                    if (slot.firstChild) {
+                        const type = slot.firstChild.innerText;
+                        applyGate(type, alpha, beta); // mutates alpha,beta
+                    }
+                });
+
+                updateViz(q, alpha, beta);
+            }
+        }
+
+        function applyGate(type, a, b) {
+            // Complex math helpers
+            // X: swap a, b
+            if (type === 'X') {
+                let tr = a.r, ti = a.i;
+                a.r = b.r; a.i = b.i;
+                b.r = tr; b.i = ti;
+            }
+            // Z: flip phase of b
+            else if (type === 'Z') {
+                b.r = -b.r;
+                b.i = -b.i;
+            }
+            // H: 1/sqrt(2) * [[1, 1], [1, -1]]
+            else if (type === 'H') {
+                const s = 1 / Math.sqrt(2);
+                let ar = a.r, ai = a.i;
+                let br = b.r, bi = b.i;
+
+                a.r = s * (ar + br);
+                a.i = s * (ai + bi);
+                b.r = s * (ar - br);
+                b.i = s * (ai - bi);
+            }
+            // M: Collapse (Random)
+            else if (type === 'M') {
+                const probOne = b.r * b.r + b.i * b.i;
+                if (Math.random() < probOne) {
+                    a.r = 0; a.i = 0;
+                    b.r = 1; b.i = 0;
+                } else {
+                    a.r = 1; a.i = 0;
+                    b.r = 0; b.i = 0;
+                }
+            }
+        }
+
+        function updateViz(q, a, b) {
+            // Prob |1> = |beta|^2
+            const probOne = b.r * b.r + b.i * b.i;
+            document.getElementById(`prob${q}`).style.height = `${probOne * 100}%`;
+
+            // Bloch sphere vector angle?
+            // Theta (latitude): cos(theta/2) = |alpha|
+            // Phi (longitude): phase difference
+            // Simplified 2D rotation for Z-phase
+            // We just show probability as vector flip?
+
+            // Just simplistic visualization:
+            // Angle 0 (Up) = |0>
+            // Angle 180 (Down) = |1>
+            // H -> 90 deg
+
+            // theta = 2 * acos(|alpha|)
+            // if alpha is 1, theta = 0
+            // if alpha is 0.707, theta = 90 deg
+            // if alpha is 0, theta = 180
+
+            const magA = Math.sqrt(a.r * a.r + a.i * a.i);
+            // safe clamp
+            let val = Math.max(-1, Math.min(1, magA));
+            let theta = 2 * Math.acos(val) * (180 / Math.PI);
+
+            // Which way? if probOne is high, theta approaches 180.
+
+            document.getElementById(`vec${q}`).style.transform = `rotate(${theta}deg)`;
+        }
+
+    </script>
+    <div class="ad-overlay-bottom"
+        style="position:fixed; bottom:0; left:260px; width:calc(100% - 260px); z-index:1000; display:flex; flex-direction:column; align-items:center; padding-bottom:10px;">
+        <span class="ad-label" style="color:#aaa; font-size:0.8rem; margin-bottom:5px;">Advertisement</span>
+        <ins class="adsbygoogle" style="display:block; width:100%; height:90px;"
+            data-ad-client="ca-pub-5166575587547718" data-ad-slot="overlay-unit" data-ad-format="auto"
+            data-full-width-responsive="true"></ins>
+        <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+    </div>
+</body>
+
+</html>

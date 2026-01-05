@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Orbital Defense - Th3-C0der Playground</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718"
+        crossorigin="anonymous"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #050505;
+            color: #fff;
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            user-select: none;
+        }
+
+        .game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle at center, #1a1a2e 0%, #000 100%);
+        }
+
+        canvas {
+            display: block;
+        }
+
+        .ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .hud-top {
+            position: absolute;
+            top: 20px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 40px;
+            box-sizing: border-box;
+            z-index: 10;
+        }
+
+        .back-btn {
+            pointer-events: auto;
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 16px;
+            border-radius: 20px;
+            backdrop-filter: blur(4px);
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+
+        .score-board {
+            text-align: right;
+        }
+
+        .score-val {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #00ccff;
+            text-shadow: 0 0 10px #00ccff;
+        }
+
+        .health-bar {
+            width: 200px;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .health-fill {
+            height: 100%;
+            background: #00ff66;
+            width: 100%;
+            box-shadow: 0 0 10px #00ff66;
+            transition: width 0.2s, background 0.2s;
+        }
+
+        .start-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            pointer-events: auto;
+            z-index: 20;
+            backdrop-filter: blur(5px);
+        }
+
+        .title {
+            font-size: 3rem;
+            color: #00ccff;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            text-shadow: 0 0 20px #00ccff;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #aaa;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        .btn {
+            background: transparent;
+            border: 2px solid #00ccff;
+            color: #00ccff;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border-radius: 30px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: #00ccff;
+            color: #000;
+            box-shadow: 0 0 30px #00ccff;
+            transform: scale(1.05);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .ad-overlay-bottom {
+            position: fixed;
+            bottom: 0px;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            padding: 10px 0;
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="game-container">
+        <canvas id="gameCanvas"></canvas>
+
+        <div class="ui-layer">
+            <div class="hud-top">
+                <a href="/playground" class="back-btn"><i class="fas fa-arrow-left"></i> EXIT</a>
+                <div class="score-board">
+                    <div class="score-val" id="scoreDisplay">0</div>
+                    <div class="health-bar">
+                        <div class="health-fill" id="healthFill"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="startScreen" class="start-overlay">
+            <div class="title">Orbital Defense</div>
+            <div class="subtitle">Click/Tap to shoot. Protect the Planet.</div>
+            <button class="btn" id="startBtn">Deploy</button>
+        </div>
+
+        <div id="gameOverScreen" class="start-overlay hidden">
+            <div class="title" style="color:#ff3366; text-shadow:0 0 20px #ff3366;">Critical Failure</div>
+            <div class="subtitle">Score: <span id="finalScore" style="color:white; font-weight:bold;">0</span></div>
+            <button class="btn" id="restartBtn" style="border-color:#ff3366; color:#ff3366;">Reboot System</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const dpr = window.devicePixelRatio || 1;
+
+        // UI
+        const startScreen = document.getElementById('startScreen');
+        const gameOverScreen = document.getElementById('gameOverScreen');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const healthFill = document.getElementById('healthFill');
+        const finalScore = document.getElementById('finalScore');
+
+        // State
+        let isPlaying = false;
+        let width, height, cx, cy;
+        let score = 0;
+        let planetHealth = 100;
+        let lastTime = 0;
+        let spawnTimer = 0;
+        let spawnRate = 1500; // ms
+
+        // Entities
+        let projectiles = [];
+        let enemies = [];
+        let particles = [];
+        let shockwaves = [];
+
+        function resize() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width * dpr;
+            canvas.height = height * dpr;
+            ctx.scale(dpr, dpr);
+            cx = width / 2;
+            cy = height / 2;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        // Classes
+        class Planet {
+            constructor() {
+                this.radius = 40;
+                this.color = '#00ccff';
+                this.atmosphereAlpha = 0.5;
+            }
+            draw() {
+                // Glow
+                ctx.save();
+                ctx.shadowBlur = 30;
+                ctx.shadowColor = this.color;
+
+                // Body
+                ctx.beginPath();
+                ctx.arc(cx, cy, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = '#001133';
+                ctx.fill();
+
+                // Border
+                ctx.lineWidth = 3;
+                ctx.strokeStyle = this.color;
+                ctx.stroke();
+
+                // Center Core
+                ctx.beginPath();
+                ctx.arc(cx, cy, this.radius * 0.4, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+
+                ctx.restore();
+            }
+        }
+
+        class Projectile {
+            constructor(tx, ty) {
+                const angle = Math.atan2(ty - cy, tx - cx);
+                this.x = cx + Math.cos(angle) * 45;
+                this.y = cy + Math.sin(angle) * 45;
+                this.dx = Math.cos(angle) * 8;
+                this.dy = Math.sin(angle) * 8;
+                this.size = 4;
+                this.markedForDeletion = false;
+            }
+
+            update() {
+                this.x += this.dx;
+                this.y += this.dy;
+
+                // Offscreen check
+                if (this.x < 0 || this.x > width || this.y < 0 || this.y > height) {
+                    this.markedForDeletion = true;
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = '#ffff00';
+                ctx.fillStyle = '#fff';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        class Enemy {
+            constructor() {
+                // Spawn on random edge
+                const edge = Math.floor(Math.random() * 4); // 0:top, 1:right, 2:bottom, 3:left
+                if (edge === 0) {
+                    this.x = Math.random() * width;
+                    this.y = -50;
+                } else if (edge === 1) {
+                    this.x = width + 50;
+                    this.y = Math.random() * height;
+                } else if (edge === 2) {
+                    this.x = Math.random() * width;
+                    this.y = height + 50;
+                } else {
+                    this.x = -50;
+                    this.y = Math.random() * height;
+                }
+
+                this.size = Math.random() * 8 + 12; // 12-20
+                this.speed = Math.random() * 1.0 + 0.5 + (score * 0.01); // Get faster with score
+                this.color = '#ff3366';
+
+                const angle = Math.atan2(cy - this.y, cx - this.x);
+                this.dx = Math.cos(angle) * this.speed;
+                this.dy = Math.sin(angle) * this.speed;
+
+                this.markedForDeletion = false;
+                this.angle = 0;
+                this.spin = (Math.random() - 0.5) * 0.1;
+                this.hp = Math.floor(this.size / 6); // Larger = more hp
+            }
+
+            update() {
+                this.x += this.dx;
+                this.y += this.dy;
+                this.angle += this.spin;
+
+                // Check collision with planet
+                const dist = Math.hypot(this.x - cx, this.y - cy);
+                if (dist < 40 + this.size) { // 40 is planet radius
+                    this.markedForDeletion = true;
+                    damagePlanet(10);
+                    spawnExplosion(this.x, this.y, this.size, this.color);
+                    screenShake(5);
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle);
+
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.color;
+                ctx.strokeStyle = this.color;
+                ctx.lineWidth = 2;
+
+                // Draw Rock Shape
+                ctx.beginPath();
+                const sides = 6;
+                for (let i = 0; i < sides; i++) {
+                    const r = this.size * (0.8 + Math.random() * 0.4); // Jittery look
+                    // Actually random needs to be deterministic for frame consistency or it vibrates
+                    // Simplified: just draw hexagon
+                    const theta = (i / sides) * Math.PI * 2;
+                    const rx = Math.cos(theta) * this.size;
+                    const ry = Math.sin(theta) * this.size;
+                    if (i === 0) ctx.moveTo(rx, ry);
+                    else ctx.lineTo(rx, ry);
+                }
+                ctx.closePath();
+                ctx.stroke();
+
+                // HP indicator if beefy
+                if (this.hp > 1) {
+                    ctx.fillStyle = this.color;
+                    ctx.globalAlpha = 0.3;
+                    ctx.fill();
+                }
+
+                ctx.restore();
+            }
+        }
+
+        class Particle {
+            constructor(x, y, size, color) {
+                this.x = x;
+                this.y = y;
+                this.size = Math.random() * size * 0.5;
+                this.color = color;
+                const angle = Math.random() * Math.PI * 2;
+                const vel = Math.random() * 3;
+                this.dx = Math.cos(angle) * vel;
+                this.dy = Math.sin(angle) * vel;
+                this.life = 1.0;
+                this.decay = Math.random() * 0.03 + 0.01;
+            }
+            update() {
+                this.x += this.dx;
+                this.y += this.dy;
+                this.life -= this.decay;
+            }
+            draw() {
+                ctx.globalAlpha = this.life;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = 1.0;
+            }
+        }
+
+        function spawnExplosion(x, y, size, color) {
+            for (let i = 0; i < 8; i++) {
+                particles.push(new Particle(x, y, size, color));
+            }
+        }
+
+        // Game Logic
+        function startGame() {
+            score = 0;
+            planetHealth = 100;
+            updateUI();
+            projectiles = [];
+            enemies = [];
+            particles = [];
+            isPlaying = true;
+            spawnTimer = 0;
+            startScreen.classList.add('hidden');
+            gameOverScreen.classList.add('hidden');
+            requestAnimationFrame(gameLoop);
+        }
+
+        function damagePlanet(amt) {
+            planetHealth -= amt;
+            if (planetHealth < 0) planetHealth = 0;
+            updateUI();
+            if (planetHealth <= 0) gameOver();
+        }
+
+        function updateUI() {
+            scoreDisplay.innerText = score;
+            healthFill.style.width = planetHealth + '%';
+            if (planetHealth < 30) healthFill.style.background = '#ff0033';
+            else healthFill.style.background = '#00ff66';
+        }
+
+        function gameOver() {
+            isPlaying = false;
+            finalScore.innerText = score;
+            gameOverScreen.classList.remove('hidden');
+        }
+
+        // Shake
+        let shake = 0;
+        function screenShake(amt) {
+            shake = amt;
+        }
+
+        function gameLoop(timestamp) {
+            if (!isPlaying) return;
+            const dt = timestamp - lastTime;
+            lastTime = timestamp;
+
+            // Clear
+            ctx.fillStyle = 'rgba(5, 5, 8, 0.4)'; // Trail
+            ctx.fillRect(0, 0, width, height);
+
+            // Shake
+            ctx.save();
+            if (shake > 0) {
+                const sx = (Math.random() - 0.5) * shake;
+                const sy = (Math.random() - 0.5) * shake;
+                ctx.translate(sx, sy);
+                shake *= 0.9;
+                if (shake < 0.5) shake = 0;
+            }
+
+            // Planet
+            const p = new Planet();
+            p.draw();
+
+            // Spawner
+            spawnTimer += dt; // bug: large dt on tab switch causes instant horde?
+            // fix: cap logic or use elapsed
+            if (Math.random() < 0.02 + (score * 0.0001)) { // random chance per frame approx
+                // Or proper timer
+            }
+
+            // Simple timer spawn
+            // Rate decreases (gets faster) with score
+            const currentRate = Math.max(300, 1500 - (score * 10));
+            // We use simple counter
+            // Actually just random chance per frame is easier for varying density
+            if (Math.random() * 1000 < (16 + score * 0.1)) { // roughly 60fps
+                enemies.push(new Enemy());
+            }
+
+            // Update Entities
+            projectiles.forEach((proj, index) => {
+                proj.update();
+                proj.draw();
+                if (proj.markedForDeletion) projectiles.splice(index, 1);
+            });
+
+            enemies.forEach((enemy, eIndex) => {
+                enemy.update();
+                enemy.draw();
+
+                // Collision with Projectiles
+                projectiles.forEach((proj, pIndex) => {
+                    const dist = Math.hypot(proj.x - enemy.x, proj.y - enemy.y);
+                    if (dist < enemy.size + proj.size) {
+                        proj.markedForDeletion = true;
+                        enemy.hp--;
+                        spawnExplosion(proj.x, proj.y, 5, '#ffee00');
+
+                        if (enemy.hp <= 0) {
+                            enemy.markedForDeletion = true;
+                            spawnExplosion(enemy.x, enemy.y, enemy.size, enemy.color);
+                            score += 10;
+                            updateUI();
+                        }
+                    }
+                });
+
+                if (enemy.markedForDeletion) enemies.splice(eIndex, 1);
+            });
+
+            particles.forEach((part, index) => {
+                part.update();
+                part.draw();
+                if (part.life <= 0) particles.splice(index, 1);
+            });
+
+            ctx.restore();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Input
+        window.addEventListener('mousedown', e => {
+            if (!isPlaying) return;
+            const rect = canvas.getBoundingClientRect();
+            // Shoot towards mouse
+            projectiles.push(new Projectile(e.clientX, e.clientY));
+        });
+
+        window.addEventListener('touchstart', e => {
+            if (!isPlaying) return;
+            const t = e.touches[0];
+            projectiles.push(new Projectile(t.clientX, t.clientY));
+            e.preventDefault();
+        }, { passive: false });
+
+        document.getElementById('startBtn').addEventListener('click', startGame);
+        document.getElementById('restartBtn').addEventListener('click', startGame);
+        document.getElementById('restartBtn').onmouseover = () => {
+            document.getElementById('restartBtn').style.background = '#ff3366';
+            document.getElementById('restartBtn').style.color = 'white';
+        };
+        document.getElementById('restartBtn').onmouseout = () => {
+            document.getElementById('restartBtn').style.background = 'transparent';
+            document.getElementById('restartBtn').style.color = '#ff3366';
+        };
+
+    </script>
+    <div class="ad-overlay-bottom" style="z-index: 1000;">
+        <div style="width:100%; display:flex; flex-direction:column; align-items:center;">
+            <span class="ad-label" style="color:#aaa;">Advertisement</span>
+            <ins class="adsbygoogle" style="display:block; width:100%; height:90px;"
+                data-ad-client="ca-pub-5166575587547718" data-ad-slot="overlay-unit" data-ad-format="auto"
+                data-full-width-responsive="true"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+    </div>
+</body>
+
+</html>

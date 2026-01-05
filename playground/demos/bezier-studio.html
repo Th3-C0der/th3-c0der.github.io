@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Bezier Studio - Th3-C0der Playground</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718"
+        crossorigin="anonymous"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #1e1e2e;
+            color: #cdd6f4;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            height: 100vh;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #181825;
+            border-right: 1px solid #313244;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 10;
+        }
+
+        .canvas-container {
+            flex-grow: 1;
+            position: relative;
+            background: #11111b;
+            cursor: crosshair;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .back-btn {
+            color: #a6adc8;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            transition: color 0.2s;
+        }
+
+        .back-btn:hover {
+            color: #89b4fa;
+        }
+
+        h2 {
+            margin: 0;
+            color: #89b4fa;
+            font-size: 1.2rem;
+        }
+
+        .btn {
+            padding: 10px;
+            background: #313244;
+            border: 1px solid #45475a;
+            color: #cdd6f4;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: 0.2s;
+            text-align: left;
+        }
+
+        .btn:hover {
+            background: #45475a;
+        }
+
+        .btn.active {
+            background: #89b4fa;
+            color: #11111b;
+            border-color: #89b4fa;
+        }
+
+        .output-box {
+            background: #11111b;
+            border: 1px solid #313244;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: #a6adc8;
+            word-break: break-all;
+            margin-top: auto;
+        }
+
+        .hint {
+            font-size: 0.8rem;
+            color: #6c7086;
+        }
+
+        .ad-overlay-bottom {
+            position: fixed;
+            bottom: 0px;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            padding: 10px 0;
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <a href="/playground" class="back-btn"><i class="fas fa-arrow-left"></i> Back</a>
+        <h2>Bezier Studio</h2>
+
+        <div class="hint">Click & Drag points to shape the curve.</div>
+
+        <button class="btn active" id="modeCubic">Cubic Bezier</button>
+        <button class="btn" id="modeQuad">Quadratic Bezier</button>
+        <button class="btn" id="toggleHandles">Toggle Handles</button>
+        <button class="btn" id="animateBtn">Animate t</button>
+
+        <div class="output-box" id="codeOutput">
+            cubic-bezier(...)
+        </div>
+    </div>
+
+    <div class="canvas-container">
+        <canvas id="canvas"></canvas>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const container = document.querySelector('.canvas-container');
+        const codeOut = document.getElementById('codeOutput');
+
+        let width, height;
+
+        // State
+        let mode = 'cubic'; // cubic, quad
+        let showHandles = true;
+        let isAnimating = false;
+        let tParam = 0; // for animation
+
+        // P0 (Start), P1 (Control 1), P2 (Control 2), P3 (End)
+        // Normalized coordinates (0-1) relative to canvas size is better for resizing?
+        // But for pixel tool, stored as pixels better.
+
+        let points = [];
+        let draggingPoint = null;
+
+        function initPoints() {
+            const w = width || 800;
+            const h = height || 600;
+            if (mode === 'cubic') {
+                points = [
+                    { x: w * 0.2, y: h * 0.8, color: '#f38ba8', label: 'Start' }, // P0
+                    { x: w * 0.2, y: h * 0.2, color: '#fab387', label: 'CP1' },  // CP1
+                    { x: w * 0.8, y: h * 0.2, color: '#fab387', label: 'CP2' },  // CP2
+                    { x: w * 0.8, y: h * 0.8, color: '#a6e3a1', label: 'End' }   // P3
+                ];
+            } else {
+                points = [
+                    { x: w * 0.2, y: h * 0.8, color: '#f38ba8', label: 'Start' }, // P0
+                    { x: w * 0.5, y: h * 0.2, color: '#fab387', label: 'CP1' },  // CP1
+                    { x: w * 0.8, y: h * 0.8, color: '#a6e3a1', label: 'End' }   // P2
+                ];
+            }
+        }
+
+        function resize() {
+            width = container.clientWidth;
+            height = container.clientHeight;
+            canvas.width = width;
+            canvas.height = height;
+            if (points.length === 0) initPoints();
+            draw();
+        }
+        window.addEventListener('resize', resize);
+
+        function drawPoint(p) {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 8, 0, Math.PI * 2);
+            ctx.fillStyle = p.color;
+            ctx.fill();
+            ctx.strokeStyle = '#111';
+            ctx.stroke();
+
+            // Label
+            if (showHandles) {
+                ctx.fillStyle = '#cdd6f4';
+                ctx.font = '10px sans-serif';
+                ctx.fillText(p.label, p.x + 10, p.y - 10);
+            }
+        }
+
+        function drawLine(p1, p2, dashed = false) {
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.strokeStyle = '#6c7086';
+            ctx.lineWidth = 1;
+            if (dashed) ctx.setLineDash([5, 5]);
+            else ctx.setLineDash([]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+
+        function lerp(a, b, t) {
+            return {
+                x: a.x + (b.x - a.x) * t,
+                y: a.y + (b.y - a.y) * t
+            };
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, width, height);
+
+            // Grid
+            ctx.strokeStyle = '#313244';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            for (let x = 0; x < width; x += 50) { ctx.moveTo(x, 0); ctx.lineTo(x, height); }
+            for (let y = 0; y < height; y += 50) { ctx.moveTo(0, y); ctx.lineTo(width, y); }
+            ctx.stroke();
+
+            // Draw Handles
+            if (showHandles) {
+                if (mode === 'cubic') {
+                    drawLine(points[0], points[1], true);
+                    drawLine(points[3], points[2], true);
+                } else {
+                    drawLine(points[0], points[1], true);
+                    drawLine(points[2], points[1], true);
+                }
+            }
+
+            // Draw Curve
+            ctx.beginPath();
+            ctx.moveTo(points[0].x, points[0].y);
+            if (mode === 'cubic') {
+                ctx.bezierCurveTo(points[1].x, points[1].y, points[2].x, points[2].y, points[3].x, points[3].y);
+            } else {
+                ctx.quadraticCurveTo(points[1].x, points[1].y, points[2].x, points[2].y);
+            }
+            ctx.strokeStyle = '#89b4fa';
+            ctx.lineWidth = 4;
+            ctx.stroke();
+
+            // Draw Points
+            if (showHandles) {
+                points.forEach(drawPoint);
+            }
+
+            // Animation / Visualization of 't'
+            if (isAnimating || window.tVisual > 0) {
+                if (isAnimating) {
+                    tParam += 0.005;
+                    if (tParam > 1) tParam = 0;
+                }
+
+                // De Casteljau's algorithm visualization
+                const t = tParam;
+
+                if (mode === 'quadratic') {
+                    // L1 = lerp(P0, P1)
+                    // L2 = lerp(P1, P2)
+                    // Q = lerp(L1, L2)
+                    const l1 = lerp(points[0], points[1], t);
+                    const l2 = lerp(points[1], points[2], t);
+                    const q = lerp(l1, l2, t);
+
+                    // Draw construction lines
+                    drawLine(l1, l2);
+
+                    // Draw construction points
+                    ctx.fillStyle = '#f9e2af';
+                    ctx.beginPath(); ctx.arc(l1.x, l1.y, 4, 0, Math.PI * 2); ctx.fill();
+                    ctx.beginPath(); ctx.arc(l2.x, l2.y, 4, 0, Math.PI * 2); ctx.fill();
+
+                    // Draw final point
+                    ctx.fillStyle = '#fff';
+                    ctx.beginPath(); ctx.arc(q.x, q.y, 6, 0, Math.PI * 2); ctx.fill();
+                } else { // Cubic
+                    // L1 = lerp(P0, P1)
+                    // L2 = lerp(P1, P2)
+                    // L3 = lerp(P2, P3)
+                    // Q1 = lerp(L1, L2)
+                    // Q2 = lerp(L2, L3)
+                    // C = lerp(Q1, Q2)
+
+                    const l1 = lerp(points[0], points[1], t);
+                    const l2 = lerp(points[1], points[2], t);
+                    const l3 = lerp(points[2], points[3], t);
+
+                    const q1 = lerp(l1, l2, t);
+                    const q2 = lerp(l2, l3, t);
+
+                    const c = lerp(q1, q2, t);
+
+                    // Lines
+                    ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+                    drawLine(l1, l2);
+                    drawLine(l2, l3);
+                    ctx.strokeStyle = 'rgba(255,255,255,0.8)';
+                    drawLine(q1, q2);
+
+                    // Points
+                    ctx.fillStyle = '#fff';
+                    ctx.beginPath(); ctx.arc(c.x, c.y, 6, 0, Math.PI * 2); ctx.fill();
+                }
+
+                if (isAnimating) requestAnimationFrame(draw);
+            }
+
+            updateCode();
+        }
+
+        function updateCode() {
+            // Can display CSS snippet if coords normalized?
+            // CSS cubic-bezier is (x1, y1, x2, y2) but strictly time (x) vs progression (y) in [0,1].
+            // Canvas coords are arbitrary.
+            // Just output raw canvas path commands.
+
+            let text = "";
+            if (mode === 'cubic') {
+                text = `ctx.moveTo(${Math.round(points[0].x)}, ${Math.round(points[0].y)});\n`;
+                text += `ctx.bezierCurveTo(\n  ${Math.round(points[1].x)}, ${Math.round(points[1].y)},\n  ${Math.round(points[2].x)}, ${Math.round(points[2].y)},\n  ${Math.round(points[3].x)}, ${Math.round(points[3].y)}\n);`;
+            } else {
+                text = `ctx.moveTo(${Math.round(points[0].x)}, ${Math.round(points[0].y)});\n`;
+                text += `ctx.quadraticCurveTo(\n  ${Math.round(points[1].x)}, ${Math.round(points[1].y)},\n  ${Math.round(points[2].x)}, ${Math.round(points[2].y)}\n);`;
+            }
+            codeOut.innerText = text;
+        }
+
+        // Interaction
+        function getMousePos(e) {
+            const rect = canvas.getBoundingClientRect();
+            return {
+                x: e.clientX - rect.left,
+                y: e.clientY - rect.top
+            };
+        }
+
+        canvas.addEventListener('mousedown', e => {
+            if (!showHandles) return;
+            const pos = getMousePos(e);
+            // Check collision
+            for (let p of points) {
+                const dist = Math.hypot(p.x - pos.x, p.y - pos.y);
+                if (dist < 15) {
+                    draggingPoint = p;
+                    break;
+                }
+            }
+        });
+
+        window.addEventListener('mousemove', e => {
+            if (draggingPoint) {
+                const pos = getMousePos(e);
+                draggingPoint.x = pos.x;
+                draggingPoint.y = pos.y;
+                if (!isAnimating) draw();
+            }
+        });
+
+        window.addEventListener('mouseup', () => draggingPoint = null);
+
+        // Buttons
+        document.getElementById('modeCubic').addEventListener('click', () => {
+            mode = 'cubic';
+            initPoints();
+            draw();
+            document.getElementById('modeCubic').classList.add('active');
+            document.getElementById('modeQuad').classList.remove('active');
+        });
+
+        document.getElementById('modeQuad').addEventListener('click', () => {
+            mode = 'quadratic';
+            initPoints();
+            draw();
+            document.getElementById('modeQuad').classList.add('active');
+            document.getElementById('modeCubic').classList.remove('active');
+        });
+
+        document.getElementById('toggleHandles').addEventListener('click', () => {
+            showHandles = !showHandles;
+            draw();
+        });
+
+        document.getElementById('animateBtn').addEventListener('click', () => {
+            isAnimating = !isAnimating;
+            if (isAnimating) draw();
+        });
+
+        // Initialize
+        resize();
+
+    </script>
+    <div class="ad-overlay-bottom" style="z-index: 1000;">
+        <div style="width:100%; display:flex; flex-direction:column; align-items:center;">
+            <span class="ad-label" style="color:#aaa;">Advertisement</span>
+            <ins class="adsbygoogle" style="display:block; width:100%; height:90px;"
+                data-ad-client="ca-pub-5166575587547718" data-ad-slot="overlay-unit" data-ad-format="auto"
+                data-full-width-responsive="true"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+    </div>
+</body>
+
+</html>

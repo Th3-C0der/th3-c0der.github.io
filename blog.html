@@ -1,327 +1,771 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="author" content="Th3-C0der">
-    <meta name="generator" content="Th3-C0der; Th3_1.8.3.8.9">
+    <meta name="description" content="Th3-C0der's Blog - Insights on AI, coding, and tech innovations">
+
+    <!-- Favicons -->
+    <link rel="icon"
+        href="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png/:/rs=w:32,h:32,m"
+        sizes="32x32">
+    <link rel="apple-touch-icon"
+        href="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png/:/rs=w:180,h:180,m">
     <link rel="manifest" href="manifest.webmanifest">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+    <!-- Open Graph -->
     <meta property="og:url" content="https://th3-c0der.github.io/blog">
     <meta property="og:site_name" content="Th3-C0der Blog">
-    <meta property="og:title" content="Th3-C0der Blog">
-    <meta property="og:description" content="Th3-C0der's Blog - Insights on AI and Coding">
+    <meta property="og:title" content="Th3-C0der Blog - Insights on AI and Coding">
+    <meta property="og:description" content="Exploring AI, coding, and tech innovations">
     <meta property="og:type" content="website">
-    <meta property="og:image" content="https://img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png">
-    <meta property="og:locale" content="en_IN">
+    <meta property="og:image"
+        content="https://img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png">
+
+    <!-- Twitter -->
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="@Th3Drag8N">
     <meta name="twitter:title" content="Th3-C0der Blog">
-    <meta name="twitter:description" content="Th3-C0der's Blog - Insights on AI and Coding">
-    <meta name="twitter:image" content="https://img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png">
-    <meta name="twitter:image:alt" content="Th3-C0der Blog">
-    <meta name="theme-color" content="#00ff00">
-    <title>Th3-C0der's Blog</title>
+    <meta name="theme-color" content="#00ff9d">
+
+    <title>Blog | Th3-C0der</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Anime.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+
+    <!-- AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718"
+        crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="static/new-style.css">
     <style>
-        html {
-            scroll-behavior: smooth;
+        /* Blog-Specific Styles */
+        .blog-section {
+            padding: var(--space-2xl) var(--space-lg);
+            padding-top: calc(var(--space-2xl) + 80px);
+            min-height: 100vh;
         }
 
-        .back-to-top {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: var(--accent-color);
-            color: var(--bg-color);
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
+        .blog-header {
+            text-align: center;
+            margin-bottom: var(--space-xl);
+        }
+
+        .blog-grid {
+            display: grid;
+            gap: var(--space-lg);
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .blog-card {
+            position: relative;
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            transition: all var(--transition-base);
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .blog-card:hover {
+            border-color: rgba(0, 255, 157, 0.2);
+            box-shadow: var(--shadow-glow);
+            transform: translateY(-5px);
+        }
+
+        .blog-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-primary);
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+            opacity: 0;
+            transition: opacity var(--transition-base);
+        }
+
+        .blog-card:hover::before {
+            opacity: 1;
+        }
+
+        .blog-meta {
             display: flex;
             align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-            z-index: 1000;
-            border: none;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            gap: var(--space-md);
+            margin-bottom: var(--space-md);
+            flex-wrap: wrap;
         }
 
-        .back-to-top.visible {
-            opacity: 1;
-            visibility: visible;
+        .blog-date {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            color: var(--accent-primary);
+            font-size: 0.875rem;
+            font-weight: 500;
         }
 
-        .back-to-top:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        .blog-date i {
+            font-size: 0.75rem;
+        }
+
+        .blog-category {
+            background: var(--bg-glass-light);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: var(--radius-full);
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .blog-title {
+            font-family: var(--font-primary);
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: var(--space-md);
+            line-height: 1.3;
+            transition: color var(--transition-fast);
+        }
+
+        .blog-card:hover .blog-title {
+            color: var(--accent-primary);
+        }
+
+        .blog-excerpt {
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: var(--space-lg);
+        }
+
+        .blog-excerpt p {
+            margin-bottom: var(--space-md);
+        }
+
+        .blog-excerpt p:last-child {
+            margin-bottom: 0;
+        }
+
+        .read-more-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+            color: var(--accent-primary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all var(--transition-fast);
+        }
+
+        .read-more-btn i {
+            transition: transform var(--transition-base);
+        }
+
+        .read-more-btn:hover i {
+            transform: translateX(5px);
+        }
+
+        .blog-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: var(--space-md);
+            margin-top: var(--space-lg);
+            padding-top: var(--space-md);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .reading-time {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        /* Timeline Effect */
+        .blog-grid::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, transparent, var(--accent-primary), transparent);
+            opacity: 0.2;
+            display: none;
+        }
+
+        @media (min-width: 768px) {
+            .blog-grid {
+                position: relative;
+            }
+
+            .blog-grid::before {
+                display: block;
+                left: -30px;
+            }
+
+            .blog-card {
+                margin-left: 20px;
+            }
+
+            .blog-card::after {
+                content: '';
+                position: absolute;
+                left: -30px;
+                top: var(--space-xl);
+                width: 12px;
+                height: 12px;
+                background: var(--accent-primary);
+                border-radius: 50%;
+                box-shadow: 0 0 20px var(--accent-glow);
+            }
+        }
+
+        /* Featured Post */
+        .blog-card.featured {
+            background: linear-gradient(135deg, var(--bg-glass) 0%, rgba(0, 255, 157, 0.05) 100%);
+            border: 2px solid var(--accent-primary);
+        }
+
+        .featured-badge {
+            position: absolute;
+            top: var(--space-md);
+            right: var(--space-md);
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            background: var(--gradient-primary);
+            color: var(--bg-primary);
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: var(--radius-full);
+            font-size: 0.75rem;
+            font-weight: 600;
         }
 
         @media (max-width: 768px) {
-            .back-to-top {
-                bottom: 15px;
-                right: 15px;
-                width: 35px;
-                height: 35px;
+            .blog-title {
+                font-size: 1.5rem;
+            }
+
+            .blog-card {
+                padding: var(--space-lg);
             }
         }
     </style>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/ScrollTrigger.min.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="/static/style.css" rel="stylesheet">
-    <script type="importmap">
-    {
-        "imports": {
-            "three": "https://cdn.skypack.dev/three@0.132.2"
-        }
-    }
-    </script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    <link href="/static/style.css" rel="stylesheet">
-    <script type="importmap">
-    {
-        "imports": {
-            "three": "https://cdn.skypack.dev/three@0.132.2"
-        }
-    }
-    </script>
-    <script type="module" src="/static/blog.js"></script>
-    <script type="module" src="/static/script.js"></script>
-    <script src="/static/js/protection.js"></script>
-    <style>
-        .blog {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .blog-post {
-            margin-bottom: 40px;
-            padding: 20px;
-            background-color: var(--card-bg-color);
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
-        }
-        .blog-post:hover {
-            transform: translateY(-2px);
-        }
-        .blog-post h2 {
-            color: var(--primary-color);
-            font-size: 1.8rem;
-            margin-bottom: 0.5rem;
-            line-height: 1.3;
-        }
-        .blog-post .date {
-            color: var(--secondary-color);
-            font-size: 0.9em;
-            margin-bottom: 10px;
-        }
-        .blog-post .excerpt {
-            margin-bottom: 15px;
-        }
-        .read-more {
-            display: inline-block;
-            padding: 5px 10px;
-            background-color: var(--primary-color);
-            color: var(--accent-color);
-            text-decoration: none;
-            border-radius: 4px;
-            transition: background-color 0.3s ease;
-        }
-        .read-more:hover {
-            background-color: var(--secondary-color);
-        }
-    </style>
 </head>
+
 <body>
-    <header>
-        <nav>
-            <div class="logo">
-                <img src="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png" alt="Th3-C0der Logo">
-                Th3-C0der
+    <!-- Custom Cursor -->
+    <div class="cursor-wrapper">
+        <div class="cursor-dot" id="cursor-dot"></div>
+        <div class="cursor-outline" id="cursor-outline"></div>
+        <div class="cursor-trail" id="cursor-trail"></div>
+    </div>
+
+    <!-- Animated Background -->
+    <div class="animated-bg">
+        <div class="gradient-orb gradient-orb-1"></div>
+        <div class="gradient-orb gradient-orb-2"></div>
+        <div class="gradient-orb gradient-orb-3"></div>
+        <canvas id="particle-canvas"></canvas>
+    </div>
+
+    <!-- Navigation -->
+    <header class="main-header" id="main-header">
+        <nav class="nav-container">
+            <a href="/" class="logo">
+                <div class="logo-icon">
+                    <img src="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png"
+                        alt="Logo">
+                </div>
+                <span class="logo-text">Th3-C0der</span>
+            </a>
+
+            <div class="nav-links" id="nav-links">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/#projects" class="nav-link">Projects</a>
+                <a href="/blog" class="nav-link active">Blog</a>
+                <a href="/#about" class="nav-link">About</a>
+                <button class="nav-link contact-btn" id="contact-trigger">Contact</button>
             </div>
-            <div class="menu-toggle">
-                <i class="fas fa-bars"></i>
-            </div>
-            <div class="nav-links">
-                <a href="/">Home</a>
-                <a href="/#projects">Projects</a>
-                <a href="#blog" class="active">Blog</a>
-                <a href="#about">About</a>
-                <a href="#" id="contact-link">Contact</a>
-                <button class="theme-toggle" aria-label="Toggle dark mode">
+
+            <div class="nav-actions">
+                <button class="theme-switch" id="theme-switch" aria-label="Toggle theme">
                     <i class="fas fa-moon"></i>
-                    <span>Theme</span>
+                    <i class="fas fa-sun"></i>
+                </button>
+                <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
                 </button>
             </div>
         </nav>
     </header>
-    <div class="nav-overlay"></div>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu-overlay" id="mobile-overlay"></div>
+
+    <!-- Main Content -->
     <main>
-        <section class="hero">
-           <div class="hero-content">
-					<h1>Welcome to
-						<br>
-						<span class="highlight">Th3-C0der's</span>
-						Blog</h1>
-					<p>Insights on AI, coding, and tech innovations</p>
-				</div>
-            <div class="hero-background">
-                <div class="circle circle-1"></div>
-                <div class="circle circle-2"></div>
-                <div class="circle circle-3"></div>
+        <section class="blog-section">
+            <div class="blog-header section-header">
+                <span class="section-label">My Thoughts</span>
+                <h1 class="section-title">
+                    <span class="title-word">The</span>
+                    <span class="title-word accent">Blog</span>
+                </h1>
+                <p class="section-subtitle">Insights on AI, coding, and tech innovations</p>
             </div>
-        </section>
-        <section id="blog" class="blog">
 
-	    <div class="blog-post">
-		    <h2>Hackathon Reflections: Building SkillVox</h2>
-		    <div class="date">October 2, 2024</div>
-		    <div class="excerpt">
-		        <p>The hackathon has come to an end, and while Ctrl+Alt+Defeat didn't come out on top, the journey was unforgettable. Our project, SkillVox, is a voice-controlled gaming tool aimed at enhancing learning in the skill ecosystem. It allows users to interact with learning modules using voice commands, creating a more dynamic and accessible experience.</p>
-		        <p>Though we didn't win, we pushed ourselves, learned a lot, and developed an app we're proud of. This is just the beginning for SkillVox, and we're excited to take the feedback we received to refine it even further. Sometimes, the lessons learned along the way are more important than the win itself. We'll be back stronger next time!</p>
-		    </div>
-	     </div>
+            <div class="blog-grid">
+                <!-- Th3-Tools Launch -->
+                <article class="blog-card featured">
+                    <div class="featured-badge">
+                        <i class="fas fa-rocket"></i>
+                        <span>New Release</span>
+                    </div>
+                    <div class="blog-meta">
+                        <span class="blog-date">
+                            <i class="fas fa-calendar-alt"></i>
+                            December 23, 2025
+                        </span>
+                        <span class="blog-category">Launch</span>
+                    </div>
+                    <h2 class="blog-title">Introducing Th3-Tools: All-in-One Productivity</h2>
+                    <div class="blog-excerpt">
+                        <p>Officially launched <strong>Th3-Tools</strong>, an ultimate productivity platform designed
+                            for developers and creators. Featuring over 100+ tools ranging from text manipulation, image
+                            editing, and developer utilities to general productivity enhancers, all in one place.</p>
+                    </div>
+                    <div class="blog-footer">
+                        <a href="https://th3-tools.vercel.app/" class="read-more-btn" target="_blank">
+                            <span>Try Th3-Tools</span>
+                            <i class="fas fa-external-link-alt"></i>
+                        </a>
+                    </div>
+                </article>
 
-            <div class="blog-post">
-                <h2>Preparing for My First Hackathon!</h2>
-                <div class="date">September 30, 2024</div>
-                <div class="excerpt">
-                    <p>Tomorrow is the big day! I'll be participating in my first hackathon with my team, Ctrl+Alt+Defeat. We're ready to tackle exciting challenges and put our skills to the test. Stay tuned for updates!</p>
+                <!-- Ad: Blog Inline -->
+                <div class="blog-card"
+                    style="padding: 10px; display: flex; justify-content: center; align-items: center; min-height: 120px;">
+                    <span
+                        style="position:absolute; top:5px; right:10px; font-size:0.7rem; color:#555;">ADVERTISEMENT</span>
+                    <ins class="adsbygoogle" style="display:block; width:100%;" data-ad-format="fluid"
+                        data-ad-layout-key="-fb+5w+4e-db+86" data-ad-client="ca-pub-5166575587547718"
+                        data-ad-slot="blog-inline"></ins>
+                    <script>
+                        (adsbygoogle = window.adsbygoogle || []).push({});
+                    </script>
                 </div>
-            </div>            
-            
-            <div class="blog-post">
-                <h2>Participating in Google Gemini API Competition</h2>
-                <div class="date">August 12, 2024</div>
-                <div class="excerpt">
-                    <p>The Google Gemini API competition was a fantastic opportunity to showcase DynaSpark AI. Competing with innovative AI projects pushed me to explore new ways of leveraging the Gemini API's advanced capabilities.</p>
-                </div>
-                <a href="https://ai.google.dev/competition/projects/dynaspark-ai" class="read-more">Read More</a>
-            </div>            
-            
-            <div class="blog-post">
-                <h2>Introducing DynaSpark AI!</h2>
-                <div class="date">August 3, 2024</div>
-                <div class="excerpt">
-                    <p>DynaSpark AI is here! Built with a vision of dynamic and engaging user interactions, DynaSpark brings the power of Google's Gemini API and Pollinations.ai's image generation capabilities together. It revolutionizes the way users interact with AI, sparking creativity and providing efficient solutions.</p>
-                </div>
-                <a href="https://dynaspark.onrender.com" class="read-more">Link</a>
+
+                <!-- Th3-Movies Launch -->
+                <article class="blog-card">
+                    <div class="blog-meta">
+                        <span class="blog-date">
+                            <i class="fas fa-calendar-alt"></i>
+                            November 24, 2025
+                        </span>
+                        <span class="blog-category">Launch</span>
+                    </div>
+                    <h2 class="blog-title">Th3-Movies: Next-Gen Streaming</h2>
+                    <div class="blog-excerpt">
+                        <p>Launched a comprehensive streaming platform for Movies, TV Series, and Anime. The platform
+                            features real-time trending content discovery, offering a seamless entertainment experience.
+                        </p>
+                    </div>
+                    <div class="blog-footer">
+                        <a href="https://th3-movies.vercel.app/" class="read-more-btn" target="_blank">
+                            <span>Try Th3-Movies</span>
+                            <i class="fas fa-external-link-alt"></i>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- MumbaiHacks 2025 -->
+                <article class="blog-card featured">
+                    <div class="featured-badge">
+                        <i class="fas fa-trophy"></i>
+                        <span>Hackathon</span>
+                    </div>
+                    <div class="blog-meta">
+                        <span class="blog-date">
+                            <i class="fas fa-calendar-alt"></i>
+                            November 2025
+                        </span>
+                        <span class="blog-category">FinTech Track</span>
+                    </div>
+                    <h2 class="blog-title">MumbaiHacks 2025: Project MultiAgent</h2>
+                    <div class="blog-excerpt">
+                        <p>Organized by the Tech Entrepreneurs Association of Mumbai. We presented
+                            <strong>MultiAgent</strong>, a Flask-based AI platform utilizing Google Gemini API.
+                        </p>
+                    </div>
+                    <div class="blog-footer">
+                        <a href="https://github.com/Th3-AI/MultiAgent" class="read-more-btn" target="_blank">
+                            <span>View Source</span>
+                            <i class="fab fa-github"></i>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Google Cloud Agentic AI Day -->
+                <article class="blog-card">
+                    <div class="blog-meta">
+                        <span class="blog-date">
+                            <i class="fas fa-calendar-alt"></i>
+                            September 2025
+                        </span>
+                        <span class="blog-category">Certification</span>
+                    </div>
+                    <h2 class="blog-title">Google Cloud Agentic AI Day 2025</h2>
+                    <div class="blog-excerpt">
+                        <p>Issued by Hack2skill (Credential ID: 2025H2S06AID-107950). Created
+                            <strong>MultiAgent</strong>.
+                        </p>
+                    </div>
+                    <div class="blog-footer">
+                        <a href="https://github.com/Th3-AI/Agent" class="read-more-btn" target="_blank">
+                            <span>View Source</span>
+                            <i class="fab fa-github"></i>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Bit N Build -->
+                <article class="blog-card">
+                    <div class="blog-meta">
+                        <span class="blog-date">
+                            <i class="fas fa-calendar-alt"></i>
+                            September 2025
+                        </span>
+                        <span class="blog-category">Event</span>
+                    </div>
+                    <h2 class="blog-title">Bit N Build Around the World 2025</h2>
+                    <div class="blog-excerpt">
+                        <p>Participated in the global event issued by Google Developer Student Clubs CRCE, connecting
+                            with a worldwide community of developers.</p>
+                    </div>
+                </article>
+
+                <!-- DynaSpark 1 Year -->
+                <article class="blog-card featured">
+                    <div class="featured-badge">
+                        <i class="fas fa-birthday-cake"></i>
+                        <span>Milestone</span>
+                    </div>
+                    <div class="blog-meta">
+                        <span class="blog-date">
+                            <i class="fas fa-calendar-alt"></i>
+                            August 1, 2025
+                        </span>
+                        <span class="blog-category">Anniversary</span>
+                    </div>
+                    <h2 class="blog-title">1 Year of DynaSpark AI 🎉</h2>
+                    <div class="blog-excerpt">
+                        <p>Officially celebrating one year since launch! Initially started as a personal experiment 16
+                            months ago, DynaSpark has evolved into a robust AI assistant. We achieved record-breaking
+                            <strong>43% user growth</strong> in the last month alone.
+                        </p>
+                    </div>
+                    <div class="blog-footer">
+                        <a href="https://www.linkedin.com/posts/th3-c0der_dynaspark-ai-dynasparkai-activity-7356896854841651200-NbK9"
+                            class="read-more-btn" target="_blank">
+                            <span>View LinkedIn Post</span>
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- FUTURE-X Competition -->
+                <article class="blog-card featured">
+                    <div class="featured-badge">
+                        <i class="fas fa-medal"></i>
+                        <span>Runner-Up</span>
+                    </div>
+                    <div class="blog-meta">
+                        <span class="blog-date">
+                            <i class="fas fa-calendar-alt"></i>
+                            March 24, 2025
+                        </span>
+                        <span class="blog-category">National Level</span>
+                    </div>
+                    <h2 class="blog-title">FUTURE-X: National Technical Presentation</h2>
+                    <div class="blog-excerpt">
+                        <p>Secured <strong>2nd Place (Runner-Up)</strong> at the ICARUS event organized by RGIT.
+                            Presented <strong>DevlopX</strong>, receiving wide recognition for its technical depth,
+                            innovation, and real-world applicability.</p>
+                    </div>
+                </article>
+
+                <!-- Hackathon Reflection -->
+                <article class="blog-card featured">
+                    <div class="featured-badge">
+                        <i class="fas fa-laptop-code"></i>
+                        <span>Hackathon</span>
+                    </div>
+                    <div class="blog-meta">
+                        <span class="blog-date">
+                            <i class="fas fa-calendar-alt"></i>
+                            October 2, 2024
+                        </span>
+                        <span class="blog-category">SkillVox Project</span>
+                    </div>
+                    <h2 class="blog-title">Reflections: Building SkillVox</h2>
+                    <div class="blog-excerpt">
+                        <p>The Codeverse 2.0 Hackathon has come to an end. While Ctrl+Alt+Defeat didn't come out on top,
+                            the
+                            journey was unforgettable. Our project, <strong>SkillVox</strong>, is a voice-controlled
+                            gaming tool aimed at enhancing learning in the skill ecosystem. It allows users to interact
+                            with learning modules using voice commands, creating a more dynamic and accessible
+                            experience.</p>
+                        <p>Though we didn't win, we pushed ourselves, learned a lot, and developed an app we're proud
+                            of. This is just the beginning for SkillVox, and we're excited to take the feedback we
+                            received to refine it even further. Sometimes, the lessons learned along the way are more
+                            important than the win itself. We'll be back stronger next time!</p>
+                    </div>
+                </article>
+
+                <!-- Hackathon Prep -->
+                <article class="blog-card">
+                    <div class="blog-meta">
+                        <span class="blog-date">
+                            <i class="fas fa-calendar-alt"></i>
+                            September 30, 2024
+                        </span>
+                        <span class="blog-category">Pre-Event</span>
+                    </div>
+                    <h2 class="blog-title">Preparing for My First Hackathon</h2>
+                    <div class="blog-excerpt">
+                        <p>Team <strong>Ctrl+Alt+Defeat</strong> is ready! We've spent the days focusing on ideation,
+                            planning, and refining our execution strategy for the upcoming challenge.</p>
+                    </div>
+                </article>
+
+                <!-- Google Gemini Comp -->
+                <article class="blog-card">
+                    <div class="blog-meta">
+                        <span class="blog-date">
+                            <i class="fas fa-calendar-alt"></i>
+                            August 12, 2024
+                        </span>
+                        <span class="blog-category">Competition</span>
+                    </div>
+                    <h2 class="blog-title">Google Gemini API Competition</h2>
+                    <div class="blog-excerpt">
+                        <p>Participated with <strong>DynaSpark AI</strong>. This event was a deep dive into the advanced
+                            capabilities of the Gemini API, providing massive exposure to the cutting edge of AI
+                            application development.</p>
+                    </div>
+                </article>
+
+                <!-- DynaSpark Launch -->
+                <article class="blog-card featured">
+                    <div class="featured-badge">
+                        <i class="fas fa-bolt"></i>
+                        <span>The Beginning</span>
+                    </div>
+                    <div class="blog-meta">
+                        <span class="blog-date">
+                            <i class="fas fa-calendar-alt"></i>
+                            August 3, 2024
+                        </span>
+                        <span class="blog-category">Launch</span>
+                    </div>
+                    <h2 class="blog-title">DynaSpark AI: Official Launch</h2>
+                    <div class="blog-excerpt">
+                        <p>A major milestone! Publicly launched <strong>DynaSpark AI</strong>, built using Google Gemini
+                            API and Pollinations.ai. The project focuses on enabling dynamic interaction, enhancing
+                            creativity, and boosting productivity through AI.</p>
+                    </div>
+                    <div class="blog-footer">
+                        <a href="https://dynaspark.onrender.com" class="read-more-btn" target="_blank">
+                            <span>Try DynaSpark</span>
+                            <i class="fas fa-external-link-alt"></i>
+                        </a>
+                    </div>
+                </article>
             </div>
-            
         </section>
     </main>
-    <footer id="about" class="about">
-        <p>© 2025 Th3-C0der. All rights reserved.</p>
-        <div class="social-links">
-            <a href="https://github.com/Th3-C0der" target="_blank" class="social-link">
-                <i class="fab fa-github"></i>
-            </a>
-            <a href="https://youtube.com/@Th3Coder" target="_blank" class="social-link">
-                <i class="fab fa-youtube"></i>
-            </a>
-            <a href="https://instagram.com/th3_c0der" target="_blank" class="social-link">
-                <i class="fab fa-instagram"></i>
-            </a>
-            <a href="https://www.linkedin.com/in/Th3-C0der" target="_blank" class="social-link">
-                <i class="fab fa-linkedin"></i>
-            </a>
-            <a href="https://coff.ee/th3coder" target="_blank" class="social-link ko-fi">
-                <i class="fas fa-coffee"></i>
-            </a>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="footer-content">
+            <div class="footer-wave">
+                <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+                    <path
+                        d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z">
+                    </path>
+                </svg>
+            </div>
+            <div class="footer-inner">
+                <p class="copyright">© 2026 Th3-C0der. All rights reserved.</p>
+                <div class="social-links" style="margin-top: 0;">
+                    <a href="https://github.com/Th3-C0der" target="_blank" class="social-link magnetic-btn"
+                        aria-label="GitHub">
+                        <i class="fab fa-github"></i>
+                    </a>
+                    <a href="https://youtube.com/@Th3Coder" target="_blank" class="social-link magnetic-btn"
+                        aria-label="YouTube">
+                        <i class="fab fa-youtube"></i>
+                    </a>
+                    <a href="https://instagram.com/th3_c0der" target="_blank" class="social-link magnetic-btn"
+                        aria-label="Instagram">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="https://www.linkedin.com/in/Th3-C0der" target="_blank" class="social-link magnetic-btn"
+                        aria-label="LinkedIn">
+                        <i class="fab fa-linkedin"></i>
+                    </a>
+                    <a href="https://coff.ee/th3coder" target="_blank" class="social-link magnetic-btn coffee-link"
+                        aria-label="Buy me a coffee">
+                        <i class="fas fa-coffee"></i>
+                    </a>
+                </div>
+            </div>
         </div>
     </footer>
-    <div class="modal" id="contact-modal">
-        <div class="modal-content">
-            <i class="fas fa-times modal-close"></i>
-            <h2>Contact Me</h2>
-            <form class="contact-form" id="contact-form">
-                <div class="form-group">
-                    <label for="name">Name</label>
-                    <input type="text" id="name" name="name" required>
-                </div>
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="subject">Subject</label>
-                    <input type="text" id="subject" name="subject" required>
-                </div>
-                <div class="form-group">
-                    <label for="message">Message</label>
-                    <textarea id="message" name="message" rows="5" required></textarea>
-                </div>
-                <button type="submit" class="submit-btn">
-                    <i class="fas fa-paper-plane"></i>
-                    Send Message
-                </button>
-            </form>
+
+    <!-- Contact Modal -->
+    <div class="modal-overlay" id="contact-modal">
+        <div class="modal-container">
+            <button class="modal-close" id="modal-close" aria-label="Close modal">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <div class="modal-content">
+                <h2 class="modal-title">Get in Touch</h2>
+                <p class="modal-subtitle">I'd love to hear from you!</p>
+
+                <form class="contact-form" id="contact-form">
+                    <div class="form-group">
+                        <input type="text" id="name" name="name" required placeholder=" ">
+                        <label for="name">Your Name</label>
+                        <span class="input-highlight"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="email" id="email" name="email" required placeholder=" ">
+                        <label for="email">Email Address</label>
+                        <span class="input-highlight"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="text" id="subject" name="subject" required placeholder=" ">
+                        <label for="subject">Subject</label>
+                        <span class="input-highlight"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <textarea id="message" name="message" rows="4" required placeholder=" "></textarea>
+                        <label for="message">Your Message</label>
+                        <span class="input-highlight"></span>
+                    </div>
+
+                    <button type="submit" class="submit-btn magnetic-btn">
+                        <span class="btn-text">Send Message</span>
+                        <span class="btn-icon"><i class="fas fa-paper-plane"></i></span>
+                        <span class="btn-loader"></span>
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
-    <button class="back-to-top" aria-label="Back to top">
-        <i class="fas fa-arrow-up"></i>
+
+    <!-- Back to Top -->
+    <button class="back-to-top" id="back-to-top" aria-label="Back to top">
+        <i class="fas fa-chevron-up"></i>
+        <svg class="progress-ring" viewBox="0 0 36 36">
+            <circle cx="18" cy="18" r="16"></circle>
+        </svg>
     </button>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    <script type="module" src="/static/script.js"></script>
-    <script type="module" src="/static/blog.js"></script>
+
+    <!-- EmailJS -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+    <!-- Main Script -->
+    <script src="static/new-script.js"></script>
+
+    <!-- Blog-specific animations -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Smooth scroll for anchor links
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    const targetId = this.getAttribute('href');
-                    if (targetId === '#') return;
-                    
-                    const targetElement = document.querySelector(targetId);
-                    if (targetElement) {
-                        targetElement.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start'
+        document.addEventListener('DOMContentLoaded', () => {
+            // Blog cards staggered animation
+            const blogCards = document.querySelectorAll('.blog-card');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry, index) => {
+                    if (entry.isIntersecting) {
+                        anime({
+                            targets: entry.target,
+                            opacity: [0, 1],
+                            translateY: [30, 0],
+                            duration: 800,
+                            delay: index * 150,
+                            easing: 'easeOutCubic'
                         });
+                        observer.unobserve(entry.target);
                     }
                 });
+            }, { threshold: 0.1 });
+
+            blogCards.forEach(card => observer.observe(card));
+
+            // Initial animation for section header
+            anime({
+                targets: '.section-label',
+                opacity: [0, 1],
+                translateY: [20, 0],
+                duration: 600,
+                delay: 300,
+                easing: 'easeOutCubic'
             });
 
-            // Handle links to other pages
-            document.querySelectorAll('a[href^="/"]').forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const href = this.getAttribute('href');
-                    if (href.startsWith('/#')) {
-                        // Handle links to sections on the home page
-                        const sectionId = href.substring(1);
-                        window.location.href = '/' + sectionId;
-                    } else {
-                        // Handle regular page navigation
-                        window.location.href = href;
-                    }
-                });
+            anime({
+                targets: '.title-word',
+                opacity: [0, 1],
+                translateY: [30, 0],
+                duration: 800,
+                delay: anime.stagger(100, { start: 400 }),
+                easing: 'easeOutCubic'
             });
 
-            // Back to top button
-            const backToTop = document.querySelector('.back-to-top');
-            
-            window.addEventListener('scroll', () => {
-                if (window.pageYOffset > 300) {
-                    backToTop.classList.add('visible');
-                } else {
-                    backToTop.classList.remove('visible');
-                }
-            });
-
-            backToTop.addEventListener('click', () => {
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                });
+            anime({
+                targets: '.section-subtitle',
+                opacity: [0, 1],
+                translateY: [20, 0],
+                duration: 600,
+                delay: 700,
+                easing: 'easeOutCubic'
             });
         });
     </script>
+
+    <!-- Pokemon Click Effect -->
+    <script type="module">
+        import { initPokemonEffect } from '/static/pokemon-effect.js';
+        initPokemonEffect();
+    </script>
 </body>
+
 </html>

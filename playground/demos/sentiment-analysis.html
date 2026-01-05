@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sentiment Analysis Tool - Th3-C0der Playground</title>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718" crossorigin="anonymous"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718"
+        crossorigin="anonymous"></script>
     <style>
         body {
             margin: 0;
@@ -113,22 +115,35 @@
             display: inline-block;
         }
 
-        .positive, .joy, .gratitude, .optimism, .admiration {
+        .positive,
+        .joy,
+        .gratitude,
+        .optimism,
+        .admiration {
             background: rgba(46, 213, 115, 0.2);
             color: #2ed573;
         }
 
-        .negative, .anger, .sadness, .fear, .disgust, .pessimism {
+        .negative,
+        .anger,
+        .sadness,
+        .fear,
+        .disgust,
+        .pessimism {
             background: rgba(255, 71, 87, 0.2);
             color: #ff4757;
         }
 
-        .neutral, .conflicted, .ambiguity {
+        .neutral,
+        .conflicted,
+        .ambiguity {
             background: rgba(255, 171, 0, 0.2);
             color: #ffab00;
         }
 
-        .surprise, .trust, .anticipation {
+        .surprise,
+        .trust,
+        .anticipation {
             background: rgba(78, 205, 196, 0.2);
             color: #4ecdc4;
         }
@@ -284,8 +299,22 @@
                 width: 95%;
             }
         }
+
+        .ad-overlay-bottom {
+            position: fixed;
+            bottom: 0px;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            padding: 10px 0;
+            display: flex;
+            justify-content: center;
+        }
     </style>
 </head>
+
 <body>
     <a href="/playground" class="back-btn">Back to Playground</a>
     <div class="container">
@@ -328,7 +357,7 @@
                 this.clearBtn = document.getElementById('clear');
                 this.resultDiv = document.getElementById('result');
                 this.loadingDiv = document.getElementById('loading');
-                
+
                 this.sentimentCategories = {
                     positive: ['joy', 'gratitude', 'optimism', 'admiration'],
                     negative: ['anger', 'sadness', 'fear', 'disgust', 'pessimism'],
@@ -336,7 +365,7 @@
                     special: ['surprise', 'trust', 'anticipation'],
                     complex: ['sarcasm']
                 };
-                
+
                 this.setupEventListeners();
                 this.loadModels();
             }
@@ -348,7 +377,7 @@
                         throw new Error(`Failed to load models: ${response.status} ${response.statusText}`);
                     }
                     const models = await response.json();
-                    
+
                     // Add models to select element
                     models.forEach(model => {
                         const option = document.createElement('option');
@@ -389,7 +418,7 @@
                 const isAdvanced = this.analysisType.value === 'advanced';
 
                 try {
-                    const prompt = isAdvanced 
+                    const prompt = isAdvanced
                         ? `Analyze the sentiment of this text and respond with ONLY a JSON object in this exact format, no other text:
 {
   "score": 0.8,
@@ -413,7 +442,7 @@ Text: "${text}"`;
 
                     const modelParam = this.model.value ? `&model=${this.model.value}` : '';
                     const response = await fetch(`https://dynaspark.onrender.com/api/generate_response?user_input=${encodeURIComponent(prompt)}${modelParam}&json=true`);
-                    
+
                     if (!response.ok) {
                         if (response.status === 429) {
                             throw new Error('Rate limit exceeded. Please try again in a minute.');
@@ -422,7 +451,7 @@ Text: "${text}"`;
                     }
 
                     const data = await response.json();
-                    
+
                     // Handle API response according to documentation
                     if (data && typeof data === 'object') {
                         if (data.message) {
@@ -445,7 +474,7 @@ Text: "${text}"`;
                             return;
                         }
                     }
-                    
+
                     throw new Error('Invalid response format from API');
                 } catch (error) {
                     console.error('Analysis error:', error);
@@ -661,7 +690,7 @@ Text: "${text}"`;
 
             getAdvancedSentiment(analysis) {
                 const emotions = analysis.emotions;
-                
+
                 // Check for sarcasm first
                 if (emotions.sarcasm) {
                     return {
@@ -677,8 +706,8 @@ Text: "${text}"`;
 
                 // Get primary, secondary, and tertiary emotions
                 const sortedEmotions = Object.entries(emotions)
-                    .sort(([,a], [,b]) => b - a);
-                
+                    .sort(([, a], [, b]) => b - a);
+
                 const primaryEmotion = sortedEmotions[0]?.[0] || 'neutral';
                 const secondaryEmotions = sortedEmotions
                     .slice(1, 3)
@@ -689,10 +718,10 @@ Text: "${text}"`;
 
                 // Calculate base score
                 let score = this.calculateEmotionScore(primaryEmotion, emotions);
-                
+
                 // Calculate emotional intensity
                 const emotionalIntensity = this.calculateEmotionalIntensity(emotions);
-                
+
                 // Calculate emotional complexity
                 const emotionalComplexity = this.calculateEmotionalComplexity(emotions);
 
@@ -704,7 +733,7 @@ Text: "${text}"`;
                 };
 
                 let weightedScore = score * emotionWeights.primary;
-                
+
                 secondaryEmotions.forEach(emotion => {
                     const emotionScore = this.calculateEmotionScore(emotion, emotions);
                     weightedScore += emotionScore * emotionWeights.secondary;
@@ -747,10 +776,10 @@ Text: "${text}"`;
             calculateEmotionalIntensity(emotions) {
                 const totalEmotions = Object.values(emotions).reduce((a, b) => a + b, 0);
                 const uniqueEmotions = Object.keys(emotions).length;
-                
+
                 // Base intensity on number of emotions and their frequency
                 let intensity = Math.min(1, totalEmotions / 8);
-                
+
                 // Increase intensity for strong emotions
                 const strongEmotions = ['anger', 'joy', 'disgust', 'fear'];
                 const hasStrongEmotion = strongEmotions.some(emotion => emotions[emotion]);
@@ -767,10 +796,10 @@ Text: "${text}"`;
             calculateEmotionalComplexity(emotions) {
                 const uniqueEmotions = Object.keys(emotions).length;
                 const totalEmotions = Object.values(emotions).reduce((a, b) => a + b, 0);
-                
+
                 // Base complexity on number of unique emotions
                 let complexity = Math.min(1, uniqueEmotions / 5);
-                
+
                 // Increase complexity for mixed emotions
                 const hasMixedEmotions = this.hasMixedSentiment(emotions);
                 if (hasMixedEmotions) {
@@ -780,10 +809,10 @@ Text: "${text}"`;
                 // Adjust for emotional balance
                 const positiveEmotions = ['joy', 'gratitude', 'optimism', 'admiration'];
                 const negativeEmotions = ['anger', 'sadness', 'fear', 'disgust', 'pessimism'];
-                
+
                 const positiveCount = positiveEmotions.filter(e => emotions[e]).length;
                 const negativeCount = negativeEmotions.filter(e => emotions[e]).length;
-                
+
                 if (positiveCount > 0 && negativeCount > 0) {
                     complexity = Math.max(complexity, 0.8);
                 }
@@ -805,10 +834,10 @@ Text: "${text}"`;
             getDominantTone(emotions) {
                 const positiveEmotions = ['joy', 'gratitude', 'optimism', 'admiration'];
                 const negativeEmotions = ['anger', 'sadness', 'fear', 'disgust', 'pessimism'];
-                
-                const positiveScore = positiveEmotions.reduce((sum, emotion) => 
+
+                const positiveScore = positiveEmotions.reduce((sum, emotion) =>
                     sum + (emotions[emotion] || 0), 0);
-                const negativeScore = negativeEmotions.reduce((sum, emotion) => 
+                const negativeScore = negativeEmotions.reduce((sum, emotion) =>
                     sum + (emotions[emotion] || 0), 0);
 
                 if (positiveScore > negativeScore * 1.5) return 'overwhelmingly_positive';
@@ -821,10 +850,10 @@ Text: "${text}"`;
             getEmotionalBalance(emotions) {
                 const positiveEmotions = ['joy', 'gratitude', 'optimism', 'admiration'];
                 const negativeEmotions = ['anger', 'sadness', 'fear', 'disgust', 'pessimism'];
-                
+
                 const positiveCount = positiveEmotions.filter(e => emotions[e]).length;
                 const negativeCount = negativeEmotions.filter(e => emotions[e]).length;
-                
+
                 if (positiveCount === 0 && negativeCount === 0) return 'neutral';
                 if (positiveCount > negativeCount * 2) return 'strongly_positive';
                 if (positiveCount > negativeCount) return 'slightly_positive';
@@ -836,10 +865,10 @@ Text: "${text}"`;
             getEmotionalStability(emotions) {
                 const volatileEmotions = ['anger', 'fear', 'surprise'];
                 const stableEmotions = ['trust', 'anticipation', 'gratitude'];
-                
+
                 const volatileCount = volatileEmotions.filter(e => emotions[e]).length;
                 const stableCount = stableEmotions.filter(e => emotions[e]).length;
-                
+
                 if (volatileCount > stableCount * 2) return 'highly_volatile';
                 if (volatileCount > stableCount) return 'volatile';
                 if (stableCount > volatileCount * 2) return 'highly_stable';
@@ -850,10 +879,10 @@ Text: "${text}"`;
             hasMixedSentiment(emotions) {
                 const positiveEmotions = ['joy', 'gratitude', 'optimism', 'admiration', 'trust', 'anticipation'];
                 const negativeEmotions = ['anger', 'sadness', 'fear', 'disgust', 'pessimism'];
-                
+
                 const hasPositive = positiveEmotions.some(emotion => emotions[emotion]);
                 const hasNegative = negativeEmotions.some(emotion => emotions[emotion]);
-                
+
                 return hasPositive && hasNegative;
             }
 
@@ -885,7 +914,7 @@ Text: "${text}"`;
 
                 // Check for negative context words
                 const negativeContext = ['broke', 'broken', 'terrible', 'awful', 'horrible', 'trash', 'garbage', 'rubbish', 'waste'];
-                const hasNegativeContext = negativeContext.some(word => 
+                const hasNegativeContext = negativeContext.some(word =>
                     this.textInput.value.toLowerCase().includes(word)
                 );
 
@@ -939,5 +968,17 @@ Text: "${text}"`;
         // Initialize the sentiment analyzer
         const analyzer = new SentimentAnalyzer();
     </script>
+    <div class="ad-overlay-bottom">
+        <div style="width:100%; display:flex; flex-direction:column; align-items:center;">
+            <span class="ad-label" style="color:#aaa; font-size:0.8rem; margin-bottom:5px;">Advertisement</span>
+            <ins class="adsbygoogle" style="display:block; width:100%; height:90px;"
+                data-ad-client="ca-pub-5166575587547718" data-ad-slot="overlay-unit" data-ad-format="auto"
+                data-full-width-responsive="true"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+    </div>
 </body>
-</html> 
+
+</html>

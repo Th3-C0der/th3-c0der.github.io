@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Cyber Bloom - Th3-C0der Playground</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718"
+        crossorigin="anonymous"></script>
+    <style>
+        body {
+            background-color: #000;
+            color: #fff;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        canvas {
+            box-shadow: 0 0 100px rgba(255, 0, 85, 0.2);
+            border-radius: 50%;
+        }
+
+        .controls {
+            position: absolute;
+            bottom: 120px;
+            display: flex;
+            gap: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px 20px;
+            border-radius: 30px;
+            backdrop-filter: blur(5px);
+            border: 1px solid #333;
+        }
+
+        .btn {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .btn:hover {
+            color: #ff0055;
+            text-shadow: 0 0 10px #ff0055;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            text-decoration: none;
+            color: #555;
+            font-family: sans-serif;
+        }
+
+        .back-btn:hover {
+            color: #fff;
+        }
+
+        .ad-overlay-bottom {
+            position: fixed;
+            bottom: 0px;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            padding: 10px 0;
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <a href="/playground" class="back-btn">&larr; Back</a>
+
+    <canvas id="canvas"></canvas>
+
+    <div class="controls">
+        <button class="btn" id="regenBtn" title="Regenerate"><i class="fas fa-sync-alt"></i></button>
+        <button class="btn" id="saveBtn" title="Save Image"><i class="fas fa-camera"></i></button>
+        <button class="btn" id="autoBtn" title="Auto Mode"><i class="fas fa-play"></i></button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        let width, height;
+        let time = 0;
+        let autoPlay = false;
+
+        // Params
+        let petals = 8;
+        let layers = 5;
+        let curl = 1;
+        let hueStart = 0;
+
+        function resize() {
+            const size = Math.min(window.innerWidth, window.innerHeight) * 0.9;
+            canvas.width = size;
+            canvas.height = size;
+            width = size;
+            height = size;
+            draw();
+        }
+        window.addEventListener('resize', resize);
+
+        function randomize() {
+            petals = Math.floor(Math.random() * 12) + 5;
+            layers = Math.floor(Math.random() * 8) + 3;
+            curl = (Math.random() * 2 - 1) * 2;
+            hueStart = Math.random() * 360;
+            time = 0;
+        }
+
+        function draw() {
+            // Dark bg with trail
+            ctx.fillStyle = 'rgba(0,0,0,0.1)';
+            // Actually fully clear for crisp geometry? Or trail?
+            // "Bloom" usually implies smooth animation.
+            // Let's do clear for clarity of structure.
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, width, height);
+
+            const cx = width / 2;
+            const cy = height / 2;
+
+            ctx.globalCompositeOperation = 'lighter'; // Additive blending for glow
+
+            // Draw bloom
+            for (let l = 0; l < layers; l++) {
+                const layerT = l / layers;
+                const radius = (width / 2) * (0.2 + 0.8 * layerT);
+                const count = petals + l * 2;
+                const hue = (hueStart + l * 30 + time * 10) % 360;
+
+                ctx.strokeStyle = `hsla(${hue}, 80%, 50%, 0.5)`;
+                ctx.lineWidth = 2;
+
+                ctx.beginPath();
+                for (let i = 0; i <= count; i++) {
+                    const angle = (i / count) * Math.PI * 2 + (time * 0.01 * (l + 1));
+
+                    // Flower shape math
+                    // r = cos(k * theta) style
+                    const r = radius * (0.8 + 0.2 * Math.cos(angle * 5 + time));
+
+                    // Spirograph twist
+                    const x = cx + r * Math.cos(angle);
+                    const y = cy + r * Math.sin(angle);
+
+                    // Bezier point?
+                    // Let's draw lines to center or curves
+
+                    // Draw curve ring
+                    if (i === 0) ctx.moveTo(x, y);
+                    else {
+                        // Control point
+                        const cpR = r * (1 + 0.5 * Math.sin(time + l));
+                        const cpA = angle - (Math.PI / count) * curl;
+                        const cpx = cx + cpR * Math.cos(cpA);
+                        const cpy = cy + cpR * Math.sin(cpA);
+
+                        ctx.quadraticCurveTo(cpx, cpy, x, y);
+                    }
+                }
+                ctx.closePath();
+                ctx.stroke();
+
+                // Dots
+                ctx.fillStyle = `hsla(${hue + 180}, 100%, 80%, 0.8)`;
+                for (let i = 0; i < count; i++) {
+                    const angle = (i / count) * Math.PI * 2 + (time * 0.01 * (l + 1));
+                    const r = radius * (0.8 + 0.2 * Math.cos(angle * 5 + time));
+                    const x = cx + r * Math.cos(angle);
+                    const y = cy + r * Math.sin(angle);
+                    ctx.beginPath();
+                    ctx.arc(x, y, 2, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            time += 0.02;
+            if (autoPlay) requestAnimationFrame(draw);
+        }
+
+        document.getElementById('regenBtn').addEventListener('click', () => {
+            randomize();
+            draw();
+        });
+
+        document.getElementById('saveBtn').addEventListener('click', () => {
+            const link = document.createElement('a');
+            link.download = 'cyber-bloom.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        });
+
+        const autoBtn = document.getElementById('autoBtn');
+        autoBtn.addEventListener('click', () => {
+            autoPlay = !autoPlay;
+            if (autoPlay) {
+                autoBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                draw();
+            } else {
+                autoBtn.innerHTML = '<i class="fas fa-play"></i>';
+            }
+        });
+
+        randomize();
+        // Start animation loop
+        autoPlay = true;
+        autoBtn.innerHTML = '<i class="fas fa-pause"></i>';
+        resize();
+
+    </script>
+    <div class="ad-overlay-bottom">
+        <div style="width:100%; display:flex; flex-direction:column; align-items:center;">
+            <span class="ad-label" style="color:#aaa;">Advertisement</span>
+            <ins class="adsbygoogle" style="display:block; width:100%; height:90px;"
+                data-ad-client="ca-pub-5166575587547718" data-ad-slot="overlay-unit" data-ad-format="auto"
+                data-full-width-responsive="true"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Neural Network Playground - Th3-C0der Playground</title>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718" crossorigin="anonymous"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718"
+        crossorigin="anonymous"></script>
     <style>
         body {
             margin: 0;
@@ -284,16 +286,31 @@
         .mode-btn.active:hover {
             background: #4ecdc4;
         }
+
+        .ad-overlay-bottom {
+            position: fixed;
+            bottom: 0px;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            padding: 10px 0;
+            display: flex;
+            justify-content: center;
+        }
     </style>
 </head>
+
 <body>
     <a href="/playground" class="back-btn">← Back to Playground</a>
     <button class="info-btn" id="infoBtn">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" fill="currentColor"/>
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"
+                fill="currentColor" />
         </svg>
     </button>
-    
+
     <div class="container">
         <h1>Neural Network Playground</h1>
         <canvas id="canvas" width="800" height="600"></canvas>
@@ -355,28 +372,39 @@
             <h2>Neural Network Playground Guide</h2>
             <div style="text-align: left; line-height: 1.6;">
                 <h3>What is a Neural Network?</h3>
-                <p>A neural network is a computational model inspired by the human brain's neural structure. It consists of interconnected nodes (neurons) that process and transmit information, enabling the network to learn patterns and make predictions.</p>
+                <p>A neural network is a computational model inspired by the human brain's neural structure. It consists
+                    of interconnected nodes (neurons) that process and transmit information, enabling the network to
+                    learn patterns and make predictions.</p>
 
                 <h3>Interactive Features</h3>
                 <ul>
-                    <li><strong>Add Points:</strong> Click on the canvas to add data points. First click adds class 0 (red), second click adds class 1 (blue).</li>
+                    <li><strong>Add Points:</strong> Click on the canvas to add data points. First click adds class 0
+                        (red), second click adds class 1 (blue).</li>
                     <li><strong>Remove Points:</strong> Click on existing points to remove them.</li>
                     <li><strong>Clear All:</strong> Remove all points and start fresh.</li>
                 </ul>
 
                 <h3>Network Types</h3>
                 <ul>
-                    <li><strong>XOR Problem:</strong> A classic problem demonstrating non-linear classification. The network learns to classify points based on the XOR logic gate pattern.</li>
-                    <li><strong>Circle Classification:</strong> The network learns to distinguish points inside and outside a circle, showcasing boundary learning.</li>
-                    <li><strong>Spiral Classification:</strong> A complex problem with interlocking spirals, testing the network's ability to learn intricate patterns.</li>
-                    <li><strong>Custom Points:</strong> Create your own classification problem by adding points manually.</li>
+                    <li><strong>XOR Problem:</strong> A classic problem demonstrating non-linear classification. The
+                        network learns to classify points based on the XOR logic gate pattern.</li>
+                    <li><strong>Circle Classification:</strong> The network learns to distinguish points inside and
+                        outside a circle, showcasing boundary learning.</li>
+                    <li><strong>Spiral Classification:</strong> A complex problem with interlocking spirals, testing the
+                        network's ability to learn intricate patterns.</li>
+                    <li><strong>Custom Points:</strong> Create your own classification problem by adding points
+                        manually.</li>
                 </ul>
 
                 <h3>Network Architecture</h3>
                 <ul>
-                    <li><strong>Learning Rate:</strong> Controls the speed of learning. Higher values (0.1) make learning faster but less stable, while lower values (0.001) make learning slower but more stable.</li>
-                    <li><strong>Hidden Layers:</strong> Additional layers between input and output. More layers can learn more complex patterns but require more training time.</li>
-                    <li><strong>Neurons per Layer:</strong> Number of processing units in each hidden layer. More neurons increase the network's capacity to learn complex patterns.</li>
+                    <li><strong>Learning Rate:</strong> Controls the speed of learning. Higher values (0.1) make
+                        learning faster but less stable, while lower values (0.001) make learning slower but more
+                        stable.</li>
+                    <li><strong>Hidden Layers:</strong> Additional layers between input and output. More layers can
+                        learn more complex patterns but require more training time.</li>
+                    <li><strong>Neurons per Layer:</strong> Number of processing units in each hidden layer. More
+                        neurons increase the network's capacity to learn complex patterns.</li>
                 </ul>
 
                 <h3>Visualization Guide</h3>
@@ -414,14 +442,14 @@
 
             initializeNetwork() {
                 let prevSize = this.inputSize;
-                
+
                 // Initialize weights and biases for hidden layers
                 for (let i = 0; i < this.hiddenLayers; i++) {
                     this.weights.push(this.randomMatrix(this.neuronsPerLayer, prevSize));
                     this.biases.push(this.randomMatrix(this.neuronsPerLayer, 1));
                     prevSize = this.neuronsPerLayer;
                 }
-                
+
                 // Initialize weights and biases for output layer
                 this.weights.push(this.randomMatrix(this.outputSize, prevSize));
                 this.biases.push(this.randomMatrix(this.outputSize, 1));
@@ -430,13 +458,13 @@
                 this.activations = Array(this.weights.length + 1).fill().map((_, i) => {
                     const size = i === 0 ? this.inputSize :
                         i === this.weights.length ? this.outputSize :
-                        this.neuronsPerLayer;
+                            this.neuronsPerLayer;
                     return Array(size).fill().map(() => [0]);
                 });
             }
 
             randomMatrix(rows, cols) {
-                return Array(rows).fill().map(() => 
+                return Array(rows).fill().map(() =>
                     Array(cols).fill().map(() => (Math.random() * 2 - 1) * Math.sqrt(2 / cols))
                 );
             }
@@ -463,13 +491,13 @@
                 for (let i = 0; i < this.weights.length; i++) {
                     // Calculate weighted sum
                     const weightedSum = this.matrixMultiply(this.weights[i], current);
-                    
+
                     // Add bias
                     const biasedSum = this.matrixAdd(weightedSum, this.biases[i]);
-                    
+
                     // Apply activation function
                     current = biasedSum.map(row => row.map(val => this.sigmoid(val)));
-                    
+
                     // Store activation
                     this.activations[i + 1] = current;
                 }
@@ -528,7 +556,7 @@
 
                 // Calculate output layer error
                 let error = this.matrixSubtract(targetMatrix, output);
-                let delta = error.map(row => 
+                let delta = error.map(row =>
                     row.map(val => val * this.sigmoidDerivative(output[0][0]))
                 );
 
@@ -614,7 +642,7 @@
                         this.ctx.fillText('Initializing Network...', this.canvas.width / 2, this.canvas.height / 2);
 
                         await this.resetNetwork();
-                        
+
                         // Initialize network with forward pass
                         if (this.trainingData.inputs.length > 0) {
                             this.network.forward(this.trainingData.inputs[0]);
@@ -698,7 +726,7 @@
 
                 try {
                     // Shuffle training data
-                    const indices = Array.from({length: this.trainingData.inputs.length}, (_, i) => i);
+                    const indices = Array.from({ length: this.trainingData.inputs.length }, (_, i) => i);
                     for (let i = indices.length - 1; i > 0; i--) {
                         const j = Math.floor(Math.random() * (i + 1));
                         [indices[i], indices[j]] = [indices[j], indices[i]];
@@ -708,7 +736,7 @@
                         const idx = indices[i];
                         const input = this.trainingData.inputs[idx];
                         const target = this.trainingData.targets[idx];
-                        
+
                         // Forward pass
                         const output = this.network.forward(input);
                         if (!output || !output[0] || typeof output[0][0] === 'undefined') {
@@ -728,7 +756,7 @@
                     this.epoch++;
                     const accuracy = (correct / this.trainingData.inputs.length) * 100;
                     const avgLoss = totalLoss / this.trainingData.inputs.length;
-                    
+
                     // Update UI
                     this.updateStats(this.epoch, avgLoss, accuracy);
                     this.draw();
@@ -779,7 +807,7 @@
                         const x1 = padding + i * layerWidth;
                         const x2 = padding + (i + 1) * layerWidth;
                         const neurons1 = i === 0 ? this.network.inputSize : this.network.neuronsPerLayer;
-                        const neurons2 = i === this.network.weights.length - 1 ? 
+                        const neurons2 = i === this.network.weights.length - 1 ?
                             this.network.outputSize : this.network.neuronsPerLayer;
 
                         for (let j = 0; j < neurons1; j++) {
@@ -789,7 +817,7 @@
                                 const weight = this.network.weights[i][k][j];
                                 const opacity = Math.abs(weight);
                                 const color = weight > 0 ? '#4ecdc4' : '#ff6b6b';
-                                
+
                                 this.ctx.beginPath();
                                 this.ctx.moveTo(x1, y1);
                                 this.ctx.lineTo(x2, y2);
@@ -805,20 +833,20 @@
                         const x = padding + i * layerWidth;
                         const neurons = i === 0 ? this.network.inputSize :
                             i === this.network.weights.length ? this.network.outputSize :
-                            this.network.neuronsPerLayer;
+                                this.network.neuronsPerLayer;
 
                         for (let j = 0; j < neurons; j++) {
                             const y = padding + (j + 1) * (layerHeight / (neurons + 1));
-                            
+
                             // Safe activation access with default value
                             let activation = 0;
-                            if (this.network.activations[i] && 
-                                this.network.activations[i][j] && 
-                                Array.isArray(this.network.activations[i][j]) && 
+                            if (this.network.activations[i] &&
+                                this.network.activations[i][j] &&
+                                Array.isArray(this.network.activations[i][j]) &&
                                 this.network.activations[i][j].length > 0) {
                                 activation = this.network.activations[i][j][0];
                             }
-                            
+
                             this.ctx.beginPath();
                             this.ctx.arc(x, y, neuronRadius, 0, Math.PI * 2);
                             this.ctx.fillStyle = `rgba(78, 205, 196, ${0.3 + Math.abs(activation) * 0.7})`;
@@ -857,7 +885,7 @@
                         const y = (j / resolution) * 4 - 2;
                         const output = this.network.forward([x, y]);
                         const confidence = output?.[0]?.[0] ?? 0.5;
-                        
+
                         this.ctx.fillStyle = gradient;
                         this.ctx.globalAlpha = Math.abs(confidence - 0.5) * 2;
                         this.ctx.fillRect(i * step, j * step, step, step);
@@ -879,7 +907,7 @@
                     this.ctx.arc(x, y, 5, 0, Math.PI * 2);
                     this.ctx.fillStyle = target > 0.5 ? '#4ecdc4' : '#ff6b6b';
                     this.ctx.fill();
-                    
+
                     // Draw confidence ring
                     this.ctx.beginPath();
                     this.ctx.arc(x, y, 8, 0, Math.PI * 2);
@@ -1064,7 +1092,7 @@
                 if (!this.network.weights || !this.network.weights.length) return false;
                 if (!this.network.activations || !this.network.activations.length) return false;
                 if (!this.network.inputSize || !this.network.neuronsPerLayer || !this.network.outputSize) return false;
-                
+
                 try {
                     // Validate weights structure
                     for (let i = 0; i < this.network.weights.length; i++) {
@@ -1093,5 +1121,17 @@
         // Initialize the network visualizer
         const visualizer = new NetworkVisualizer(document.getElementById('canvas'));
     </script>
+    <div class="ad-overlay-bottom" style="z-index: 1000;">
+        <div style="width:100%; display:flex; flex-direction:column; align-items:center;">
+            <span class="ad-label" style="color:#aaa;">Advertisement</span>
+            <ins class="adsbygoogle" style="display:block; width:100%; height:90px;"
+                data-ad-client="ca-pub-5166575587547718" data-ad-slot="overlay-unit" data-ad-format="auto"
+                data-full-width-responsive="true"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+    </div>
 </body>
-</html> 
+
+</html>

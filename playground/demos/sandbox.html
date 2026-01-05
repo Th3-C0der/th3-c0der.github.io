@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Sandbox - Th3-C0der Playground</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718"
+        crossorigin="anonymous"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #0d0d0d;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            font-family: 'Segoe UI', sans-serif;
+            user-select: none;
+        }
+
+        canvas {
+            display: block;
+            image-rendering: pixelated;
+            /* Crucial for sharp individual pixels */
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .ui-panel {
+            position: absolute;
+            bottom: 120px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(20, 20, 20, 0.9);
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 10px 20px;
+            display: flex;
+            gap: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .tool-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid transparent;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .tool-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .tool-btn.active {
+            border-color: var(--color);
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 10px var(--color);
+        }
+
+        .tool-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--color);
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px 15px;
+            border-radius: 20px;
+            transition: 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .back-btn:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .brush-size {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin-left: 10px;
+            border-left: 1px solid #333;
+            padding-left: 15px;
+        }
+
+        input[type=range] {
+            width: 80px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: transparent;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 12px;
+            width: 12px;
+            border-radius: 50%;
+            background: #fff;
+            cursor: pointer;
+            margin-top: -4px;
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #555;
+            border-radius: 2px;
+        }
+
+        .ad-overlay-bottom {
+            position: fixed;
+            bottom: 0px;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            padding: 10px 0;
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <a href="/playground" class="back-btn"><i class="fas fa-arrow-left"></i> Back</a>
+
+    <canvas id="sandCanvas"></canvas>
+
+    <div class="ui-panel">
+        <div class="tool-btn active" data-tool="1" style="--color: #ffcc00;" title="Sand">
+            <div class="tool-indicator"></div>
+        </div>
+        <div class="tool-btn" data-tool="2" style="--color: #00ccff;" title="Water">
+            <div class="tool-indicator"></div>
+        </div>
+        <div class="tool-btn" data-tool="3" style="--color: #888888;" title="Stone">
+            <div class="tool-indicator"></div>
+        </div>
+        <div class="tool-btn" data-tool="4" style="--color: #ff0055;" title="Acid">
+            <div class="tool-indicator"></div>
+        </div>
+        <div class="tool-btn" data-tool="0" style="--color: #ffffff;" title="Eraser">
+            <i class="fas fa-eraser"></i>
+        </div>
+
+        <div class="brush-size">
+            <span style="font-size: 0.7rem; color: #888; margin-bottom: 2px;">Size</span>
+            <input type="range" id="brushSize" min="1" max="10" value="3">
+        </div>
+
+        <div class="tool-btn" id="clearBtn" title="Clear All" style="border:none;">
+            <i class="fas fa-trash-alt"></i>
+        </div>
+    </div>
+
+    <script>
+        // Setup Grid
+        // We use a smaller internal canvas resolution and scale it up with CSS for performance
+        const scale = 4;
+        const canvas = document.getElementById('sandCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let width, height;
+        let grid = [];
+        let nextGrid = []; // Not actually needed for many sand algos if updated carefully, 
+        // but good for sync. We'll use a single grid updated bottom-up to save memory/ops
+
+        let rows, cols;
+
+        // Types: 0: Empty, 1: Sand, 2: Water, 3: Stone, 4: Acid
+        const COLORS = {
+            0: [13, 13, 13],    // Background
+            1: [255, 204, 0],   // Sand
+            2: [0, 204, 255],   // Water
+            3: [136, 136, 136], // Stone
+            4: [255, 0, 85]     // Acid
+        };
+
+        let currentTool = 1;
+        let brushRadius = 3;
+        let isDrawing = false;
+        let mouseX = 0, mouseY = 0;
+
+        function resize() {
+            canvas.width = Math.ceil(window.innerWidth / scale);
+            canvas.height = Math.ceil(window.innerHeight / scale);
+            width = canvas.width;
+            height = canvas.height;
+            cols = width;
+            rows = height;
+
+            // Re-init grid
+            grid = new Uint8Array(cols * rows).fill(0);
+        }
+
+        window.addEventListener('resize', resize);
+        resize();
+
+        // Image Data for fast rendering
+        const imgData = ctx.createImageData(width, height);
+        const data = imgData.data;
+
+        function drawPixel(x, y, type) {
+            if (x >= 0 && x < cols && y >= 0 && y < rows) {
+                grid[y * cols + x] = type;
+            }
+        }
+
+        function getPixel(x, y) {
+            if (x >= 0 && x < cols && y >= 0 && y < rows) {
+                return grid[y * cols + x];
+            }
+            return 3; // Treat out of bounds as stone (walls)
+        }
+
+        function update() {
+            // Process Input
+            if (isDrawing) {
+                for (let y = -brushRadius; y <= brushRadius; y++) {
+                    for (let x = -brushRadius; x <= brushRadius; x++) {
+                        if (x * x + y * y <= brushRadius * brushRadius) {
+                            // Sprinkle probability for less dense brush
+                            if (Math.random() > 0.5 || currentTool === 0 || currentTool === 3) {
+                                drawPixel(mouseX + x, mouseY + y, currentTool);
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Update Physics
+            // Iterate bottom to top, left to right (or random dir to avoid bias)
+            // randomness solves "left-drift"
+
+            // Need a way to track moved pixels so we don't move them twice in one frame
+            // Since we iterate bottom up, elements moving DOWN are fine.
+            // Elements moving Side/Up might be an issue.
+            // Simple approach: Bottom to top.
+
+            for (let y = rows - 1; y >= 0; y--) {
+                // Random x-direction to prevent stack bias
+                const startX = Math.random() > 0.5 ? 0 : cols - 1;
+                const step = startX === 0 ? 1 : -1;
+
+                for (let i = 0; i < cols; i++) {
+                    const x = startX === 0 ? i : cols - 1 - i;
+                    const idx = y * cols + x;
+                    const type = grid[idx];
+
+                    if (type === 0 || type === 3) continue; // Empty or Stone
+
+                    // Logic based on type
+                    if (type === 1) { // SAND
+                        // Try move down
+                        const below = (y + 1) * cols + x;
+                        if (y + 1 < rows && grid[below] === 0) {
+                            grid[below] = type;
+                            grid[idx] = 0;
+                        }
+                        // Try move down-left/right (liquid-ish solid)
+                        else if (y + 1 < rows && grid[below] === 2) { // Sand sinks in water
+                            grid[below] = type;
+                            grid[idx] = 2; // Swap
+                        }
+                        else {
+                            const dir = Math.random() > 0.5 ? 1 : -1;
+                            const belowA = (y + 1) * cols + (x + dir);
+                            const belowB = (y + 1) * cols + (x - dir);
+
+                            if (y + 1 < rows) {
+                                if (x + dir >= 0 && x + dir < cols && grid[belowA] === 0) {
+                                    grid[belowA] = type;
+                                    grid[idx] = 0;
+                                } else if (x - dir >= 0 && x - dir < cols && grid[belowB] === 0) {
+                                    grid[belowB] = type;
+                                    grid[idx] = 0;
+                                }
+                            }
+                        }
+                    }
+                    else if (type === 2) { // WATER
+                        const below = (y + 1) * cols + x;
+                        if (y + 1 < rows && grid[below] === 0) {
+                            grid[below] = type;
+                            grid[idx] = 0;
+                        } else {
+                            // Flow sideways
+                            const dir = Math.random() > 0.5 ? 1 : -1;
+                            const sideA = y * cols + (x + dir);
+                            const sideB = y * cols + (x - dir);
+
+                            if (x + dir >= 0 && x + dir < cols && grid[sideA] === 0) {
+                                grid[sideA] = type;
+                                grid[idx] = 0;
+                            } else if (x - dir >= 0 && x - dir < cols && grid[sideB] === 0) {
+                                grid[sideB] = type;
+                                grid[idx] = 0;
+                            }
+                        }
+                    }
+                    else if (type === 4) { // ACID
+                        // Dissolves everything except Acid and empty
+                        // Moves like liquid
+                        // Check neighbors
+                        const dirs = [[0, 1], [1, 0], [-1, 0], [0, -1]];
+                        for (let d = 0; d < dirs.length; d++) {
+                            const nx = x + dirs[d][0];
+                            const ny = y + dirs[d][1];
+                            if (nx >= 0 && nx < cols && ny >= 0 && ny < rows) {
+                                const nIdx = ny * cols + nx;
+                                const nType = grid[nIdx];
+                                if (nType !== 0 && nType !== 4) {
+                                    // Dissolve
+                                    if (Math.random() < 0.1) {
+                                        grid[nIdx] = 0;
+                                        grid[idx] = 0; // Acid used up
+                                        break; // Stop processing this pixel
+                                    }
+                                }
+                            }
+                        }
+
+                        // Movement (gravity)
+                        if (grid[idx] === 4) {
+                            const below = (y + 1) * cols + x;
+                            if (y + 1 < rows && grid[below] === 0) {
+                                grid[below] = type;
+                                grid[idx] = 0;
+                            } else {
+                                // Flow sideways
+                                const dir = Math.random() > 0.5 ? 1 : -1;
+                                const sideA = y * cols + (x + dir);
+                                if (x + dir >= 0 && x + dir < cols && grid[sideA] === 0) {
+                                    grid[sideA] = type;
+                                    grid[idx] = 0;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        function draw() {
+            // Fill Image Data
+            for (let i = 0; i < grid.length; i++) {
+                const type = grid[i];
+                const color = COLORS[type];
+                const pIdx = i * 4;
+
+                // Add some noise/variation based on position for nice look
+                const noise = (i % 3) * 5;
+
+                data[pIdx] = Math.min(255, color[0] + noise);
+                data[pIdx + 1] = Math.min(255, color[1] + noise);
+                data[pIdx + 2] = Math.min(255, color[2] + noise);
+                data[pIdx + 3] = 255;
+            }
+
+            ctx.putImageData(imgData, 0, 0);
+        }
+
+        function loop() {
+            update();
+            draw();
+            requestAnimationFrame(loop);
+        }
+
+        // Interaction
+        const sandCanvas = document.getElementById('sandCanvas');
+
+        function getCoords(e) {
+            const rect = sandCanvas.getBoundingClientRect();
+            const scaleX = sandCanvas.width / rect.width;
+            const scaleY = sandCanvas.height / rect.height;
+            return {
+                x: Math.floor((e.clientX - rect.left) * scaleX),
+                y: Math.floor((e.clientY - rect.top) * scaleY)
+            };
+        }
+
+        sandCanvas.addEventListener('mousedown', e => {
+            isDrawing = true;
+            const pos = getCoords(e);
+            mouseX = pos.x;
+            mouseY = pos.y;
+        });
+
+        window.addEventListener('mouseup', () => isDrawing = false);
+
+        sandCanvas.addEventListener('mousemove', e => {
+            const pos = getCoords(e);
+            mouseX = pos.x;
+            mouseY = pos.y;
+        });
+
+        // UI
+        document.querySelectorAll('.tool-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (btn.id === 'clearBtn') {
+                    grid.fill(0);
+                    return;
+                }
+
+                document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentTool = parseInt(btn.dataset.tool);
+            });
+        });
+
+        document.getElementById('brushSize').addEventListener('input', e => {
+            brushRadius = parseInt(e.target.value);
+        });
+
+        loop();
+
+    </script>
+    <div class="ad-overlay-bottom" style="z-index: 1000;">
+        <div style="width:100%; display:flex; flex-direction:column; align-items:center;">
+            <span class="ad-label" style="color:#aaa;">Advertisement</span>
+            <ins class="adsbygoogle" style="display:block; width:100%; height:90px;"
+                data-ad-client="ca-pub-5166575587547718" data-ad-slot="overlay-unit" data-ad-format="auto"
+                data-full-width-responsive="true"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+    </div>
+</body>
+
+</html>

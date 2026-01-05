@@ -1,44 +1,189 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google-adsense-account" content="ca-pub-5166575587547718">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718"
-     crossorigin="anonymous"></script>
-    <title>Error-404</title>
+        crossorigin="anonymous"></script>
+
+    <title>404 - Page Not Found | Th3-C0der</title>
+
+    <!-- Favicons -->
+    <link rel="icon"
+        href="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png/:/rs=w:32,h:32,m"
+        sizes="32x32">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Anime.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+
+    <link rel="stylesheet" href="static/new-style.css">
+
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
+        .error-section {
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            background-color: #f0f0f0;
-        }
-        .image-container {
+            min-height: 100vh;
+            padding: var(--space-lg);
             position: relative;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-            border-radius: 10px;
-            overflow: visible;
-            transition: transform 0.3s ease;
-            width: 1000px;
+            z-index: 10;
+            text-align: center;
         }
-        .image-container:hover {
-            transform: translateY(-10px);
+
+        .error-container {
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            max-width: 800px;
+            width: 90%;
+            box-shadow: var(--shadow-lg);
+            opacity: 0;
+            transform: translateY(30px);
         }
-        img {
-            display: block;
+
+        .error-svg-container {
             width: 100%;
-            height: auto;
+            max-width: 500px;
+            margin: 0 auto var(--space-lg);
+            filter: drop-shadow(0 0 20px var(--accent-glow));
+        }
+
+        .error-title {
+            font-family: var(--font-primary);
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: var(--space-sm);
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .error-message {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: var(--space-xl);
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.6;
+        }
+
+        .return-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+            background: var(--gradient-primary);
+            color: var(--bg-primary);
+            padding: var(--space-md) var(--space-xl);
+            border-radius: var(--radius-full);
+            text-decoration: none;
+            font-weight: 700;
+            transition: all var(--transition-base);
+            box-shadow: var(--shadow-md);
+            border: none;
+            outline: none;
+        }
+
+        .return-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .return-btn i {
+            transition: transform var(--transition-base);
+        }
+
+        .return-btn:hover i {
+            transform: translateX(-5px);
+        }
+
+        @media (max-width: 768px) {
+            .error-title {
+                font-size: 2.5rem;
+            }
+
+            .error-container {
+                padding: var(--space-lg);
+            }
         }
     </style>
 </head>
+
 <body>
-    <div class="image-container">
-        <a href="/"><img src="https://raw.githubusercontent.com/Th3-C0der/Th3-C0der.github.io/main/404.svg" alt="ERROR-404"></a>
+    <!-- Custom Cursor -->
+    <div class="cursor-wrapper">
+        <div class="cursor-dot" id="cursor-dot"></div>
+        <div class="cursor-outline" id="cursor-outline"></div>
     </div>
+
+    <!-- Animated Background -->
+    <div class="animated-bg">
+        <div class="gradient-orb gradient-orb-1"></div>
+        <div class="gradient-orb gradient-orb-2"></div>
+        <div class="gradient-orb gradient-orb-3"></div>
+        <canvas id="particle-canvas"></canvas>
+    </div>
+
+    <main class="error-section">
+        <div class="error-container">
+            <div class="error-svg-container">
+                <!-- Using img tag to display the SVG -->
+                <img src="/404.svg" alt="404 Error" style="width: 100%; height: auto;">
+            </div>
+            <h1 class="error-title">LOST IN SPACE</h1>
+            <p class="error-message">
+                The coordinates you requested lead to uncharted digital territory.
+                Let's redirect you back to the main station.
+            </p>
+            <a href="/" class="return-btn magnetic-btn">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to Reality</span>
+            </a>
+        </div>
+    </main>
+
+    <!-- Main Script -->
+    <script src="static/new-script.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Fade in error container
+            anime({
+                targets: '.error-container',
+                opacity: [0, 1],
+                translateY: [30, 0],
+                duration: 1000,
+                easing: 'easeOutCubic',
+                delay: 200
+            });
+
+            // Re-init magnetic buttons for the new button
+            if (typeof initMagneticButtons === 'function') {
+                initMagneticButtons();
+            }
+
+            // Re-init particles if not automatically started
+            if (typeof initParticleBackground === 'function') {
+                initParticleBackground();
+            }
+        });
+    </script>
 </body>
+
 </html>

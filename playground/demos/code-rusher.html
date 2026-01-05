@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Code Rusher - Th3-C0der Playground</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718"
+        crossorigin="anonymous"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0d0221;
+            --primary: #00ff41;
+            /* Matrix Green */
+            --danger: #ff0055;
+            --text: #fff;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #gameCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .ui-layer {
+            position: absolute;
+            z-index: 2;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .hud {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px 40px;
+            font-size: 1.5rem;
+            text-shadow: 0 0 10px var(--primary);
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), transparent);
+        }
+
+        .score-box i {
+            color: var(--primary);
+            margin-right: 10px;
+        }
+
+        .lives-box i {
+            color: var(--danger);
+            margin-right: 10px;
+        }
+
+        .input-zone {
+            position: absolute;
+            bottom: 130px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        .input-display {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            padding: 15px 30px;
+            font-size: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+            min-height: 1.2em;
+            text-transform: uppercase;
+            position: relative;
+        }
+
+        .input-display::after {
+            content: '_';
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            50% {
+                opacity: 0;
+            }
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 10;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-family: 'Segoe UI', sans-serif;
+            pointer-events: auto;
+        }
+
+        .back-btn:hover {
+            color: #fff;
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 3;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            pointer-events: auto;
+        }
+
+        .overlay.hidden {
+            display: none;
+        }
+
+        .title {
+            font-size: 4rem;
+            color: var(--primary);
+            text-shadow: 0 0 20px var(--primary);
+            margin-bottom: 20px;
+            letter-spacing: 5px;
+        }
+
+        .start-btn {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            padding: 15px 40px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.3s;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+        }
+
+        .start-btn:hover {
+            background: var(--primary);
+            color: #000;
+            box-shadow: 0 0 30px var(--primary);
+        }
+
+        .game-over-stats {
+            color: #fff;
+            margin-bottom: 30px;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+
+        .crt-scanline {
+            width: 100%;
+            height: 100px;
+            z-index: 10;
+            background: linear-gradient(0deg, rgba(0, 0, 0, 0) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(0, 0, 0, 0) 100%);
+            opacity: 0.1;
+            position: absolute;
+            bottom: 100%;
+            animation: scanline 10s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes scanline {
+            0% {
+                bottom: 100%;
+            }
+
+            100% {
+                bottom: -100px;
+            }
+        }
+
+        .ad-overlay-bottom {
+            position: fixed;
+            bottom: 0px;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            padding: 10px 0;
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="crt-scanline"></div>
+    <a href="/playground" class="back-btn"><i class="fas fa-arrow-left"></i> Back</a>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <div class="ui-layer">
+        <div class="hud">
+            <div class="score-box"><i class="fas fa-terminal"></i> <span id="scoreVal">0</span></div>
+            <div class="lives-box"><i class="fas fa-heart"></i> <span id="livesVal">100%</span></div>
+        </div>
+        <div class="input-zone">
+            <div class="input-display" id="typingDisplay"></div>
+        </div>
+    </div>
+
+    <!-- Start Overlay -->
+    <div class="overlay" id="startOverlay">
+        <h1 class="title">CODE RUSHER</h1>
+        <p style="margin-bottom: 40px; color: #aaa;">Type the falling keywords to hack into the system.</p>
+        <button class="start-btn" onclick="startGame()">Init Sequence</button>
+    </div>
+
+    <!-- Game Over Overlay -->
+    <div class="overlay hidden" id="gameOverOverlay">
+        <h1 class="title" style="color: var(--danger)">SYSTEM FAILURE</h1>
+        <div class="game-over-stats">
+            <p>Data Recovered: <span id="finalScore" style="color: var(--primary)">0</span></p>
+        </div>
+        <button class="start-btn" onclick="resetGame()">Reboot System</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const typingDisplay = document.getElementById('typingDisplay');
+        const scoreEl = document.getElementById('scoreVal');
+        const livesEl = document.getElementById('livesVal');
+
+        let width, height;
+        let animationFrame;
+        let lastTime = 0;
+
+        // Game State
+        let isPlaying = false;
+        let score = 0;
+        let health = 100;
+        let words = [];
+        let currentInput = "";
+        let spawnTimer = 0;
+        let spawnInterval = 2000; // ms
+        let difficultyMultiplier = 1;
+
+        // Word Bank
+        const wordList = [
+            "HTML", "CSS", "REACT", "NODE", "JAVA", "PYTHON", "RUBY", "GO", "RUST",
+            "SWIFT", "KOTLIN", "DOCKER", "LINUX", "BASH", "GIT", "GITHUB", "API",
+            "JSON", "XML", "SQL", "MONGO", "REDIS", "AWS", "AZURE", "CLOUD",
+            "SERVER", "CLIENT", "HTTP", "HTTPS", "SSH", "FTP", "TCP", "UDP",
+            "CONST", "LET", "VAR", "FUNCTION", "CLASS", "OBJECT", "ARRAY", "STRING",
+            "PROMISE", "ASYNC", "AWAIT", "DEBUG", "COMPILE", "BUILD", "DEPLOY",
+            "ALGORITHM", "AGENT", "AI", "NEURAL", "CYBER", "HACK", "ROOT", "SUDO",
+            "VOID", "INT", "FLOAT", "BOOL", "CHAR", "STRUCT", "ENUM", "PUBLIC",
+            "PRIVATE", "STATIC", "TH3", "C0DER", "GLITCH", "MATRIX", "BINARY"
+        ];
+
+        class FallingWord {
+            constructor() {
+                this.text = wordList[Math.floor(Math.random() * wordList.length)];
+                this.x = Math.random() * (width - 150) + 50;
+                this.y = -30;
+                this.speed = (Math.random() * 1 + 1) * difficultyMultiplier;
+                this.color = "#00ff41";
+                this.fontSize = Math.floor(Math.random() * 10) + 16;
+                this.matchedIndices = 0; // tracking partial match if we wanted
+            }
+
+            update(dt) {
+                this.y += this.speed;
+                // Simple difficulty scaling
+                this.speed += 0.001;
+            }
+
+            draw() {
+                ctx.font = `bold ${this.fontSize}px 'Courier New'`;
+                // Glow effect
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.color;
+
+                // Draw text
+                ctx.fillStyle = this.color;
+                ctx.fillText(this.text, this.x, this.y);
+
+                // Reset shadow
+                ctx.shadowBlur = 0;
+
+                // Highlight matched part
+                if (currentInput.length > 0 && this.text.startsWith(currentInput.toUpperCase())) {
+                    ctx.fillStyle = "#fff";
+                    const matchedStr = this.text.substring(0, currentInput.length);
+                    ctx.fillText(matchedStr, this.x, this.y);
+                }
+            }
+        }
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            width = canvas.width;
+            height = canvas.height;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        function startGame() {
+            document.getElementById('startOverlay').classList.add('hidden');
+            document.getElementById('gameOverOverlay').classList.add('hidden');
+
+            score = 0;
+            health = 100;
+            words = [];
+            currentInput = "";
+            spawnInterval = 2000;
+            difficultyMultiplier = 1;
+
+            updateUI();
+            isPlaying = true;
+            lastTime = performance.now();
+            requestAnimationFrame(gameLoop);
+
+            // Focus logic to grab keyboard
+            window.focus();
+        }
+
+        function resetGame() {
+            startGame();
+        }
+
+        function gameOver() {
+            isPlaying = false;
+            document.getElementById('gameOverOverlay').classList.remove('hidden');
+            document.getElementById('finalScore').innerText = score;
+        }
+
+        function spawnWord() {
+            words.push(new FallingWord());
+        }
+
+        function updateUI() {
+            scoreEl.innerText = score;
+            livesEl.innerText = Math.max(0, Math.floor(health)) + "%";
+            typingDisplay.innerText = currentInput;
+
+            // Visual feedback for health
+            livesEl.style.color = health < 30 ? "#f00" : "#fff";
+        }
+
+        // Input Handling
+        window.addEventListener('keydown', e => {
+            if (!isPlaying) return;
+
+            // Letters only
+            if (e.key.length === 1 && e.key.match(/[a-zA-Z0-9]/)) {
+                currentInput += e.key.toUpperCase();
+                checkInput();
+            } else if (e.key === 'Backspace') {
+                currentInput = currentInput.slice(0, -1);
+            } else if (e.key === 'Escape') {
+                // Could pause?
+                currentInput = "";
+            }
+
+            updateUI();
+        });
+
+        function checkInput() {
+            // Check if any word matches fully
+            const matchIndex = words.findIndex(w => w.text === currentInput);
+            if (matchIndex !== -1) {
+                // Destroy word
+                words.splice(matchIndex, 1);
+                currentInput = "";
+                score += 10;
+
+                // Increase difficulty slightly
+                difficultyMultiplier += 0.05;
+                spawnInterval = Math.max(500, spawnInterval - 20);
+
+                // SFX (Synthesized)
+                playSynthSound(600, 0.1, 'square');
+            } else {
+                // Check if valid prefix exists, else clear? 
+                // Strict mode: if input matches nothing's start, clear it or shake?
+                // Let's keep it simple: just let them type.
+
+                const validPrefix = words.some(w => w.text.startsWith(currentInput));
+                if (!validPrefix && currentInput.length > 0) {
+                    // Shake effect on input box
+                    typingDisplay.style.borderColor = "#f00";
+                    setTimeout(() => typingDisplay.style.borderColor = "#00ff41", 200);
+                    // Clear input or just punish? Let's just user backspace.
+                    // Or auto-clear invalid typing for flow? 
+                    // Auto-clear usually feels better in fast games.
+                    // But if they mistype one char, clearing all is annoying.
+                    // We will keep it but flash red.
+                }
+            }
+        }
+
+        // Game Loop
+        function gameLoop(time) {
+            if (!isPlaying) return;
+
+            const dt = time - lastTime; // ms
+            lastTime = time;
+
+            ctx.clearRect(0, 0, width, height);
+
+            // Matrix rain bg effect (subtle)
+            // ... omitting for performance/clarity, plain bg is fine, we have scanline CSS
+
+            // Spawn Logic
+            spawnTimer += dt;
+            if (spawnTimer > spawnInterval) {
+                spawnWord();
+                spawnTimer = 0;
+            }
+
+            // Update & Draw Words
+            for (let i = words.length - 1; i >= 0; i--) {
+                let w = words[i];
+                w.update(dt / 16); // normalize roughly
+                w.draw();
+
+                // Collision with bottom
+                if (w.y > height - 50) {
+                    health -= 10; // 10 hits = death
+                    words.splice(i, 1);
+                    currentInput = ""; // punish typing flow
+
+                    // SFX
+                    playSynthSound(150, 0.3, 'sawtooth');
+
+                    if (health <= 0) {
+                        gameOver();
+                    }
+                }
+            }
+
+            updateUI();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Simple Audio
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx;
+        function playSynthSound(freq, duration, type = 'sine') {
+            if (!audioCtx) audioCtx = new AudioContext();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(freq / 2, audioCtx.currentTime + duration);
+
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        }
+
+    </script>
+    <div class="ad-overlay-bottom" style="z-index: 1000;">
+        <div style="width:100%; display:flex; flex-direction:column; align-items:center;">
+            <span class="ad-label" style="color:#aaa;">Advertisement</span>
+            <ins class="adsbygoogle" style="display:block; width:100%; height:90px;"
+                data-ad-client="ca-pub-5166575587547718" data-ad-slot="overlay-unit" data-ad-format="auto"
+                data-full-width-responsive="true"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+    </div>
+</body>
+
+</html>

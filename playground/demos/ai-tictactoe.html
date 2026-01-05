@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Tic-Tac-Toe - Th3-C0der Playground</title>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718" crossorigin="anonymous"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718"
+        crossorigin="anonymous"></script>
     <style>
         body {
             margin: 0;
@@ -107,7 +109,8 @@
             transform: rotate(180deg);
         }
 
-        select, button {
+        select,
+        button {
             padding: 0.8rem 1.5rem;
             border: none;
             border-radius: 8px;
@@ -118,7 +121,8 @@
             font-size: 1rem;
         }
 
-        select:hover, button:hover {
+        select:hover,
+        button:hover {
             background: rgba(255, 255, 255, 0.2);
         }
 
@@ -205,8 +209,22 @@
                 font-size: 2.5rem;
             }
         }
+
+        .ad-overlay-bottom {
+            position: fixed;
+            bottom: 0px;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            padding: 10px 0;
+            display: flex;
+            justify-content: center;
+        }
     </style>
 </head>
+
 <body>
     <a href="/playground" class="back-btn">← Back to Playground</a>
     <div class="game-container">
@@ -263,7 +281,7 @@
                 const availableMoves = board.map((cell, index) => cell === '' ? index : -1).filter(index => index !== -1);
                 if (availableMoves.length === 0) return -1;
 
-                switch(this.difficulty) {
+                switch (this.difficulty) {
                     case 'easy':
                         return this.getRandomMove(availableMoves);
                     case 'medium':
@@ -363,9 +381,9 @@
 
                 return winPatterns.some(pattern => {
                     const [a, b, c] = pattern;
-                    return board[a] && 
-                           board[a] === board[b] && 
-                           board[a] === board[c];
+                    return board[a] &&
+                        board[a] === board[b] &&
+                        board[a] === board[c];
                 });
             }
 
@@ -412,7 +430,7 @@
             setupControlsToggle() {
                 const toggle = document.getElementById('controlsToggle');
                 const controls = document.getElementById('gameControls');
-                
+
                 toggle.addEventListener('click', () => {
                     controls.classList.toggle('minimized');
                     toggle.classList.toggle('minimized');
@@ -433,7 +451,7 @@
                 // Reset timeout on user interaction
                 controls.addEventListener('mouseenter', resetTimeout);
                 controls.addEventListener('touchstart', resetTimeout);
-                
+
                 // Initial timeout
                 resetTimeout();
             }
@@ -444,7 +462,7 @@
                 // Player's move
                 this.board[index] = this.currentPlayer;
                 this.updateBoard();
-                
+
                 if (this.checkWinner()) {
                     this.handleGameOver('win');
                     return;
@@ -458,13 +476,13 @@
                 // AI's move
                 this.currentPlayer = 'O';
                 this.updateStatus();
-                
+
                 setTimeout(() => {
                     const aiMove = this.ai.getMove(this.board);
                     if (aiMove !== -1) {
                         this.board[aiMove] = 'O';
                         this.updateBoard();
-                        
+
                         if (this.checkWinner()) {
                             this.handleGameOver('loss');
                             return;
@@ -475,7 +493,7 @@
                             return;
                         }
                     }
-                    
+
                     this.currentPlayer = 'X';
                     this.updateStatus();
                 }, 500);
@@ -507,9 +525,9 @@
 
                 return winPatterns.some(pattern => {
                     const [a, b, c] = pattern;
-                    return this.board[a] && 
-                           this.board[a] === this.board[b] && 
-                           this.board[a] === this.board[c];
+                    return this.board[a] &&
+                        this.board[a] === this.board[b] &&
+                        this.board[a] === this.board[c];
                 });
             }
 
@@ -520,8 +538,8 @@
             handleGameOver(result) {
                 this.gameOver = true;
                 let message = '';
-                
-                switch(result) {
+
+                switch (result) {
                     case 'win':
                         message = 'You win!';
                         this.stats.wins++;
@@ -535,7 +553,7 @@
                         this.stats.draws++;
                         break;
                 }
-                
+
                 this.updateStatus(message);
                 this.updateStats();
             }
@@ -558,5 +576,17 @@
         // Initialize game
         const game = new Game();
     </script>
+    <div class="ad-overlay-bottom">
+        <div style="width:100%; display:flex; flex-direction:column; align-items:center;">
+            <span class="ad-label" style="color:#aaa;">Advertisement</span>
+            <ins class="adsbygoogle" style="display:block; width:100%; height:90px;"
+                data-ad-client="ca-pub-5166575587547718" data-ad-slot="overlay-unit" data-ad-format="auto"
+                data-full-width-responsive="true"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+    </div>
 </body>
-</html> 
+
+</html>

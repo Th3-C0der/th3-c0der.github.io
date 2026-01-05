@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Voxel City - Th3-C0der Playground</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718"
+        crossorigin="anonymous"></script>
+    <style>
+        body {
+            background-color: #222;
+            color: #fff;
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            height: 100vh;
+        }
+
+        .tools {
+            width: 80px;
+            background: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 20px;
+            gap: 15px;
+            z-index: 10;
+            border-right: 1px solid #444;
+        }
+
+        .tool-btn {
+            width: 50px;
+            height: 50px;
+            background: #444;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 2px solid #555;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: 0.2s;
+        }
+
+        .tool-btn:hover {
+            background: #555;
+        }
+
+        .tool-btn.active {
+            border-color: #00ddee;
+            box-shadow: 0 0 10px rgba(0, 221, 238, 0.3);
+        }
+
+        .color-picker {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid #fff;
+            margin-top: 10px;
+        }
+
+        .canvas-area {
+            flex-grow: 1;
+            background: #88ccff;
+            /* Sky */
+            position: relative;
+            cursor: pointer;
+        }
+
+        .hud {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px 20px;
+            border-radius: 20px;
+            pointer-events: none;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 100px;
+            /* Offset past sidebar */
+            color: #fff;
+            text-decoration: none;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px 16px;
+            border-radius: 4px;
+        }
+
+        .back-btn:hover {
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        /* Isometric grid hint? Nah just clean */
+        .ad-overlay-bottom {
+            position: fixed;
+            bottom: 0px;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            padding: 10px 0;
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="tools">
+        <a href="/playground" style="color:#aaa; font-size:1.5rem; margin-bottom:10px;"><i
+                class="fas fa-arrow-left"></i></a>
+
+        <div class="tool-btn active" id="toolPlace" title="Place Block"><i class="fas fa-cube"></i></div>
+        <div class="tool-btn" id="toolErase" title="Remove Block"><i class="fas fa-eraser"></i></div>
+
+        <div style="height:1px; width:40px; background:#555; margin:10px 0;"></div>
+
+        <div class="color-picker" style="background:#ff5555" data-color="#ff5555"></div>
+        <div class="color-picker" style="background:#55ff55" data-color="#55ff55"></div>
+        <div class="color-picker" style="background:#5555ff" data-color="#5555ff"></div>
+        <div class="color-picker" style="background:#eeeeee" data-color="#eeeeee"></div>
+        <div class="color-picker" style="background:#555555" data-color="#555555"></div>
+    </div>
+
+    <div class="canvas-area">
+        <canvas id="canvas"></canvas>
+        <a href="/playground" class="back-btn">Exit</a>
+        <div class="hud">Blocks: <span id="blockCount">0</span></div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const container = document.querySelector('.canvas-area');
+
+        let width, height;
+        let blocks = {}; // key: "x,y,z" -> {color}
+        // Grid size
+        const GRID_SIZE = 32; // width of tile
+        const TILE_H = 16;   // height of tile top
+        // Isometric Math
+        // ScreenX = (mapX - mapY) * TILE_W
+        // ScreenY = (mapX + mapY) * TILE_H - (z * TILE_Z)
+
+        let selectedColor = '#eeeeee';
+        let tool = 'place';
+
+        // Camera pan
+        let camX = 0, camY = 0;
+        let isDragging = false;
+        let lastMouse = { x: 0, y: 0 };
+
+        let hoverBlock = null; // {x, y, z}
+
+        function resize() {
+            width = container.clientWidth;
+            height = container.clientHeight;
+            canvas.width = width;
+            canvas.height = height;
+
+            // Center camera initially
+            camX = width / 2;
+            camY = height / 2;
+
+            draw();
+        }
+        window.addEventListener('resize', resize);
+
+        function toScreen(x, y, z) {
+            const sx = (x - y) * GRID_SIZE + camX;
+            const sy = (x + y) * (GRID_SIZE / 2) - (z * GRID_SIZE) + camY;
+            return { x: sx, y: sy };
+        }
+
+        function drawBlock(x, y, z, color) {
+            const p = toScreen(x, y, z);
+
+            // Draw Cube
+            // Top Face
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y - GRID_SIZE);
+            ctx.lineTo(p.x + GRID_SIZE, p.y - GRID_SIZE / 2 - GRID_SIZE); // Up
+            // Wait, standard iso cube drawing.
+            // Center p.x, p.y is usually bottom center of sprite?
+            // Let's standard: center of tile on ground.
+
+            // Top Quad
+            //      Top
+            // Left     Right
+            //    Bottom
+
+            /*
+               /\
+              /  \
+              \  /
+               \/
+               | |
+               \_/
+            */
+
+            const w = GRID_SIZE;     // half width really
+            const h = GRID_SIZE / 2; // half height of top face
+
+            // Top Face
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y - h); // Bottom corner of top face
+            ctx.lineTo(p.x - w, p.y - h * 2); // Left
+            ctx.lineTo(p.x, p.y - h * 3);     // Top
+            ctx.lineTo(p.x + w, p.y - h * 2); // Right
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            // Right Face (Darker)
+            ctx.fillStyle = shadeColor(color, -20);
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y - h);
+            ctx.lineTo(p.x + w, p.y - h * 2);
+            ctx.lineTo(p.x + w, p.y); // Bottom right
+            ctx.lineTo(p.x, p.y + h); // Bottom center
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            // Left Face (Darkest)
+            ctx.fillStyle = shadeColor(color, -40);
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y - h);
+            ctx.lineTo(p.x - w, p.y - h * 2);
+            ctx.lineTo(p.x - w, p.y);
+            ctx.lineTo(p.x, p.y + h);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+        }
+
+        function drawHighlight(x, y, z, color) {
+            const p = toScreen(x, y, z);
+            const w = GRID_SIZE;
+            const h = GRID_SIZE / 2;
+
+            ctx.fillStyle = color;
+            ctx.globalAlpha = 0.5;
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y - h);
+            ctx.lineTo(p.x - w, p.y - h * 2);
+            ctx.lineTo(p.x, p.y - h * 3);
+            ctx.lineTo(p.x + w, p.y - h * 2);
+            ctx.closePath();
+            ctx.fill();
+            ctx.globalAlpha = 1.0;
+        }
+
+        function draw() {
+            // Sky
+            const grad = ctx.createLinearGradient(0, 0, 0, height);
+            grad.addColorStop(0, '#88ccff');
+            grad.addColorStop(1, '#66aaff');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, width, height);
+
+            // Axis sorting...
+            // Simple Painter's Algo: Sort by (x + y + z)
+            // Actually for isometric: draw from back-to-front.
+            // Sort keys by X+Y (+Z)
+
+            // Filter blocks to array
+            const renderList = [];
+            for (let k in blocks) {
+                const parts = k.split(',');
+                renderList.push({
+                    x: parseInt(parts[0]),
+                    y: parseInt(parts[1]),
+                    z: parseInt(parts[2]),
+                    c: blocks[k]
+                });
+            }
+
+            // Sort
+            renderList.sort((a, b) => {
+                const scoreA = a.x + a.y + a.z;
+                const scoreB = b.x + b.y + b.z;
+                return scoreA - scoreB;
+            });
+
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = 'rgba(0,0,0,0.1)';
+
+            // Draw Ground Grid (virtual) ?
+            // Just draw cursor on z=0 if no block
+
+            renderList.forEach(b => {
+                drawBlock(b.x, b.y, b.z, b.c);
+            });
+
+            // Hover
+            if (hoverBlock) {
+                // If invalid (occupied and tool==place), we target adjacent face.
+                // Raycasting logic determines adjacent face.
+
+                // For simplicity: If tool is erase, highlight existing block.
+                // If tool is place, we need to know WHICH face we hovered.
+
+                // Simplified raycast: done in mousemove.
+                // Here we just draw.
+
+                if (tool === 'place') {
+                    // Ghost block
+                    drawBlock(hoverBlock.x, hoverBlock.y, hoverBlock.z, selectedColor);
+                } else {
+                    // Highlight erase target
+                    // Red overlay
+                    // Actually we need to re-render that block with overlay, hard to do on top.
+                    // Just draw a red wireframe box
+                    const p = toScreen(hoverBlock.x, hoverBlock.y, hoverBlock.z);
+                    // ... complex. skip overlay for simplicity, just change opacity in logic maybe?
+                }
+            }
+        }
+
+        // Block Logic
+        // Just start with a floor
+        for (let x = -5; x <= 5; x++) {
+            for (let y = -5; y <= 5; y++) {
+                blocks[`${x},${y},0`] = (x + y) % 2 === 0 ? '#888' : '#999';
+            }
+        }
+        document.getElementById('blockCount').innerText = Object.keys(blocks).length;
+
+        // Mouse Handling
+        // Inverse Iso Mapping is hard.
+        // Screen to World.
+        // Instead of math inversion which assumes z=0, we should raycast against existing blocks.
+
+        function getMouseBlock(mx, my) {
+            // Check all blocks (sorted reverse) to find first hit
+            // Hitbox is the hex shape
+
+            // Sort Front to Back
+            const list = [];
+            for (let k in blocks) {
+                const parts = k.split(',');
+                list.push({ x: parseInt(parts[0]), y: parseInt(parts[1]), z: parseInt(parts[2]) });
+            }
+            list.sort((a, b) => (b.x + b.y + b.z) - (a.x + a.y + a.z));
+
+            for (let b of list) {
+                const s = toScreen(b.x, b.y, b.z); // bottom center of block visual
+                // Hit test against the hex
+                // Approximating with rect or circle for speed
+                // Hex center is at (s.x, s.y - h) ?? No.
+
+                // Top center is s.x, s.y - 3*h
+                // Bottom center is s.x, s.y + h
+                // Width 2*w
+
+                // Radius approx GRID_SIZE
+                const cy = s.y - GRID_SIZE; // visual center roughly
+                const dist = Math.hypot(mx - s.x, my - cy);
+                if (dist < GRID_SIZE) {
+                    return b;
+                }
+            }
+
+            // If no block hit, check z=0 plane
+            // ScreenX - camX = (x-y)*W
+            // ScreenY - camY = (x+y)*H
+            // Solve for x, y
+
+            const adjX = mx - camX;
+            const adjY = my - camY;
+            const H = GRID_SIZE / 2;
+            const W = GRID_SIZE;
+
+            // adjY = (x+y)*H => (x+y) = adjY/H
+            // adjX = (x-y)*W => (x-y) = adjX/W
+            // 2x = adjY/H + adjX/W
+            // 2y = adjY/H - adjX/W
+
+            const paramX = (adjY / H + adjX / W) / 2;
+            const paramY = (adjY / H - adjX / W) / 2;
+
+            const rx = Math.round(paramX);
+            const ry = Math.round(paramY);
+
+            return { x: rx, y: ry, z: 0, ground: true };
+        }
+
+        canvas.addEventListener('mousedown', e => {
+            if (e.button === 2) { // Right click pan
+                isDragging = true;
+                lastMouse = { x: e.clientX, y: e.clientY };
+                return;
+            }
+
+            if (hoverBlock) {
+                if (tool === 'place') {
+                    blocks[`${hoverBlock.x},${hoverBlock.y},${hoverBlock.z}`] = selectedColor;
+                } else {
+                    delete blocks[`${hoverBlock.x},${hoverBlock.y},${hoverBlock.z}`];
+                }
+                document.getElementById('blockCount').innerText = Object.keys(blocks).length;
+                draw();
+            }
+        });
+
+        window.addEventListener('mousemove', e => {
+            if (isDragging) {
+                camX += e.clientX - lastMouse.x;
+                camY += e.clientY - lastMouse.y;
+                lastMouse = { x: e.clientX, y: e.clientY };
+                draw();
+                return;
+            }
+
+            const rect = canvas.getBoundingClientRect();
+            const mx = e.clientX - rect.left;
+            const my = e.clientY - rect.top;
+
+            const hit = getMouseBlock(mx, my);
+
+            if (hit) {
+                if (tool === 'erase') {
+                    if (hit.ground && !blocks[`${hit.x},${hit.y},${hit.z}`]) {
+                        hoverBlock = null; // can't erase pure ground
+                    } else {
+                        hoverBlock = hit;
+                    }
+                } else {
+                    // Place: Need to determine face
+                    if (hit.ground && !blocks[`${hit.x},${hit.y},${hit.z}`]) {
+                        // Placing on ground plane
+                        hoverBlock = { x: hit.x, y: hit.y, z: 0 }; // z 0 ?? Wait
+                        // If z=0 is empty, we place at z=0.
+                        // But if z=0 is occupied, we stack?
+                    } else {
+                        // Hit an existing block. Stack on top (simple mode)
+                        // Ideally check faces. Default to Top face for simple Voxel builder
+                        hoverBlock = { x: hit.x, y: hit.y, z: hit.z + 1 };
+                    }
+                }
+            } else {
+                hoverBlock = null;
+            }
+
+            draw();
+        });
+
+        window.addEventListener('mouseup', () => isDragging = false);
+        window.addEventListener('contextmenu', e => e.preventDefault()); // prevent menu
+
+        // UI
+        document.querySelectorAll('.color-picker').forEach(El => {
+            El.addEventListener('click', () => {
+                selectedColor = El.dataset.color;
+                document.querySelectorAll('.color-picker').forEach(p => p.style.border = '2px solid transparent');
+                El.style.border = '2px solid #fff';
+            });
+        });
+
+        document.getElementById('toolPlace').addEventListener('click', () => {
+            tool = 'place';
+            document.getElementById('toolPlace').classList.add('active');
+            document.getElementById('toolErase').classList.remove('active');
+        });
+        document.getElementById('toolErase').addEventListener('click', () => {
+            tool = 'erase';
+            document.getElementById('toolErase').classList.add('active');
+            document.getElementById('toolPlace').classList.remove('active');
+        });
+
+        // Helper
+        function shadeColor(color, percent) {
+            var R = parseInt(color.substring(1, 3), 16);
+            var G = parseInt(color.substring(3, 5), 16);
+            var B = parseInt(color.substring(5, 7), 16);
+
+            R = parseInt(R * (100 + percent) / 100);
+            G = parseInt(G * (100 + percent) / 100);
+            B = parseInt(B * (100 + percent) / 100);
+
+            R = (R < 255) ? R : 255;
+            G = (G < 255) ? G : 255;
+            B = (B < 255) ? B : 255;
+
+            var RR = ((R.toString(16).length == 1) ? "0" + R.toString(16) : R.toString(16));
+            var GG = ((G.toString(16).length == 1) ? "0" + G.toString(16) : G.toString(16));
+            var BB = ((B.toString(16).length == 1) ? "0" + B.toString(16) : B.toString(16));
+
+            return "#" + RR + GG + BB;
+        }
+
+        resize();
+    </script>
+    <div class="ad-overlay-bottom">
+        <div style="width:100%; display:flex; flex-direction:column; align-items:center;">
+            <span class="ad-label" style="color:#aaa;">Advertisement</span>
+            <ins class="adsbygoogle" style="display:block; width:100%; height:90px;"
+                data-ad-client="ca-pub-5166575587547718" data-ad-slot="overlay-unit" data-ad-format="auto"
+                data-full-width-responsive="true"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+    </div>
+</body>
+
+</html>

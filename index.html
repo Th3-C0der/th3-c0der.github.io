@@ -1,388 +1,635 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<link rel="icon" href="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png/:/rs=w:16,h:16,m" sizes="16x16">
-		<link rel="icon" href="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png/:/rs=w:24,h:24,m" sizes="24x24">
-		<link rel="icon" href="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png/:/rs=w:32,h:32,m" sizes="32x32">
-		<link rel="icon" href="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png/:/rs=w:48,h:48,m" sizes="48x48">
-		<link rel="icon" href="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png/:/rs=w:64,h:64,m" sizes="64x64">
-		<meta charset="utf-8">
-		<meta http-equiv="X-UA-Compatible" content="IE=edge">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<meta name="author" content="Th3-C0der">
-		<meta name="generator" content="Th3-C0der; Th3_1.8.3.8.9">
-		<link rel="manifest" href="manifest.webmanifest">
-		<link rel="apple-touch-icon" sizes="72x72" href="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png/:/rs=w:72,h:72,m">
-		<link rel="apple-touch-icon" sizes="114x114" href="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png/:/rs=w:114,h:114,m">
-		<link rel="apple-touch-icon" sizes="120x120" href="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png/:/rs=w:120,h:120,m">
-		<link rel="apple-touch-icon" sizes="144x144" href="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png/:/rs=w:144,h:144,m">
-		<link rel="apple-touch-icon" sizes="152x152" href="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png/:/rs=w:152,h:152,m">
-		<link rel="apple-touch-icon" sizes="180x180" href="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png/:/rs=w:180,h:180,m">
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-		<meta property="og:url" content="https://th3-c0der.github.io/">
-		<meta property="og:site_name" content="Th3-C0der">
-		<meta property="og:title" content="Th3-C0der">
-		<meta property="og:description" content="Th3-C0der's Th3-AI Hub">
-		<meta property="og:type" content="website">
-		<meta property="og:image" content="https://img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png">
-		<meta property="og:locale" content="en_IN">
-		<meta name="twitter:card" content="summary">
-		<meta name="twitter:site" content="@Th3Drag8N">
-		<meta name="twitter:title" content="Th3-C0der">
-		<meta name="twitter:description" content="Th3-C0der">
-		<meta name="twitter:image" content="https://img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png">
-		<meta name="twitter:image:alt" content="Th3-C0der">
-		<meta name="theme-color" content="#00ff00">
-		<title>Th3-C0der</title>
-		<style>
-			html {
-				scroll-behavior: smooth;
-			}
 
-			.back-to-top {
-				position: fixed;
-				bottom: 20px;
-				right: 20px;
-				background: var(--accent-color);
-				color: var(--bg-color);
-				width: 40px;
-				height: 40px;
-				border-radius: 50%;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				cursor: pointer;
-				opacity: 0;
-				visibility: hidden;
-				transition: all 0.3s ease;
-				z-index: 1000;
-				border: none;
-				box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-			}
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="author" content="Th3-C0der">
+	<meta name="description" content="Th3-C0der's Portfolio - Exploring the intersection of code and creativity">
 
-			.back-to-top.visible {
-				opacity: 1;
-				visibility: visible;
-			}
+	<!-- Favicons -->
+	<link rel="icon"
+		href="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png/:/rs=w:32,h:32,m"
+		sizes="32x32">
+	<link rel="apple-touch-icon"
+		href="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png/:/rs=w:180,h:180,m">
+	<link rel="manifest" href="manifest.webmanifest">
 
-			.back-to-top:hover {
-				transform: translateY(-3px);
-				box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-			}
+	<!-- Open Graph -->
+	<meta property="og:url" content="https://th3-c0der.github.io/">
+	<meta property="og:site_name" content="Th3-C0der">
+	<meta property="og:title" content="Th3-C0der - Portfolio">
+	<meta property="og:description" content="Exploring the intersection of code and creativity">
+	<meta property="og:type" content="website">
+	<meta property="og:image"
+		content="https://img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png">
 
-			@media (max-width: 768px) {
-				.hero-content h1 {
-					font-size: 2rem;
-					line-height: 1.2;
-				}
+	<!-- Twitter -->
+	<meta name="twitter:card" content="summary">
+	<meta name="twitter:site" content="@Th3Drag8N">
+	<meta name="twitter:title" content="Th3-C0der">
+	<meta name="theme-color" content="#00ff9d">
 
-				.hero-content p {
-					font-size: 1rem;
-					margin-top: 0.5rem;
-				}
+	<title>Th3-C0der | Portfolio</title>
 
-				.projects {
-					padding: 0.5rem;
-					gap: 1rem;
-					display: grid;
-					grid-template-columns: 1fr;
-				}
+	<!-- Fonts -->
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link
+		href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
+		rel="stylesheet">
 
-				.project-card {
-					margin: 0;
-					width: 100%;
-				}
+	<!-- Icons -->
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
-				.project-image {
-					height: 160px;
-					object-fit: cover;
-				}
+	<!-- Anime.js -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
 
-				.project-info {
-					padding: 1rem;
-				}
+	<!-- AdSense -->
+	<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718"
+		crossorigin="anonymous"></script>
 
-				.project-info h3 {
-					font-size: 1.2rem;
-					margin-bottom: 0.5rem;
-				}
 
-				.project-info p {
-					font-size: 0.9rem;
-					margin-bottom: 1rem;
-				}
 
-				.project-link {
-					padding: 0.5rem 1rem;
-					font-size: 0.9rem;
-					width: 100%;
-					text-align: center;
-				}
+	<link rel="stylesheet" href="static/new-style.css">
+</head>
 
-				.playground-card {
-					margin: 0;
-				}
+<body>
+	<!-- Custom Cursor -->
+	<div class="cursor-wrapper">
+		<div class="cursor-dot" id="cursor-dot"></div>
+		<div class="cursor-outline" id="cursor-outline"></div>
+		<div class="cursor-trail" id="cursor-trail"></div>
+	</div>
 
-				.playground-badge {
-					font-size: 0.8rem;
-					padding: 0.3rem 0.8rem;
-				}
+	<!-- Animated Background -->
+	<div class="animated-bg">
+		<div class="gradient-orb gradient-orb-1"></div>
+		<div class="gradient-orb gradient-orb-2"></div>
+		<div class="gradient-orb gradient-orb-3"></div>
+		<canvas id="particle-canvas"></canvas>
+	</div>
 
-				.playground-tags {
-					flex-wrap: wrap;
-					gap: 0.3rem;
-				}
-
-				.playground-tags span {
-					font-size: 0.8rem;
-					padding: 0.2rem 0.6rem;
-				}
-
-				.playground-link {
-					padding: 0.5rem 1rem;
-					font-size: 0.9rem;
-					width: 100%;
-					text-align: center;
-				}
-
-				.back-to-top {
-					bottom: 15px;
-					right: 15px;
-					width: 35px;
-					height: 35px;
-				}
-			}
-
-			@media (max-width: 480px) {
-				.hero-content h1 {
-					font-size: 1.8rem;
-				}
-
-				.hero-content p {
-					font-size: 0.9rem;
-				}
-
-				.project-image {
-					height: 140px;
-				}
-
-				.project-info h3 {
-					font-size: 1.1rem;
-				}
-
-				.project-info p {
-					font-size: 0.85rem;
-				}
-
-				.project-link, .playground-link {
-					padding: 0.4rem 0.8rem;
-					font-size: 0.85rem;
-				}
-			}
-		</style>
-		<script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718" crossorigin="anonymous"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/ScrollTrigger.min.js"></script>
-		<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-		<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-		<link href="/static/style.css" rel="stylesheet">
-		<script type="importmap">
-		{
-			"imports": {
-				"three": "https://cdn.skypack.dev/three@0.132.2"
-			}
-		}
-		</script>
-		<script type="module" src="/static/script.js"></script>
-		<script src="/static/js/protection.js"></script>
-	</head>
-	<body>
-		<header>
-			<nav>
-				<div class="logo">
-					<img src="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png" alt="Th3-C0der Logo">
-					Th3-C0der
+	<!-- Navigation -->
+	<header class="main-header" id="main-header">
+		<nav class="nav-container">
+			<a href="#" class="logo">
+				<div class="logo-icon">
+					<img src="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png"
+						alt="Logo">
 				</div>
-				<div class="menu-toggle">
-					<i class="fas fa-bars"></i>
+				<span class="logo-text">Th3-C0der</span>
+			</a>
+
+			<div class="nav-links" id="nav-links">
+				<a href="#home" class="nav-link active" data-section="home">Home</a>
+				<a href="#projects" class="nav-link" data-section="projects">Projects</a>
+				<a href="/blog" class="nav-link">Blog</a>
+				<a href="#about" class="nav-link" data-section="about">About</a>
+				<a href="#contact" class="nav-link" data-section="contact">Contact</a>
+			</div>
+
+			<div class="nav-actions">
+				<button class="theme-switch" id="theme-switch" aria-label="Toggle theme">
+					<i class="fas fa-moon"></i>
+					<i class="fas fa-sun"></i>
+				</button>
+				<button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">
+					<span></span>
+					<span></span>
+					<span></span>
+				</button>
+			</div>
+		</nav>
+	</header>
+
+	<!-- Mobile Menu Overlay -->
+	<div class="mobile-menu-overlay" id="mobile-overlay"></div>
+
+	<!-- Main Content -->
+	<main>
+		<!-- Hero Section -->
+		<section id="home" class="hero-section">
+			<!-- Parallax Layers -->
+			<div class="parallax-container">
+				<div class="parallax-layer" data-depth="0.1">
+					<div class="floating-shape shape-1"></div>
+					<div class="floating-shape shape-2"></div>
 				</div>
-				<div class="nav-links">
-					<a href="#" class="active">Home</a>
-					<a href="#projects">Projects</a>
-					<a href="/blog">Blog</a>
-					<a href="#about">About</a>
-					<a href="#" id="contact-link">Contact</a>
-					<button class="theme-toggle" aria-label="Toggle dark mode">
-						<i class="fas fa-moon"></i>
-						<span>Theme</span>
-					</button>
+				<div class="parallax-layer" data-depth="0.3">
+					<div class="floating-shape shape-3"></div>
+					<div class="floating-shape shape-4"></div>
 				</div>
-			</nav>
-		</header>
-		<div class="nav-overlay"></div>
-		<main>
-			<section id="home" class="hero">
-				<div class="hero-content">
-					<h1>Welcome to
-						<br>
-						<span class="highlight">Th3-C0der's</span>
-						Portfolio</h1>
-					<p>Exploring the intersection of code and creativity</p>
+				<div class="parallax-layer" data-depth="0.5">
+					<div class="floating-shape shape-5"></div>
 				</div>
-				<div class="hero-background">
-					<div class="circle circle-1"></div>
-					<div class="circle circle-2"></div>
-					<div class="circle circle-3"></div>
+			</div>
+
+			<!-- Dynamic Centerpiece -->
+			<div class="centerpiece-container" id="centerpiece">
+				<div class="orb-wrapper">
+					<div class="orb-core"></div>
+					<div class="orb-ring ring-1"></div>
+					<div class="orb-ring ring-2"></div>
+					<div class="orb-ring ring-3"></div>
+					<div class="orb-glow"></div>
+					<div class="orb-particles" id="orb-particles"></div>
 				</div>
-			</section>
-			<section id="projects" class="projects">
-				<div class="project-card playground-card">
-					<div class="playground-badge">Featured</div>
-					<img src="https://raw.githubusercontent.com/Th3-AI/Th3-AI.github.io/main/assets/playground-preview.png" alt="Creative Playground" class="project-image">
-					<div class="project-info">
-						
-						<p>Explore interactive experiments, creative coding projects & games!</p>
-						<div class="playground-tags">
-							<span>Interactive</span>
-							<span>Creative</span>
-							<span>Fun</span>
+			</div>
+
+			<!-- Hero Content -->
+			<div class="hero-content">
+				<div class="hero-badge">
+					<span class="badge-dot"></span>
+					<span class="badge-text">Available for projects</span>
+				</div>
+
+				<h1 class="hero-title">
+					<span class="title-line">
+						<span class="char-wrapper" data-text="Welcome to">Welcome to</span>
+					</span>
+					<span class="title-line title-highlight">
+						<span class="char-wrapper highlight-text" data-text="Th3-C0der's">Th3-C0der's</span>
+					</span>
+					<span class="title-line">
+						<span class="char-wrapper" data-text="Portfolio">Portfolio</span>
+					</span>
+				</h1>
+
+				<p class="hero-description">
+					<span class="word-animate">Exploring</span>
+					<span class="word-animate">the</span>
+					<span class="word-animate">intersection</span>
+					<span class="word-animate">of</span>
+					<span class="word-animate accent">code</span>
+					<span class="word-animate">and</span>
+					<span class="word-animate accent">creativity</span>
+				</p>
+
+				<div class="hero-cta">
+					<a href="#projects" class="btn btn-primary magnetic-btn">
+						<span class="btn-text">View Projects</span>
+						<span class="btn-icon"><i class="fas fa-arrow-right"></i></span>
+						<span class="btn-bg"></span>
+					</a>
+					<a href="/playground" class="btn btn-secondary magnetic-btn">
+						<span class="btn-text">Explore Playground</span>
+						<span class="btn-icon"><i class="fas fa-gamepad"></i></span>
+					</a>
+				</div>
+			</div>
+
+			<!-- Scroll Indicator -->
+			<div class="scroll-indicator" id="scroll-indicator">
+				<div class="scroll-mouse">
+					<div class="scroll-wheel"></div>
+				</div>
+				<span class="scroll-text">Scroll to explore</span>
+			</div>
+		</section>
+
+		<!-- Projects Section -->
+		<section id="projects" class="projects-section">
+			<div class="section-header">
+				<span class="section-label">Portfolio</span>
+				<h2 class="section-title">
+					<span class="title-word">Featured</span>
+					<span class="title-word accent">Projects</span>
+				</h2>
+				<p class="section-subtitle">Discover my latest work and creative experiments</p>
+			</div>
+
+			<div class="projects-grid">
+				<!-- Featured Playground Card -->
+				<article class="project-card featured-card" data-category="playground">
+					<div class="card-glow"></div>
+					<div class="card-content">
+						<div class="card-badge">
+							<i class="fas fa-star"></i>
+							<span>Featured</span>
 						</div>
-						<a href="/playground" class="project-link playground-link">
-							<i class="fas fa-gamepad"></i>
-							Explore Playground
+						<div class="card-image">
+							<img src="https://raw.githubusercontent.com/Th3-AI/Th3-AI.github.io/main/assets/playground-preview.png"
+								alt="Creative Playground" loading="lazy">
+							<div class="image-overlay">
+								<div class="overlay-icon">
+									<i class="fas fa-gamepad"></i>
+								</div>
+							</div>
+						</div>
+						<div class="card-info">
+							<h3 class="card-title">Creative Playground</h3>
+							<p class="card-description">Explore interactive experiments, creative coding projects &
+								games!</p>
+							<div class="card-tags">
+								<span class="tag">Interactive</span>
+								<span class="tag">Creative</span>
+								<span class="tag">Fun</span>
+							</div>
+							<a href="/playground" class="card-link magnetic-btn">
+								<span>Explore Playground</span>
+								<i class="fas fa-arrow-right"></i>
+							</a>
+						</div>
+					</div>
+				</article>
+
+				<!-- DynaSpark AI -->
+				<article class="project-card" data-category="ai">
+					<div class="card-glow"></div>
+					<div class="card-content">
+						<div class="card-image">
+							<img src="https://raw.githubusercontent.com/Th3-AI/Th3-AI.github.io/main/assets/DynaSpark-API-S.png"
+								alt="DynaSpark AI" loading="lazy">
+							<div class="image-overlay">
+								<div class="overlay-icon">
+									<i class="fas fa-robot"></i>
+								</div>
+							</div>
+						</div>
+						<div class="card-info">
+							<h3 class="card-title">DynaSpark AI</h3>
+							<p class="card-description">A versatile and dynamic AI assistant, specializing in creative
+								problem-solving and advanced image generation.</p>
+							<a href="https://dynaspark.onrender.com" class="card-link magnetic-btn" target="_blank">
+								<span>View Project</span>
+								<i class="fas fa-external-link-alt"></i>
+							</a>
+						</div>
+					</div>
+				</article>
+
+				<!-- Th3-Movies -->
+				<article class="project-card" data-category="entertainment">
+					<div class="card-glow"></div>
+					<div class="card-content">
+						<div class="card-image">
+							<img src="https://raw.githubusercontent.com/Th3-AI/Th3-AI.github.io/main/assets/Th3-Movies.png"
+								alt="Th3-Movies" loading="lazy">
+							<div class="image-overlay">
+								<div class="overlay-icon">
+									<i class="fas fa-film"></i>
+								</div>
+							</div>
+						</div>
+						<div class="card-info">
+							<h3 class="card-title">Th3-Movies</h3>
+							<p class="card-description">A comprehensive streaming platform for Movies, TV Series, and
+								Anime with real-time trending content.</p>
+							<a href="https://th3-movies.onrender.com" class="card-link magnetic-btn" target="_blank">
+								<span>View Project</span>
+								<i class="fas fa-external-link-alt"></i>
+							</a>
+						</div>
+					</div>
+				</article>
+
+				<!-- Th3-Tools -->
+				<article class="project-card" data-category="tools">
+					<div class="card-glow"></div>
+					<div class="card-content">
+						<div class="card-image">
+							<img src="https://raw.githubusercontent.com/Th3-AI/Th3-AI.github.io/main/assets/Th3-Tools.png"
+								alt="Th3-Tools" loading="lazy">
+							<div class="image-overlay">
+								<div class="overlay-icon">
+									<i class="fas fa-toolbox"></i>
+								</div>
+							</div>
+						</div>
+						<div class="card-info">
+							<h3 class="card-title">Th3-Tools</h3>
+							<p class="card-description">Your ultimate productivity toolkit: 100+ tools for developers,
+								creators, and everyday tasks in one place.</p>
+							<a href="https://th3-tools.onrender.com" class="card-link magnetic-btn" target="_blank">
+								<span>View Project</span>
+								<i class="fas fa-external-link-alt"></i>
+							</a>
+						</div>
+					</div>
+				</article>
+
+				<!-- Th3-AI -->
+				<article class="project-card" data-category="ai">
+					<div class="card-glow"></div>
+					<div class="card-content">
+						<div class="card-image">
+							<img src="https://raw.githubusercontent.com/Th3-AI/Th3-AI.github.io/main/assets/Th3-AI.png"
+								alt="Th3-AI" loading="lazy">
+							<div class="image-overlay">
+								<div class="overlay-icon">
+									<i class="fas fa-brain"></i>
+								</div>
+							</div>
+						</div>
+						<div class="card-info">
+							<h3 class="card-title">Th3-AI</h3>
+							<p class="card-description">Your gateway to multiple AI assistants created by Th3-C0der.</p>
+							<a href="https://th3-ai.github.io" class="card-link magnetic-btn" target="_blank">
+								<span>View Project</span>
+								<i class="fas fa-external-link-alt"></i>
+							</a>
+						</div>
+					</div>
+				</article>
+
+				<!-- Th3-Space -->
+				<article class="project-card" data-category="data">
+					<div class="card-glow"></div>
+					<div class="card-content">
+						<div class="card-image">
+							<img src="https://raw.githubusercontent.com/Th3-AI/Th3-AI.github.io/main/assets/Th3-Space.png"
+								alt="Th3-Space" loading="lazy">
+							<div class="image-overlay">
+								<div class="overlay-icon">
+									<i class="fas fa-satellite"></i>
+								</div>
+							</div>
+						</div>
+						<div class="card-info">
+							<h3 class="card-title">Th3-Space</h3>
+							<p class="card-description">An interactive web app offering real-time access to diverse
+								space and Earth science data.</p>
+							<a href="https://th3-space.onrender.com" class="card-link magnetic-btn" target="_blank">
+								<span>View Project</span>
+								<i class="fas fa-external-link-alt"></i>
+							</a>
+						</div>
+					</div>
+				</article>
+
+				<!-- Th3-Search -->
+				<article class="project-card" data-category="tools">
+					<div class="card-glow"></div>
+					<div class="card-content">
+						<div class="card-image">
+							<img src="https://raw.githubusercontent.com/Th3-AI/Th3-AI.github.io/main/assets/Th3-Search-1.png"
+								alt="Th3-Search" loading="lazy">
+							<div class="image-overlay">
+								<div class="overlay-icon">
+									<i class="fas fa-search"></i>
+								</div>
+							</div>
+						</div>
+						<div class="card-info">
+							<h3 class="card-title">Th3-Search</h3>
+							<p class="card-description">An AI-powered ad free search engine offering quick AI summary of
+								search results.</p>
+							<a href="https://th3-search.onrender.com" class="card-link magnetic-btn" target="_blank">
+								<span>View Project</span>
+								<i class="fas fa-external-link-alt"></i>
+							</a>
+						</div>
+					</div>
+				</article>
+
+				<!-- Th3-Share -->
+				<article class="project-card" data-category="tools">
+					<div class="card-glow"></div>
+					<div class="card-content">
+						<div class="card-image">
+							<img src="https://raw.githubusercontent.com/Th3-AI/Th3-AI.github.io/main/assets/Th3-Share-DS.png"
+								alt="Th3-Share" loading="lazy">
+							<div class="image-overlay">
+								<div class="overlay-icon">
+									<i class="fas fa-share-alt"></i>
+								</div>
+							</div>
+						</div>
+						<div class="card-info">
+							<h3 class="card-title">Th3-Share</h3>
+							<p class="card-description">A seamless and secure file-sharing platform, designed for fast
+								transfers and data protection.</p>
+							<a href="https://th3-share.onrender.com" class="card-link magnetic-btn" target="_blank">
+								<span>View Project</span>
+								<i class="fas fa-external-link-alt"></i>
+							</a>
+						</div>
+					</div>
+				</article>
+			</div>
+		</section>
+
+		<!-- About Section -->
+		<section id="about" class="about-section">
+			<div class="about-container">
+				<div class="about-visual">
+					<div class="visual-frame">
+						<div class="frame-decoration"></div>
+						<div class="visual-content">
+							<div class="code-block">
+								<div class="code-header">
+									<span class="dot red"></span>
+									<span class="dot yellow"></span>
+									<span class="dot green"></span>
+								</div>
+								<pre class="code-content"><code><span class="code-keyword">const</span> <span class="code-variable">developer</span> = {
+    <span class="code-property">name</span>: <span class="code-string">"Th3-C0der"</span>,
+    <span class="code-property">passion</span>: <span class="code-string">"Creative Coding"</span>,
+    <span class="code-property">skills</span>: [
+        <span class="code-string">"AI/ML"</span>,
+        <span class="code-string">"Web Dev"</span>,
+        <span class="code-string">"Creative Tech"</span>
+    ],
+    <span class="code-property">status</span>: <span class="code-string">"Always Learning"</span>
+};</code></pre>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="about-content">
+					<span class="section-label">About Me</span>
+					<h2 class="about-title">
+						<span class="title-word">Crafting</span>
+						<span class="title-word">Digital</span>
+						<span class="title-word accent">Experiences</span>
+					</h2>
+					<p class="about-text">
+						I'm a passionate developer exploring the intersection of code and creativity.
+						From AI-powered applications to interactive experiments, I love building things
+						that push boundaries and create meaningful experiences.
+					</p>
+
+					<div class="social-links">
+						<a href="https://github.com/Th3-C0der" target="_blank" class="social-link magnetic-btn"
+							aria-label="GitHub">
+							<i class="fab fa-github"></i>
+							<span class="link-glow"></span>
+						</a>
+						<a href="https://youtube.com/@Th3Coder" target="_blank" class="social-link magnetic-btn"
+							aria-label="YouTube">
+							<i class="fab fa-youtube"></i>
+							<span class="link-glow"></span>
+						</a>
+						<a href="https://instagram.com/th3_c0der" target="_blank" class="social-link magnetic-btn"
+							aria-label="Instagram">
+							<i class="fab fa-instagram"></i>
+							<span class="link-glow"></span>
+						</a>
+						<a href="https://www.linkedin.com/in/Th3-C0der" target="_blank" class="social-link magnetic-btn"
+							aria-label="LinkedIn">
+							<i class="fab fa-linkedin"></i>
+							<span class="link-glow"></span>
+						</a>
+						<a href="https://coff.ee/th3coder" target="_blank" class="social-link magnetic-btn coffee-link"
+							aria-label="Buy me a coffee">
+							<i class="fas fa-coffee"></i>
+							<span class="link-glow"></span>
 						</a>
 					</div>
 				</div>
-				<div class="project-card">
-					<img src="https://raw.githubusercontent.com/Th3-AI/Th3-AI.github.io/main/assets/DynaSpark.png" alt="Project 3" class="project-image">
-					<div class="project-info">
-						<h3>DynaSpark AI</h3>
-						<p>A versatile and dynamic AI assistant, specializing in creative problem-solving and advanced image generation.</p>
-						<a href="https://dynaspark.onrender.com" class="project-link">View Project</a>
-					</div>
-				</div>
-				<div class="project-card">
-					<img src="https://raw.githubusercontent.com/Th3-AI/Th3-AI.github.io/main/assets/Th3-AI-S-D.png" alt="Project 1" class="project-image">
-					<div class="project-info">
-						<h3>Th3-AI</h3>
-						<p>Th3-AI, your gateway to multiple AI assistants created by Th3-C0der.</p>
-						<a href="https://th3-ai.github.io" class="project-link">View Project</a>
-					</div>
-				</div>
-				<div class="project-card">
-					<img src="https://raw.githubusercontent.com/Th3-AI/Th3-AI.github.io/main/assets/Th3-Space.png" alt="Project 2" class="project-image">
-					<div class="project-info">
-						<h3>Th3-Space</h3>
-						<p>An interactive web app offering real-time access to diverse space and Earth science data.</p>
-						<a href="https://th3-space.onrender.com" class="project-link">View Project</a>
-					</div>
-				</div>
-				<div class="project-card">
-					<img src="https://raw.githubusercontent.com/Th3-AI/Th3-AI.github.io/main/assets/Th3-Search-1.png" alt="Project 4" class="project-image">
-					<div class="project-info">
-						<h3>Th3-Search</h3>
-						<p>An AI-powered ad free search engine offering quick AI summary of search results.</p>
-						<a href="https://th3-search.onrender.com" class="project-link">View Project</a>
-					</div>
-				</div>
-				<div class="project-card">
-					<img src="https://raw.githubusercontent.com/Th3-AI/Th3-AI.github.io/main/assets/Th3-Share.png" alt="Project 5" class="project-image">
-					<div class="project-info">
-						<h3>Th3-Share</h3>
-						<p>A seamless and secure file-sharing platform, designed for fast transfers and data protection.</p>
-						<a href="https://th3-share.onrender.com" class="project-link">View Project</a>
-					</div>
-				</div>
-			</section>
-		</main>
-		<footer id="about" class="about">
-			<p>© 2025 Th3-C0der. All rights reserved.</p>
-			<div class="social-links">
-				<a href="https://github.com/Th3-C0der" target="_blank" class="social-link">
-					<i class="fab fa-github"></i>
-				</a>
-				<a href="https://youtube.com/@Th3Coder" target="_blank" class="social-link">
-					<i class="fab fa-youtube"></i>
-				</a>
-				<a href="https://instagram.com/th3_c0der" target="_blank" class="social-link">
-					<i class="fab fa-instagram"></i>
-				</a>
-				<a href="https://www.linkedin.com/in/Th3-C0der" target="_blank" class="social-link">
-					<i class="fab fa-linkedin"></i>
-				</a>
-				<a href="https://coff.ee/th3coder" target="_blank" class="social-link ko-fi">
-					<i class="fas fa-coffee"></i>
-				</a>
 			</div>
-		</footer>
-		<div class="modal" id="contact-modal">
-			<div class="modal-content">
-				<i class="fas fa-times modal-close"></i>
-				<h2>Contact Me</h2>
+		</section>
+	</main>
+
+	<!-- Ad: Before Footer -->
+	<div class="ad-container ad-banner">
+		<span class="ad-label">Advertisement</span>
+		<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-5166575587547718"
+			data-ad-slot="responsive-footer" data-ad-format="auto" data-full-width-responsive="true"></ins>
+		<script>
+			(adsbygoogle = window.adsbygoogle || []).push({});
+		</script>
+	</div>
+
+	<!-- Footer -->
+	<footer class="main-footer">
+		<div class="footer-content">
+			<div class="footer-wave">
+				<svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+					<path
+						d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z">
+					</path>
+				</svg>
+			</div>
+			<div class="footer-inner">
+				<p class="copyright">© 2026 Th3-C0der. All rights reserved.</p>
+				<a href="/terms" class="footer-link">Terms & Privacy</a>
+			</div>
+		</div>
+	</footer>
+
+	<!-- Contact Section (Inline, not modal) -->
+	<section class="contact-section" id="contact">
+		<div class="contact-container">
+			<div class="contact-info">
+				<span class="section-label">Get in Touch</span>
+				<h2 class="contact-title">
+					<span class="title-word">Let's</span>
+					<span class="title-word accent">Connect</span>
+				</h2>
+				<p class="contact-text">
+					Have a project in mind or just want to say hi?
+					I'd love to hear from you. Drop me a message and I'll get back to you as soon as possible.
+				</p>
+
+				<div class="contact-methods">
+					<div class="contact-method">
+						<div class="method-icon"><i class="fas fa-envelope"></i></div>
+						<div class="method-details">
+							<span class="method-label">Email</span>
+							<a href="mailto:dvp.ai.ml@gmail.com" class="method-value">dvp.ai.ml@gmail.com</a>
+						</div>
+					</div>
+					<div class="contact-method">
+						<div class="method-icon"><i class="fab fa-whatsapp"></i></div>
+						<div class="method-details">
+							<span class="method-label">WhatsApp</span>
+							<a href="https://wa.me/919665246244" class="method-value">Click Here!</a>
+						</div>
+					</div>
+					<!-- <div class="contact-method">
+						<div class="method-icon"><i class="fas fa-map-marker-alt"></i></div>
+						<div class="method-details">
+							<span class="method-label">Location</span>
+							<span class="method-value">Planet Earth 🌍</span>
+						</div>
+					</div> -->
+				</div>
+
+				<div class="social-links contact-social">
+					<a href="https://github.com/Th3-C0der" target="_blank" class="social-link magnetic-btn"
+						aria-label="GitHub">
+						<i class="fab fa-github"></i>
+					</a>
+					<a href="https://youtube.com/@Th3Coder" target="_blank" class="social-link magnetic-btn"
+						aria-label="YouTube">
+						<i class="fab fa-youtube"></i>
+					</a>
+					<a href="https://instagram.com/th3_c0der" target="_blank" class="social-link magnetic-btn"
+						aria-label="Instagram">
+						<i class="fab fa-instagram"></i>
+					</a>
+					<a href="https://www.linkedin.com/in/Th3-C0der" target="_blank" class="social-link magnetic-btn"
+						aria-label="LinkedIn">
+						<i class="fab fa-linkedin"></i>
+					</a>
+				</div>
+			</div>
+
+			<div class="contact-form-wrapper">
 				<form class="contact-form" id="contact-form">
 					<div class="form-group">
-						<label for="name">Name</label>
-						<input type="text" id="name" name="name" required>
+						<input type="text" id="name" name="name" required placeholder=" ">
+						<label for="name">Your Name</label>
+						<span class="input-line"></span>
 					</div>
+
 					<div class="form-group">
-						<label for="email">Email</label>
-						<input type="email" id="email" name="email" required>
+						<input type="email" id="email" name="email" required placeholder=" ">
+						<label for="email">Email Address</label>
+						<span class="input-line"></span>
 					</div>
+
 					<div class="form-group">
+						<input type="text" id="subject" name="subject" required placeholder=" ">
 						<label for="subject">Subject</label>
-						<input type="text" id="subject" name="subject" required>
+						<span class="input-line"></span>
 					</div>
+
 					<div class="form-group">
-						<label for="message">Message</label>
-						<textarea id="message" name="message" rows="5" required></textarea>
+						<textarea id="message" name="message" rows="4" required placeholder=" "></textarea>
+						<label for="message">Your Message</label>
+						<span class="input-line"></span>
 					</div>
-					<button type="submit" class="submit-btn">
-						<i class="fas fa-paper-plane"></i>
-						Send Message
+
+					<button type="submit" class="submit-btn magnetic-btn">
+						<span class="btn-text">Send Message</span>
+						<span class="btn-icon"><i class="fas fa-paper-plane"></i></span>
 					</button>
 				</form>
 			</div>
 		</div>
-		<button class="back-to-top" aria-label="Back to top">
-			<i class="fas fa-arrow-up"></i>
-		</button>
-		<script>
-			document.addEventListener('DOMContentLoaded', function() {
-				// Smooth scroll for anchor links
-				document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-					anchor.addEventListener('click', function (e) {
-						e.preventDefault();
-						const targetId = this.getAttribute('href');
-						if (targetId === '#') return;
-						
-						const targetElement = document.querySelector(targetId);
-						if (targetElement) {
-							targetElement.scrollIntoView({
-								behavior: 'smooth',
-								block: 'start'
-							});
-						}
-					});
-				});
+	</section>
 
-				// Back to top button
-				const backToTop = document.querySelector('.back-to-top');
-				
-				window.addEventListener('scroll', () => {
-					if (window.pageYOffset > 300) {
-						backToTop.classList.add('visible');
-					} else {
-						backToTop.classList.remove('visible');
-					}
-				});
+	<!-- Back to Top -->
+	<button class="back-to-top" id="back-to-top" aria-label="Back to top">
+		<i class="fas fa-chevron-up"></i>
+		<svg class="progress-ring" viewBox="0 0 36 36">
+			<circle cx="18" cy="18" r="16"></circle>
+		</svg>
+	</button>
 
-				backToTop.addEventListener('click', () => {
-					window.scrollTo({
-						top: 0,
-						behavior: 'smooth'
-					});
-				});
-			});
-		</script>
-	</body>
+	<!-- Page Transition Overlay -->
+	<div class="page-transition" id="page-transition">
+		<div class="transition-layer"></div>
+		<div class="transition-layer"></div>
+		<div class="transition-layer"></div>
+	</div>
+
+	<!-- EmailJS -->
+	<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+	<!-- Main Script -->
+	<script src="static/new-script.js"></script>
+
+	<!-- Pokemon Click Effect -->
+	<script type="module">
+		import { initPokemonEffect } from '/static/pokemon-effect.js';
+		initPokemonEffect();
+	</script>
+</body>
+
 </html>

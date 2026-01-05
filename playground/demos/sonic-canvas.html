@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Sonic Canvas - Th3-C0der Playground</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718"
+        crossorigin="anonymous"></script>
+    <style>
+        body {
+            background-color: #000;
+            color: #fff;
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            height: 100vh;
+        }
+
+        .controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            pointer-events: auto;
+            backdrop-filter: blur(5px);
+            border: 1px solid #333;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+        }
+
+        h2 {
+            margin: 0 0 10px 0;
+            color: #ff0055;
+            font-size: 1.2rem;
+        }
+
+        .hint {
+            font-size: 0.9rem;
+            color: #aaa;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background: #ff0055;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #ff2277;
+        }
+
+        button.text-btn {
+            background: transparent;
+            border: 1px solid #555;
+            margin-left: 10px;
+        }
+
+        button.text-btn:hover {
+            border-color: #fff;
+            background: #222;
+        }
+
+        .overlay {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            text-align: center;
+            pointer-events: none;
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 2rem;
+            font-weight: bold;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+        }
+
+        .ad-overlay-bottom {
+            position: fixed;
+            bottom: 0px;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            padding: 10px 0;
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <canvas id="canvas"></canvas>
+
+    <div class="overlay" id="overlayText">Click to Activate Audio</div>
+
+    <div class="controls">
+        <a href="/playground" style="color:#aaa; text-decoration:none; display:block; margin-bottom:10px;">&larr;
+            Exit</a>
+        <h2>Sonic Canvas</h2>
+        <div class="hint">Draw to create sound. <br> Y = Pitch, X = Pan/Filter</div>
+        <button id="clearBtn">Clear Canvas</button>
+        <button id="modeBtn" class="text-btn">Mode: Sine</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const overlay = document.getElementById('overlayText');
+
+        let width, height;
+        let audioCtx;
+        let isDrawing = false;
+        let points = [];
+        let oscillators = []; // {osc, gain, panner, x, y}
+
+        let mode = 'sine';
+        const modes = ['sine', 'square', 'sawtooth', 'triangle'];
+
+        function resize() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+            draw();
+        }
+        window.addEventListener('resize', resize);
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                overlay.style.display = 'none';
+            }
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        function getFreq(y) {
+            // Y from 0 (top) to height (bottom)
+            // Top = High Pitch, Bottom = Low
+            const norm = 1 - (y / height); // 0 to 1
+            // Map 0-1 to 100Hz - 2000Hz (Logarithmic preference usually, but linear ok for fun)
+            return 100 + Math.pow(norm, 2) * 2000;
+        }
+
+        function getPan(x) {
+            return (x / width) * 2 - 1; // -1 to 1
+        }
+
+        function startSound(x, y) {
+            if (!audioCtx) return;
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            const panner = audioCtx.createStereoPanner();
+
+            osc.type = mode;
+            osc.frequency.value = getFreq(y);
+            panner.pan.value = getPan(x);
+
+            osc.connect(panner);
+            panner.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            osc.start();
+            gain.gain.value = 0.1;
+
+            const soundObj = { osc, gain, panner, x, y, life: 1.0 };
+            oscillators.push(soundObj);
+            return soundObj;
+        }
+
+        function draw() {
+            // Fade out (slower for better visibility)
+            ctx.fillStyle = 'rgba(0,0,0,0.03)';
+            ctx.fillRect(0, 0, width, height);
+
+            // Draw active oscillators
+            for (let i = 0; i < oscillators.length; i++) {
+                const o = oscillators[i];
+                o.life -= 0.005; // Longer life
+                o.gain.gain.value = o.life * 0.1; // fade volume
+
+                // Visual
+                ctx.beginPath();
+                ctx.arc(o.x, o.y, 10 + o.life * 20, 0, Math.PI * 2); // Base size + life size
+
+                const hue = (o.x / width) * 360;
+                ctx.fillStyle = `hsla(${hue}, 100%, 50%, ${o.life * 0.5})`;
+                ctx.fill();
+                ctx.strokeStyle = `hsla(${hue}, 100%, 80%, ${o.life})`;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                if (o.life <= 0) {
+                    try {
+                        o.osc.stop();
+                        o.osc.disconnect();
+                    } catch (e) { }
+                    oscillators.splice(i, 1);
+                    i--;
+                }
+            }
+
+            requestAnimationFrame(draw);
+        }
+
+        canvas.addEventListener('mousedown', e => {
+            initAudio();
+            isDrawing = true;
+            processInput(e.clientX, e.clientY);
+        });
+
+        window.addEventListener('mousemove', e => {
+            if (isDrawing) processInput(e.clientX, e.clientY);
+        });
+
+        window.addEventListener('mouseup', () => isDrawing = false);
+
+        // Touch
+        canvas.addEventListener('touchstart', e => {
+            initAudio();
+            isDrawing = true;
+            e.preventDefault();
+        }, { passive: false });
+
+        canvas.addEventListener('touchmove', e => {
+            if (isDrawing) {
+                const t = e.touches[0];
+                processInput(t.clientX, t.clientY);
+            }
+        });
+
+        canvas.addEventListener('touchend', () => isDrawing = false);
+
+        let lastSpawn = 0;
+        function processInput(x, y) {
+            const now = Date.now();
+            if (now - lastSpawn > 30) { // Faster spawn for smoother lines
+                startSound(x, y);
+                lastSpawn = now;
+            }
+        }
+
+        document.getElementById('clearBtn').addEventListener('click', () => {
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, width, height);
+
+            // Stop all sounds
+            oscillators.forEach(o => {
+                try {
+                    o.osc.stop();
+                    o.osc.disconnect();
+                } catch (e) { }
+            });
+            oscillators = [];
+        });
+
+        document.getElementById('modeBtn').addEventListener('click', (e) => {
+            const idx = modes.indexOf(mode);
+            mode = modes[(idx + 1) % modes.length];
+            e.target.innerText = `Mode: ${mode.charAt(0).toUpperCase() + mode.slice(1)}`;
+        });
+
+        resize();
+        draw();
+
+    </script>
+    <div class="ad-overlay-bottom">
+        <div style="width:100%; display:flex; flex-direction:column; align-items:center;">
+            <span class="ad-label" style="color:#aaa;">Advertisement</span>
+            <ins class="adsbygoogle" style="display:block; width:100%; height:90px;"
+                data-ad-client="ca-pub-5166575587547718" data-ad-slot="overlay-unit" data-ad-format="auto"
+                data-full-width-responsive="true"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+    </div>
+</body>
+
+</html>

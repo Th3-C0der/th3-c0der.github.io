@@ -1,926 +1,1566 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <link rel="icon" href="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png/:/rs=w:16,h:16,m" sizes="16x16">
-    <link rel="icon" href="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png/:/rs=w:24,h:24,m" sizes="24x24">
-    <link rel="icon" href="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png/:/rs=w:32,h:32,m" sizes="32x32">
-    <link rel="icon" href="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png/:/rs=w:48,h:48,m" sizes="48x48">
-    <link rel="icon" href="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png/:/rs=w:64,h:64,m" sizes="64x64">
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="author" content="Th3-C0der">
-    <meta name="generator" content="Th3-C0der; Th3_1.8.3.8.9">
+    <meta name="description" content="Creative Playground - Interactive experiments and coding projects">
+
+    <!-- Favicons -->
+    <link rel="icon"
+        href="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png/:/rs=w:32,h:32,m"
+        sizes="32x32">
+    <link rel="apple-touch-icon"
+        href="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png/:/rs=w:180,h:180,m">
     <link rel="manifest" href="manifest.webmanifest">
-    <link rel="apple-touch-icon" sizes="72x72" href="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png/:/rs=w:72,h:72,m">
-    <link rel="apple-touch-icon" sizes="114x114" href="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png/:/rs=w:114,h:114,m">
-    <link rel="apple-touch-icon" sizes="120x120" href="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png/:/rs=w:120,h:120,m">
-    <link rel="apple-touch-icon" sizes="144x144" href="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png/:/rs=w:144,h:144,m">
-    <link rel="apple-touch-icon" sizes="152x152" href="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png/:/rs=w:152,h:152,m">
-    <link rel="apple-touch-icon" sizes="180x180" href="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png/:/rs=w:180,h:180,m">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+    <!-- Open Graph -->
     <meta property="og:url" content="https://th3-c0der.github.io/playground">
-    <meta property="og:site_name" content="Th3-C0der">
-    <meta property="og:title" content="Th3-C0der Playground">
-    <meta property="og:description" content="Interactive coding experiments and creative projects">
+    <meta property="og:site_name" content="Th3-C0der Playground">
+    <meta property="og:title" content="Creative Playground - Interactive Experiments">
+    <meta property="og:description" content="Explore interactive coding experiments and creative projects">
     <meta property="og:type" content="website">
-    <meta property="og:image" content="https://img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png">
-    <meta property="og:locale" content="en_IN">
+    <meta property="og:image"
+        content="https://img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png">
+
+    <!-- Twitter -->
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="@Th3Drag8N">
     <meta name="twitter:title" content="Th3-C0der Playground">
-    <meta name="twitter:description" content="Interactive coding experiments and creative projects">
-    <meta name="twitter:image" content="https://img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png">
-    <meta name="twitter:image:alt" content="Th3-C0der Playground">
-    <meta name="theme-color" content="#00ff00">
-    <title>Th3-C0der Playground</title>
-    <style>
-        html {
-            scroll-behavior: smooth;
-        }
+    <meta name="theme-color" content="#00ff9d">
 
-        .back-to-top {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: var(--accent-color);
-            color: var(--bg-color);
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-            z-index: 1000;
-            border: none;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-        }
+    <title>Playground | Th3-C0der</title>
 
-        .back-to-top.visible {
-            opacity: 1;
-            visibility: visible;
-        }
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
 
-        .back-to-top:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-        }
-
-        @media (max-width: 768px) {
-            .back-to-top {
-                bottom: 15px;
-                right: 15px;
-                width: 35px;
-                height: 35px;
-            }
-        }
-    </style>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718" crossorigin="anonymous"></script>
-    <link href="/static/style.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/ScrollTrigger.min.js"></script>
+    <!-- Icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    <script type="importmap">
-    {
-        "imports": {
-            "three": "https://cdn.skypack.dev/three@0.132.2"
-        }
-    }
-    </script>
-    <script type="module" src="/static/script.js"></script>
+
+    <!-- Anime.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+
+    <!-- AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718"
+        crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="static/new-style.css">
+
     <style>
-        .playground-container {
-            padding: 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
+        /* Playground-Specific Styles */
+        .playground-section {
+            padding: var(--space-2xl) var(--space-lg);
+            padding-top: calc(var(--space-2xl) + 80px);
+            min-height: 100vh;
         }
 
         .playground-header {
             text-align: center;
-            margin-bottom: 3rem;
+            margin-bottom: var(--space-xl);
         }
 
-        .playground-header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            color: var(--text-color);
-        }
-
-        .playground-header p {
-            font-size: 1.2rem;
-            color: var(--text-secondary);
-            max-width: 600px;
-            margin: 0 auto 2rem;
-        }
-
-        .disclaimer {
-            background: rgba(255, 193, 7, 0.1);
-            border: 2px solid #ffc107;
-            border-radius: 12px;
-            padding: 1rem 1.5rem;
-            margin: 0 auto 2rem;
-            max-width: 800px;
+        /* Disclaimer Banner */
+        .disclaimer-banner {
+            background: linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 152, 0, 0.1) 100%);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            border-radius: var(--radius-lg);
+            padding: var(--space-md) var(--space-lg);
             display: flex;
             align-items: center;
-            gap: 1rem;
-            animation: pulse 2s infinite;
+            gap: var(--space-md);
+            max-width: 800px;
+            margin: 0 auto var(--space-xl);
+            opacity: 0;
+            transform: translateY(20px);
         }
 
-        .disclaimer i {
+        .disclaimer-banner i {
             font-size: 1.5rem;
             color: #ffc107;
         }
 
-        .disclaimer p {
-            margin: 0;
-            color: var(--text-color);
+        .disclaimer-banner p {
+            color: var(--text-secondary);
             font-size: 0.95rem;
-            line-height: 1.5;
+            line-height: 1.6;
+            margin: 0;
         }
 
-        @keyframes pulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.4);
-            }
-            70% {
-                box-shadow: 0 0 0 10px rgba(255, 193, 7, 0);
-            }
-            100% {
-                box-shadow: 0 0 0 0 rgba(255, 193, 7, 0);
-            }
-        }
-
-        .playground-categories {
+        /* Category Filter */
+        .category-filter {
             display: flex;
-            flex-wrap: nowrap;
-            gap: 0.5rem;
-            justify-content: flex-start;
-            margin-bottom: 2rem;
-            padding: 1rem;
-            background: var(--card-bg);
-            border-radius: 20px;
-            border: 1px solid rgba(0, 255, 157, 0.1);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: thin;
-            scrollbar-color: var(--accent-color) var(--card-bg);
-            position: relative;
+            flex-wrap: wrap;
+            gap: var(--space-sm);
+            justify-content: center;
+            margin-bottom: var(--space-xl);
+            padding: var(--space-md);
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius-xl);
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
-        .playground-categories::-webkit-scrollbar {
-            height: 6px;
-        }
-
-        .playground-categories::-webkit-scrollbar-track {
-            background: var(--card-bg);
-            border-radius: 3px;
-        }
-
-        .playground-categories::-webkit-scrollbar-thumb {
-            background: var(--accent-color);
-            border-radius: 3px;
-        }
-
-        .category-btn {
-            padding: 0.6rem 1.2rem;
-            border: none;
-            border-radius: 30px;
-            background: var(--card-bg);
-            color: var(--text-color);
+        .filter-btn {
+            padding: var(--space-sm) var(--space-md);
+            background: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-full);
+            color: var(--text-secondary);
+            font-family: var(--font-secondary);
             font-weight: 600;
+            font-size: 0.9rem;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 2px solid var(--accent-color);
-            font-size: 0.85rem;
-            white-space: nowrap;
-            flex-shrink: 0;
-            min-width: max-content;
+            transition: all var(--transition-base);
         }
 
-        .category-btn:active {
-            transform: scale(0.95);
+        .filter-btn:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
         }
 
-        .category-btn.active {
-            background: var(--accent-color);
-            color: var(--bg-color);
-            box-shadow: 0 5px 15px rgba(0, 255, 157, 0.3);
-            transform: translateY(-2px);
+        .filter-btn.active {
+            background: var(--gradient-primary);
+            border-color: transparent;
+            color: var(--bg-primary);
         }
 
         .random-btn {
-            padding: 0.6rem 1.2rem;
-            font-size: 0.85rem;
             margin-left: auto;
-            flex-shrink: 0;
-        }
-
-        .random-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .random-btn:hover {
-            transform: translateY(-2px) scale(1.05);
-            box-shadow: 0 5px 20px rgba(0, 255, 157, 0.4);
-        }
-
-        .random-btn:hover::before {
-            opacity: 1;
-        }
-
-        .random-btn i, .random-btn span {
-            position: relative;
-            z-index: 2;
+            background: var(--bg-glass-light);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
         }
 
         .random-btn i {
-            font-size: 1.2em;
+            transition: transform var(--transition-base);
         }
 
+        .random-btn:hover i {
+            transform: rotate(180deg);
+        }
+
+        /* Playground Grid */
         .playground-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            padding: 1rem;
-            position: relative;
-            min-height: 400px;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: var(--space-lg);
+            max-width: 1400px;
+            margin: 0 auto;
         }
 
-        .playground-card {
-            background: var(--card-bg);
-            border-radius: 12px;
+        /* Playground Card */
+        .pg-card {
+            position: relative;
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius-lg);
             overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all var(--transition-base);
             opacity: 0;
             transform: scale(0.95) translateY(20px);
-            animation: cardEnter 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-            position: relative;
-            will-change: transform, opacity;
         }
 
-        .playground-card.hidden {
-            position: absolute;
-            opacity: 0;
-            transform: scale(0.95) translateY(20px);
-            pointer-events: none;
-            visibility: hidden;
+        .pg-card.visible {
+            opacity: 1;
+            transform: scale(1) translateY(0);
         }
 
-        .playground-card.entering {
-            animation: cardEnter 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        .pg-card.hidden {
+            display: none;
         }
 
-        .playground-card.exiting {
-            animation: cardExit 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        .pg-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(0, 255, 157, 0.3);
+            box-shadow: var(--shadow-glow);
         }
 
-        @keyframes cardEnter {
-            from {
-                opacity: 0;
-                transform: scale(0.95) translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-            }
-        }
-
-        @keyframes cardExit {
-            from {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-            }
-            to {
-                opacity: 0;
-                transform: scale(0.95) translateY(20px);
-            }
-        }
-
-        .playground-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .playground-card:hover .card-preview i {
-            transform: scale(1.1) rotate(5deg);
-        }
-
-        .card-preview {
-            position: relative;
-            width: 100%;
-            height: 200px;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, var(--accent-color), var(--secondary-color));
-            transition: all 0.3s ease;
-        }
-
-        .card-preview::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0));
-            z-index: 1;
-            transition: opacity 0.3s ease;
-        }
-
-        .playground-card:hover .card-preview::before {
-            opacity: 0.5;
-        }
-
-        .card-preview i {
-            font-size: 4rem;
-            color: rgba(255, 255, 255, 0.9);
-            z-index: 2;
-            transition: all 0.3s ease;
-        }
-
-        .playground-card[data-category="visual"] .card-preview {
-            background: linear-gradient(135deg, #FF6B6B, #FF8E53);
-        }
-
-        .playground-card[data-category="ai"] .card-preview {
-            background: linear-gradient(135deg, #4FACFE, #00F2FE);
-        }
-
-        .playground-card[data-category="game"] .card-preview {
-            background: linear-gradient(135deg, #43E97B, #38F9D7);
-        }
-
-        .playground-card[data-category="audio"] .card-preview {
-            background: linear-gradient(135deg, #FA709A, #FEE140);
-        }
-
-        .playground-card[data-category="physics"] .card-preview {
-            background: linear-gradient(135deg, #667EEA, #764BA2);
-        }
-
-        .card-content {
-            padding: 1.5rem;
-        }
-
-        .card-content h3 {
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-            color: var(--text-color);
-        }
-
-        .card-content p {
-            color: var(--text-secondary);
-            margin-bottom: 1rem;
-            line-height: 1.5;
-        }
-
-        .card-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .card-tag {
-            background: var(--accent-color);
-            color: white;
-            padding: 0.25rem 0.75rem;
-            border-radius: 15px;
-            font-size: 0.8rem;
-        }
-
-        .try-now-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: var(--accent-color);
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border-radius: 25px;
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .try-now-btn::before {
-            content: '';
+        .pg-card-glow {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0));
-            transform: translateX(-100%);
-            transition: transform 0.3s ease;
+            background: radial-gradient(circle at var(--glow-x, 50%) var(--glow-y, 50%),
+                    var(--accent-glow) 0%,
+                    transparent 50%);
+            opacity: 0;
+            transition: opacity var(--transition-base);
+            pointer-events: none;
         }
 
-        .try-now-btn:hover::before {
-            transform: translateX(0);
+        .pg-card:hover .pg-card-glow {
+            opacity: 1;
         }
 
-        .try-now-btn:hover {
+        .pg-card-preview {
+            position: relative;
+            height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .pg-card-preview i {
+            font-size: 4rem;
+            color: rgba(255, 255, 255, 0.9);
+            z-index: 2;
+            transition: all var(--transition-base);
+        }
+
+        .pg-card:hover .pg-card-preview i {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        /* Category-specific gradients */
+        .pg-card[data-category="visual"] .pg-card-preview {
+            background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+        }
+
+        .pg-card[data-category="ai"] .pg-card-preview {
+            background: linear-gradient(135deg, #4FACFE, #00F2FE);
+        }
+
+        .pg-card[data-category="game"] .pg-card-preview {
+            background: linear-gradient(135deg, #43E97B, #38F9D7);
+        }
+
+        .pg-card[data-category="audio"] .pg-card-preview {
+            background: linear-gradient(135deg, #FA709A, #FEE140);
+        }
+
+        .pg-card[data-category="physics"] .pg-card-preview {
+            background: linear-gradient(135deg, #667EEA, #764BA2);
+        }
+
+        .pg-card-content {
+            padding: var(--space-lg);
+        }
+
+        .pg-card-title {
+            font-family: var(--font-primary);
+            font-size: 1.35rem;
+            font-weight: 600;
+            margin-bottom: var(--space-sm);
+            transition: color var(--transition-fast);
+        }
+
+        .pg-card:hover .pg-card-title {
+            color: var(--accent-primary);
+        }
+
+        .pg-card-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: var(--space-md);
+        }
+
+        .pg-card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-xs);
+            margin-bottom: var(--space-md);
+        }
+
+        .pg-tag {
+            background: var(--bg-glass-light);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: var(--radius-full);
+            font-size: 0.75rem;
+            color: var(--accent-primary);
+        }
+
+        .pg-card-link {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+            background: var(--gradient-primary);
+            color: var(--bg-primary);
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--radius-full);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all var(--transition-base);
+        }
+
+        .pg-card-link i {
+            font-size: 0.875rem;
+            transition: transform var(--transition-base);
+        }
+
+        .pg-card-link:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 255, 157, 0.3);
+            box-shadow: var(--shadow-glow);
         }
 
-        .try-now-btn i {
-            transition: transform 0.3s ease;
+        .pg-card-link:hover i {
+            transform: translateX(4px);
         }
 
-        .try-now-btn:hover i {
-            transform: translateX(3px);
+        /* Stats Counter */
+        .playground-stats {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-xl);
+            margin-bottom: var(--space-xl);
+            flex-wrap: wrap;
         }
 
+        .stat-item {
+            text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .stat-number {
+            font-family: var(--font-primary);
+            font-size: 3rem;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* Responsive */
         @media (max-width: 768px) {
-            .playground-container {
-                padding: 0.5rem;
+            .category-filter {
+                padding: var(--space-sm);
+                gap: var(--space-xs);
             }
 
-            .playground-header h1 {
-                font-size: 1.8rem;
+            .filter-btn {
+                padding: var(--space-xs) var(--space-sm);
+                font-size: 0.8rem;
             }
 
-            .playground-header p {
-                font-size: 1rem;
-            }
-
-            .disclaimer {
-                padding: 0.8rem;
-                font-size: 0.9rem;
-            }
-
-            .playground-grid {
-                grid-template-columns: 1fr;
-                gap: 1rem;
-                padding: 0.5rem;
-            }
-
-            .playground-card {
-                margin-bottom: 1rem;
-            }
-
-            .card-preview {
-                height: 150px;
-            }
-
-            .card-preview i {
-                font-size: 3rem;
-            }
-
-            .card-content h3 {
-                font-size: 1.2rem;
-            }
-
-            .card-content p {
-                font-size: 0.9rem;
-            }
-
-            .try-now-btn {
-                padding: 0.6rem 1.2rem;
-                font-size: 0.9rem;
+            .random-btn {
+                margin-left: 0;
                 width: 100%;
                 justify-content: center;
             }
 
-            .playground-categories {
-                margin: 0.5rem;
-                padding: 0.8rem;
-                gap: 0.4rem;
+            .playground-grid {
+                grid-template-columns: 1fr;
             }
 
-            .category-btn {
-                padding: 0.5rem 1rem;
-                font-size: 0.8rem;
+            .pg-card-preview {
+                height: 150px;
             }
 
-            .random-btn {
-                padding: 0.5rem 1rem;
-                font-size: 0.8rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .playground-categories {
-                margin: 0.3rem;
-                padding: 0.6rem;
-                gap: 0.3rem;
+            .pg-card-preview i {
+                font-size: 3rem;
             }
 
-            .category-btn {
-                padding: 0.4rem 0.8rem;
-                font-size: 0.75rem;
+            .disclaimer-banner {
+                flex-direction: column;
+                text-align: center;
             }
 
-            .random-btn {
-                padding: 0.4rem 0.8rem;
-                font-size: 0.75rem;
+            .playground-stats {
+                gap: var(--space-lg);
+            }
+
+            .stat-number {
+                font-size: 2.5rem;
             }
         }
     </style>
 </head>
+
 <body>
-    <header>
-        <nav>
-            <div class="logo">
-                <img src="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png" alt="Th3-C0der Logo">
-                Th3-C0der
+    <!-- Custom Cursor -->
+    <div class="cursor-wrapper">
+        <div class="cursor-dot" id="cursor-dot"></div>
+        <div class="cursor-outline" id="cursor-outline"></div>
+        <div class="cursor-trail" id="cursor-trail"></div>
+    </div>
+
+    <!-- Animated Background -->
+    <div class="animated-bg">
+        <div class="gradient-orb gradient-orb-1"></div>
+        <div class="gradient-orb gradient-orb-2"></div>
+        <div class="gradient-orb gradient-orb-3"></div>
+        <canvas id="particle-canvas"></canvas>
+    </div>
+
+    <!-- Navigation -->
+    <header class="main-header" id="main-header">
+        <nav class="nav-container">
+            <a href="/" class="logo">
+                <div class="logo-icon">
+                    <img src="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png"
+                        alt="Logo">
+                </div>
+                <span class="logo-text">Th3-C0der</span>
+            </a>
+
+            <div class="nav-links" id="nav-links">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/#projects" class="nav-link">Projects</a>
+                <a href="/blog" class="nav-link">Blog</a>
+                <a href="/#about" class="nav-link">About</a>
+                <button class="nav-link contact-btn" id="contact-trigger">Contact</button>
             </div>
-            <div class="menu-toggle">
-                <i class="fas fa-bars"></i>
-            </div>
-            <div class="nav-links">
-                <a href="/">Home</a>
-                <a href="/#projects">Projects</a>
-                <a href="/blog">Blog</a>
-                <a href="#about">About</a>
-                <a href="#" id="contact-link">Contact</a>
-                <button class="theme-toggle" aria-label="Toggle dark mode">
+
+            <div class="nav-actions">
+                <button class="theme-switch" id="theme-switch" aria-label="Toggle theme">
                     <i class="fas fa-moon"></i>
-                    <span>Theme</span>
+                    <i class="fas fa-sun"></i>
+                </button>
+                <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
                 </button>
             </div>
         </nav>
     </header>
-    <div class="nav-overlay"></div>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu-overlay" id="mobile-overlay"></div>
+
+    <!-- Main Content -->
     <main>
-        <section id="home" class="hero">
-            <div class="hero-content">
-                <h1>Welcome to
-                    <br>
-                    <span class="highlight">Th3-C0der's</span>
-                    Playground</h1>
-                <p>Explore interactive experiments and creative coding projects</p>
+        <section class="playground-section">
+            <div class="playground-header section-header">
+                <span class="section-label">Experiments</span>
+                <h1 class="section-title">
+                    <span class="title-word">Creative</span>
+                    <span class="title-word accent">Playground</span>
+                </h1>
+                <p class="section-subtitle">Interactive experiments and creative coding projects</p>
             </div>
-            <div class="hero-background">
-                <div class="circle circle-1"></div>
-                <div class="circle circle-2"></div>
-                <div class="circle circle-3"></div>
+
+            <!-- Stats -->
+            <div class="playground-stats">
+                <div class="stat-item" data-value="41">
+                    <div class="stat-number">0</div>
+                    <div class="stat-label">Demos</div>
+                </div>
+                <div class="stat-item" data-value="5">
+                    <div class="stat-number">0</div>
+                    <div class="stat-label">Categories</div>
+                </div>
+                <div class="stat-item" data-value="100">
+                    <div class="stat-number">0</div>
+                    <div class="stat-label">Hours Built</div>
+                </div>
             </div>
-        </section>
-        <section class="playground-container">
-            <div class="playground-header">
-            <div class="disclaimer">
+
+            <!-- Disclaimer -->
+            <div class="disclaimer-banner">
                 <i class="fas fa-flask"></i>
-                <p>🚧 These playground demos are currently in beta/alpha stage. Some features may be experimental, incomplete, or not fully functional. Feel free to explore and report any issues you encounter! 🚧</p>
+                <p>🚧 These playground demos are currently in beta/alpha stage. Some features may be experimental,
+                    incomplete, or not fully functional. Feel free to explore and report any issues! 🚧</p>
             </div>
-            <div class="playground-categories">
-                <button class="category-btn active" data-category="all">All</button>
-                <button class="category-btn" data-category="ai">AI & ML</button>
-                <button class="category-btn" data-category="game">Games</button>
-                <button class="category-btn" data-category="visual">Visual</button>
-                <button class="category-btn" data-category="audio">Audio</button>
-                <button class="category-btn" data-category="physics">Physics</button>
-                <button class="category-btn random-btn">
+
+            <!-- Category Filter -->
+            <div class="category-filter">
+                <button class="filter-btn active" data-category="all">All</button>
+                <button class="filter-btn" data-category="ai">AI & ML</button>
+                <button class="filter-btn" data-category="game">Games</button>
+                <button class="filter-btn" data-category="visual">Visual</button>
+                <button class="filter-btn" data-category="audio">Audio</button>
+                <button class="filter-btn" data-category="physics">Physics</button>
+                <button class="filter-btn random-btn magnetic-btn">
                     <i class="fas fa-random"></i>
-                    Random Demo
+                    <span>Random Demo</span>
                 </button>
             </div>
-            <div class="playground-grid">
-                <!-- Project Card 1 -->
-                <div class="playground-card" data-category="physics">
-                    <div class="card-preview">
+
+            <!-- Ad: Playground Top -->
+            <div class="ad-container ad-banner">
+                <span class="ad-label">Advertisement</span>
+                <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-5166575587547718"
+                    data-ad-slot="playground-top" data-ad-format="auto" data-full-width-responsive="true"></ins>
+                <script>
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
+            </div>
+
+            <!-- Playground Grid -->
+            <div class="playground-grid" id="playground-grid">
+
+                <!-- Card: Quantum Lab -->
+                <article class="pg-card" data-category="sim">
+                    <div class="pg-card-glow"></div>
+                    <div class="pg-card-preview">
                         <i class="fas fa-atom"></i>
                     </div>
-                    <div class="card-content">
-                        <h3>Interactive Particle System</h3>
-                        <p>An interactive canvas-based particle system that responds to mouse movement and gravity.</p>
-                        <div class="card-tags">
-                            <span>Canvas</span>
-                            <span>JavaScript</span>
-                            <span>Animation</span>
+                    <div class="pg-card-content">
+                        <h3 class="pg-card-title">Quantum Lab</h3>
+                        <p class="pg-card-description">Interactive quantum circuit simulator. Build gates and visualize
+                            qubits.</p>
+                        <div class="pg-card-tags">
+                            <span class="pg-tag">Physics</span>
+                            <span class="pg-tag">Sim</span>
+                            <span class="pg-tag">Quantum</span>
                         </div>
-                        <a href="/playground/demos/particle-system.html" class="try-now-btn">Try Now</a>
+                        <a href="/playground/demos/quantum-lab.html" class="pg-card-link magnetic-btn">
+                            <span>Experiment</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
                     </div>
-                </div>
+                </article>
 
-                <!-- Project Card 2 -->
-                <div class="playground-card" data-category="visual">
-                    <div class="card-preview">
-                        <i class="fas fa-cube"></i>
-                    </div>
-                    <div class="card-content">
-                        <h3>3D Scene Explorer</h3>
-                        <p>An interactive 3D scene built with Three.js featuring different geometric shapes and camera controls.</p>
-                        <div class="card-tags">
-                            <span>Three.js</span>
-                            <span>WebGL</span>
-                            <span>3D</span>
-                        </div>
-                        <a href="/playground/demos/3d-scene.html" class="try-now-btn">Try Now</a>
-                    </div>
-                </div>
-
-                <!-- Project Card 3 -->
-                <div class="playground-card" data-category="audio">
-                    <div class="card-preview">
+                <!-- Card: Sonic Canvas -->
+                <article class="pg-card" data-category="audio">
+                    <div class="pg-card-glow"></div>
+                    <div class="pg-card-preview">
                         <i class="fas fa-music"></i>
                     </div>
-                    <div class="card-content">
-                        <h3>Audio Visualizer</h3>
-                        <p>A real-time audio visualizer that creates dynamic visualizations from audio input using the Web Audio API.</p>
-                        <div class="card-tags">
-                            <span>Web Audio API</span>
-                            <span>Canvas</span>
-                            <span>Audio</span>
+                    <div class="pg-card-content">
+                        <h3 class="pg-card-title">Sonic Canvas</h3>
+                        <p class="pg-card-description">Draw sound. Convert visual strokes into audio frequencies.</p>
+                        <div class="pg-card-tags">
+                            <span class="pg-tag">Audio</span>
+                            <span class="pg-tag">Art</span>
+                            <span class="pg-tag">Synth</span>
                         </div>
-                        <a href="/playground/demos/audio-visualizer.html" class="try-now-btn">Try Now</a>
+                        <a href="/playground/demos/sonic-canvas.html" class="pg-card-link magnetic-btn">
+                            <span>Draw</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
                     </div>
-                </div>
+                </article>
 
-                <!-- Project Card 4 -->
-                <div class="playground-card" data-category="visual">
-                    <div class="card-preview">
-                        <i class="fas fa-palette"></i>
+                <!-- Card: Voxel City -->
+                <article class="pg-card" data-category="3d">
+                    <div class="pg-card-glow"></div>
+                    <div class="pg-card-preview">
+                        <i class="fas fa-cubes"></i>
                     </div>
-                    <div class="card-content">
-                        <h3>CSS Art Gallery</h3>
-                        <p>A collection of creative artworks created using pure CSS, featuring animations and interactive elements.</p>
-                        <div class="card-tags">
-                            <span>CSS</span>
-                            <span>Animation</span>
-                            <span>Art</span>
+                    <div class="pg-card-content">
+                        <h3 class="pg-card-title">Voxel City</h3>
+                        <p class="pg-card-description">Isometric block builder. Construct 3D cityscapes pixel by pixel.
+                        </p>
+                        <div class="pg-card-tags">
+                            <span class="pg-tag">3D</span>
+                            <span class="pg-tag">Build</span>
+                            <span class="pg-tag">Iso</span>
                         </div>
-                        <a href="/playground/demos/css-art.html" class="try-now-btn">Try Now</a>
+                        <a href="/playground/demos/voxel-city.html" class="pg-card-link magnetic-btn">
+                            <span>Build</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
                     </div>
-                </div>
+                </article>
 
-                <!-- Project Card 5 -->
-                <div class="playground-card" data-category="visual">
-                    <div class="card-preview">
+                <!-- Card: Cyber Bloom -->
+                <article class="pg-card" data-category="visual">
+                    <div class="pg-card-glow"></div>
+                    <div class="pg-card-preview">
+                        <i class="fas fa-fan"></i>
+                    </div>
+                    <div class="pg-card-content">
+                        <h3 class="pg-card-title">Cyber Bloom</h3>
+                        <p class="pg-card-description">Generative cybernetic floral art. Procedural beauty in motion.
+                        </p>
+                        <div class="pg-card-tags">
+                            <span class="pg-tag">Art</span>
+                            <span class="pg-tag">Gen</span>
+                            <span class="pg-tag">Visual</span>
+                        </div>
+                        <a href="/playground/demos/cyber-bloom.html" class="pg-card-link magnetic-btn">
+                            <span>Bloom</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Ad: Grid Insert -->
+                <article class="pg-card"
+                    style="display: flex; flex-direction: column; justify-content: center; align-items: center; min-height:300px;">
+                    <span style="font-size:0.7rem; color:#555; margin-bottom:10px;">ADVERTISEMENT</span>
+                    <div style="width:100%; height:100%; display:flex; justify-content:center; align-items:center;">
+                        <ins class="adsbygoogle" style="display:block; width:100%; height:100%;"
+                            data-ad-format="rectangle" data-ad-layout="in-article"
+                            data-ad-client="ca-pub-5166575587547718" data-ad-slot="playground-grid"></ins>
+                        <script>
+                            (adsbygoogle = window.adsbygoogle || []).push({});
+                        </script>
+                    </div>
+                </article>
+
+                <!-- Card: Neuro Seekers -->
+                <article class="pg-card" data-category="ai">
+                    <div class="pg-card-glow"></div>
+                    <div class="pg-card-preview">
+                        <i class="fas fa-network-wired"></i>
+                    </div>
+                    <div class="pg-card-content">
+                        <h3 class="pg-card-title">Neuro Seekers</h3>
+                        <p class="pg-card-description">Evolutionary neural network simulation. Watch AI agents learn to
+                            survive.</p>
+                        <div class="pg-card-tags">
+                            <span class="pg-tag">AI</span>
+                            <span class="pg-tag">Evolution</span>
+                            <span class="pg-tag">Sim</span>
+                        </div>
+                        <a href="/playground/demos/neuro-seekers.html" class="pg-card-link magnetic-btn">
+                            <span>Evolve</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Card: Rogue Terminal -->
+                <article class="pg-card" data-category="game">
+                    <div class="pg-card-glow"></div>
+                    <div class="pg-card-preview">
+                        <i class="fas fa-terminal"></i>
+                    </div>
+                    <div class="pg-card-content">
+                        <h3 class="pg-card-title">Rogue Terminal</h3>
+                        <p class="pg-card-description">Text-based hacking RPG. Infiltrate the network via command line.
+                        </p>
+                        <div class="pg-card-tags">
+                            <span class="pg-tag">RPG</span>
+                            <span class="pg-tag">Text</span>
+                            <span class="pg-tag">Hack</span>
+                        </div>
+                        <a href="/playground/demos/rogue-terminal.html" class="pg-card-link magnetic-btn">
+                            <span>Connect</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Card: Gravity Assist -->
+                <article class="pg-card" data-category="physics">
+                    <div class="pg-card-glow"></div>
+                    <div class="pg-card-preview">
+                        <i class="fas fa-globe"></i>
+                    </div>
+                    <div class="pg-card-content">
+                        <h3 class="pg-card-title">Gravity Assist</h3>
+                        <p class="pg-card-description">Orbital mechanics puzzle. Place planets to guide the probe.</p>
+                        <div class="pg-card-tags">
+                            <span class="pg-tag">Space</span>
+                            <span class="pg-tag">Physics</span>
+                            <span class="pg-tag">Puzzle</span>
+                        </div>
+                        <a href="/playground/demos/gravity-assist.html" class="pg-card-link magnetic-btn">
+                            <span>Launch</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Card: Lissajous Canvas -->
+                <article class="pg-card" data-category="visual">
+                    <div class="pg-card-glow"></div>
+                    <div class="pg-card-preview">
+                        <i class="fas fa-wave-square"></i>
+                    </div>
+                    <div class="pg-card-content">
+                        <h3 class="pg-card-title">Lissajous Canvas</h3>
+                        <p class="pg-card-description">Interactive harmonic motion visualizer. Explore mathematical
+                            beauty.</p>
+                        <div class="pg-card-tags">
+                            <span class="pg-tag">Math</span>
+                            <span class="pg-tag">Visual</span>
+                            <span class="pg-tag">Art</span>
+                        </div>
+                        <a href="/playground/demos/lissajous-canvas.html" class="pg-card-link magnetic-btn">
+                            <span>Visualize</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Card: Algo Sorter -->
+                <article class="pg-card" data-category="visual">
+                    <div class="pg-card-glow"></div>
+                    <div class="pg-card-preview">
+                        <i class="fas fa-sort-amount-down"></i>
+                    </div>
+                    <div class="pg-card-content">
+                        <h3 class="pg-card-title">Algo Sorter</h3>
+                        <p class="pg-card-description">Auditory and visual sorting algorithm demonstration. Watch the
+                            code work.</p>
+                        <div class="pg-card-tags">
+                            <span class="pg-tag">Algo</span>
+                            <span class="pg-tag">CS</span>
+                            <span class="pg-tag">Sound</span>
+                        </div>
+                        <a href="/playground/demos/algo-sorter.html" class="pg-card-link magnetic-btn">
+                            <span>Sort</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Card: Bezier Studio -->
+                <article class="pg-card" data-category="tool">
+                    <div class="pg-card-glow"></div>
+                    <div class="pg-card-preview">
+                        <i class="fas fa-bezier-curve"></i>
+                    </div>
+                    <div class="pg-card-content">
+                        <h3 class="pg-card-title">Bezier Studio</h3>
+                        <p class="pg-card-description">Design tool for cubic and quadratic bezier curves. Visualize the
+                            math.</p>
+                        <div class="pg-card-tags">
+                            <span class="pg-tag">Tool</span>
+                            <span class="pg-tag">Design</span>
+                            <span class="pg-tag">Math</span>
+                        </div>
+                        <a href="/playground/demos/bezier-studio.html" class="pg-card-link magnetic-btn">
+                            <span>Design</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Card: Orbital Defense -->
+                <article class="pg-card" data-category="game">
+                    <div class="pg-card-glow"></div>
+                    <div class="pg-card-preview">
+                        <i class="fas fa-meteor"></i>
+                    </div>
+                    <div class="pg-card-content">
+                        <h3 class="pg-card-title">Orbital Defense</h3>
+                        <p class="pg-card-description">Intense planetary defense arcade shooter. Protect the core.</p>
+                        <div class="pg-card-tags">
+                            <span class="pg-tag">Action</span>
+                            <span class="pg-tag">Shooter</span>
+                            <span class="pg-tag">Space</span>
+                        </div>
+                        <a href="/playground/demos/orbital-defense.html" class="pg-card-link magnetic-btn">
+                            <span>Defend</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Card: Hex Link -->
+                <article class="pg-card" data-category="game">
+                    <div class="pg-card-glow"></div>
+                    <div class="pg-card-preview">
                         <i class="fas fa-project-diagram"></i>
                     </div>
-                    <div class="card-content">
-                        <h3>Fractal Explorer</h3>
-                        <p>An interactive fractal visualization tool featuring the Mandelbrot and Julia sets with real-time coloring and zooming.</p>
-                        <div class="card-tags">
-                            <span>WebGL</span>
-                            <span>Mathematics</span>
-                            <span>Fractals</span>
+                    <div class="pg-card-content">
+                        <h3 class="pg-card-title">Hex Link</h3>
+                        <p class="pg-card-description">Cybernetic pipe puzzle on a hexagonal grid. Connect the energy
+                            flow.</p>
+                        <div class="pg-card-tags">
+                            <span class="pg-tag">Puzzle</span>
+                            <span class="pg-tag">Logic</span>
+                            <span class="pg-tag">Hex</span>
                         </div>
-                        <a href="/playground/demos/fractal-explorer.html" class="try-now-btn">Try Now</a>
+                        <a href="/playground/demos/hex-link.html" class="pg-card-link magnetic-btn">
+                            <span>Connect</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
                     </div>
-                </div>
+                </article>
 
-                <!-- Project Card 6 -->
-                <div class="playground-card" data-category="physics">
-                    <div class="card-preview">
-                        <i class="fas fa-water"></i>
+                <!-- Card: Velocity Drift -->
+                <article class="pg-card" data-category="game">
+                    <div class="pg-card-glow"></div>
+                    <div class="pg-card-preview">
+                        <i class="fas fa-car-side"></i>
                     </div>
-                    <div class="card-content">
-                        <h3>Fluid Simulation</h3>
-                        <p>A real-time fluid dynamics simulation using WebGL, featuring interactive flow fields and particle systems.</p>
-                        <div class="card-tags">
-                            <span>WebGL</span>
-                            <span>Physics</span>
-                            <span>Simulation</span>
+                    <div class="pg-card-content">
+                        <h3 class="pg-card-title">Velocity Drift</h3>
+                        <p class="pg-card-description">Top-down arcade physics racer. Drift for points.</p>
+                        <div class="pg-card-tags">
+                            <span class="pg-tag">Racing</span>
+                            <span class="pg-tag">Physics</span>
+                            <span class="pg-tag">Drift</span>
                         </div>
-                        <a href="/playground/demos/fluid-simulation.html" class="try-now-btn">Try Now</a>
+                        <a href="/playground/demos/velocity-drift.html" class="pg-card-link magnetic-btn">
+                            <span>Race</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
                     </div>
-                </div>
+                </article>
 
-                <!-- Project Card 7 -->
-                <div class="playground-card" data-category="ai">
-                    <div class="card-preview">
-                        <i class="fas fa-brain"></i>
+                <!-- Card: Maze Master -->
+                <article class="pg-card" data-category="game">
+                    <div class="pg-card-glow"></div>
+                    <div class="pg-card-preview">
+                        <i class="fas fa-dungeon"></i>
                     </div>
-                    <div class="card-content">
-                        <h3>Neural Network Playground</h3>
-                        <p>An interactive visualization of neural networks, allowing you to create and train simple networks in real-time.</p>
-                        <div class="card-tags">
-                            <span>AI</span>
-                            <span>Machine Learning</span>
-                            <span>Visualization</span>
+                    <div class="pg-card-content">
+                        <h3 class="pg-card-title">Maze Master</h3>
+                        <p class="pg-card-description">Procedural maze generator and solver. Navigate the digital
+                            labyrinth.</p>
+                        <div class="pg-card-tags">
+                            <span class="pg-tag">Algo</span>
+                            <span class="pg-tag">Puzzle</span>
+                            <span class="pg-tag">Hack</span>
                         </div>
-                        <a href="/playground/demos/neural-network.html" class="try-now-btn">Try Now</a>
+                        <a href="/playground/demos/maze-master.html" class="pg-card-link magnetic-btn">
+                            <span>Breach</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
                     </div>
-                </div>
+                </article>
 
-                <!-- Project Card 8 -->
-                <div class="playground-card" data-category="audio">
-                    <div class="card-preview">
-                        <i class="fas fa-guitar"></i>
+                <!-- Card: Tower Blocks -->
+                <article class="pg-card" data-category="game">
+                    <div class="pg-card-glow"></div>
+                    <div class="pg-card-preview">
+                        <i class="fas fa-building"></i>
                     </div>
-                    <div class="card-content">
-                        <h3>Web Synthesizer</h3>
-                        <p>An interactive web-based synthesizer with multiple waveforms, effects, and a virtual keyboard interface.</p>
-                        <div class="card-tags">
-                            <span>Web Audio API</span>
-                            <span>Music</span>
-                            <span>Interactive</span>
+                    <div class="pg-card-content">
+                        <h3 class="pg-card-title">Tower Blocks</h3>
+                        <p class="pg-card-description">Neon stacking game. Build the highest skyscraper physics allows.
+                        </p>
+                        <div class="pg-card-tags">
+                            <span class="pg-tag">Arcade</span>
+                            <span class="pg-tag">Timing</span>
+                            <span class="pg-tag">3D</span>
                         </div>
-                        <a href="/playground/demos/synthesizer.html" class="try-now-btn">Try Now</a>
+                        <a href="/playground/demos/tower-blocks.html" class="pg-card-link magnetic-btn">
+                            <span>Build</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
                     </div>
-                </div>
+                </article>
 
-                <!-- Project Card 9 -->
-                <div class="playground-card" data-category="game">
-                    <div class="card-preview">
-                        <i class="fas fa-gamepad"></i>
+                <!-- Card: Neon Spiro -->
+                <article class="pg-card" data-category="visual">
+                    <div class="pg-card-glow"></div>
+                    <div class="pg-card-preview">
+                        <i class="fas fa-certificate"></i>
                     </div>
-                    <div class="card-content">
-                        <h3>AI Tic-Tac-Toe</h3>
-                        <p>Play Tic-Tac-Toe against an AI that learns from your moves. Features adaptive learning and difficulty levels.</p>
-                        <div class="card-tags">
-                            <span>AI</span>
-                            <span>Game</span>
-                            <span>Machine Learning</span>
+                    <div class="pg-card-content">
+                        <h3 class="pg-card-title">Neon Spiro</h3>
+                        <p class="pg-card-description">Complex geometric curve generator. Draw mesmerizing neon
+                            patterns.</p>
+                        <div class="pg-card-tags">
+                            <span class="pg-tag">Art</span>
+                            <span class="pg-tag">Geometry</span>
+                            <span class="pg-tag">Relax</span>
                         </div>
-                        <a href="/playground/demos/ai-tictactoe.html" class="try-now-btn">Try Now</a>
+                        <a href="/playground/demos/neon-spirograph.html" class="pg-card-link magnetic-btn">
+                            <span>Draw</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
                     </div>
-                </div>
+                </article>
 
-                <!-- Project Card 10 -->
-                <div class="playground-card" data-category="game">
-                    <div class="card-preview">
-                        <i class="fas fa-puzzle-piece"></i>
-                    </div>
-                    <div class="card-content">
-                        <h3>Memory Match</h3>
-                        <p>Test your memory with this modern card matching game. Features multiple themes, animations, and difficulty levels.</p>
-                        <div class="card-tags">
-                            <span>Game</span>
-                            <span>Animation</span>
-                            <span>Interactive</span>
-                        </div>
-                        <a href="/playground/demos/memory-match.html" class="try-now-btn">Try Now</a>
-                    </div>
-                </div>
-
-                <!-- Project Card 11 -->
-                <div class="playground-card" data-category="game">
-                    <div class="card-preview">
-                        <i class="fas fa-staff-snake"></i>
-                    </div>
-                    <div class="card-content">
-                        <h3>Modern Snake</h3>
-                        <p>A modern take on the classic Snake game with smooth controls, power-ups, and multiple game modes.</p>
-                        <div class="card-tags">
-                            <span>Game</span>
-                            <span>Canvas</span>
-                            <span>Classic</span>
-                        </div>
-                        <a href="/playground/demos/snake.html" class="try-now-btn">Try Now</a>
-                    </div>
-                </div>
-
-                <!-- Project Card 12 -->
-                <div class="playground-card" data-category="visual">
-                    <div class="card-preview">
-                        <i class="fas fa-tree"></i>
-                    </div>
-                    <div class="card-content">
-                        <h3>Fractal Tree Generator</h3>
-                        <p>Create beautiful fractal tree patterns with interactive controls for branching, angles, and colors.</p>
-                        <div class="card-tags">
-                            <span>Canvas</span>
-                            <span>Fractals</span>
-                            <span>Interactive</span>
-                        </div>
-                        <a href="/playground/demos/fractal-tree.html" class="try-now-btn">Try Now</a>
-                    </div>
-                </div>
-
-                <!-- Project Card 13 -->
-                <div class="playground-card" data-category="visual">
-                    <div class="card-preview">
-                        <i class="fas fa-palette"></i>
-                    </div>
-                    <div class="card-content">
-                        <h3>Color Palette Generator</h3>
-                        <p>Create beautiful color schemes with this interactive tool. Features color harmony rules, accessibility checking, and export options.</p>
-                        <div class="card-tags">
-                            <span>Design</span>
-                            <span>Colors</span>
-                            <span>Tools</span>
-                        </div>
-                        <a href="/playground/demos/color-palette.html" class="try-now-btn">Try Now</a>
-                    </div>
-                </div>
-
-                <!-- Project Card 14 -->
-                <div class="playground-card" data-category="physics">
-                    <div class="card-preview">
+                <!-- Card: Particle Vortex -->
+                <article class="pg-card" data-category="physics">
+                    <div class="pg-card-glow"></div>
+                    <div class="pg-card-preview">
                         <i class="fas fa-atom"></i>
                     </div>
-                    <div class="card-content">
-                        <h3>Particle Physics Sandbox</h3>
-                        <p>Create and experiment with interactive particle systems. Features gravity, forces, collisions, and various particle behaviors.</p>
-                        <div class="card-tags">
-                            <span>Physics</span>
-                            <span>Simulation</span>
-                            <span>Interactive</span>
+                    <div class="pg-card-content">
+                        <h3 class="pg-card-title">Particle Vortex</h3>
+                        <p class="pg-card-description">Gravitational particle physics simulation. Create vortices and
+                            repulsors.</p>
+                        <div class="pg-card-tags">
+                            <span class="pg-tag">Physics</span>
+                            <span class="pg-tag">Particles</span>
+                            <span class="pg-tag">Interactive</span>
                         </div>
-                        <a href="/playground/demos/particle-physics.html" class="try-now-btn">Try Now</a>
+                        <a href="/playground/demos/particle-vortex.html" class="pg-card-link magnetic-btn">
+                            <span>Launch</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
                     </div>
-                </div>
+                </article>
 
-                <!-- Project Card for Sentiment Analysis Tool -->
-                <div class="playground-card" data-category="ai">
-                    <div class="card-preview">
+                <!-- Card: Neon Sand -->
+                <article class="pg-card" data-category="game">
+                    <div class="pg-card-glow"></div>
+                    <div class="pg-card-preview">
+                        <i class="fas fa-hourglass-half"></i>
+                    </div>
+                    <div class="pg-card-content">
+                        <h3 class="pg-card-title">Sandbox</h3>
+                        <p class="pg-card-description">Interactive falling sand game with elemental reactions. Draw with
+                            fire, water, and acid.</p>
+                        <div class="pg-card-tags">
+                            <span class="pg-tag">Sandbox</span>
+                            <span class="pg-tag">Simulation</span>
+                            <span class="pg-tag">Creative</span>
+                        </div>
+                        <a href="/playground/demos/sandbox.html" class="pg-card-link magnetic-btn">
+                            <span>Create</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Card: Synthwave Run -->
+                <article class="pg-card" data-category="visual">
+                    <div class="pg-card-glow"></div>
+                    <div class="pg-card-preview">
+                        <i class="fas fa-road"></i>
+                    </div>
+                    <div class="pg-card-content">
+                        <h3 class="pg-card-title">Synthwave Run</h3>
+                        <p class="pg-card-description">Retro 3D visual experience. Journey through the neon grid.</p>
+                        <div class="pg-card-tags">
+                            <span class="pg-tag">Visual</span>
+                            <span class="pg-tag">Retro</span>
+                            <span class="pg-tag">3D</span>
+                        </div>
+                        <a href="/playground/demos/synthwave-run.html" class="pg-card-link magnetic-btn">
+                            <span>Dive In</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Card: Code Rusher -->
+                <article class="pg-card" data-category="game">
+                    <div class="pg-card-glow"></div>
+                    <div class="pg-card-preview">
+                        <i class="fas fa-keyboard"></i>
+                    </div>
+                    <div class="pg-card-content">
+                        <h3 class="pg-card-title">Code Rusher</h3>
+                        <p class="pg-card-description">Matrix-style typing defense game. Hack the falling code before it
+                            breaches your system.</p>
+                        <div class="pg-card-tags">
+                            <span class="pg-tag">Game</span>
+                            <span class="pg-tag">Typing</span>
+                            <span class="pg-tag">Hacker</span>
+                        </div>
+                        <a href="/playground/demos/code-rusher.html" class="pg-card-link magnetic-btn">
+                            <span>Play Now</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Card: Neon Fluid -->
+                <article class="pg-card" data-category="physics">
+                    <div class="pg-card-glow"></div>
+                    <div class="pg-card-preview">
+                        <i class="fas fa-water"></i>
+                    </div>
+                    <div class="pg-card-content">
+                        <h3 class="pg-card-title">Neon Fluid</h3>
+                        <p class="pg-card-description">Interactive fluid dynamics simulation with neon aesthetics. Stir
+                            the chaos.</p>
+                        <div class="pg-card-tags">
+                            <span class="pg-tag">Physics</span>
+                            <span class="pg-tag">Simulation</span>
+                            <span class="pg-tag">Visual</span>
+                        </div>
+                        <a href="/playground/demos/fluid-sim.html" class="pg-card-link magnetic-btn">
+                            <span>Interact</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Card: Fractal Grove -->
+                <article class="pg-card" data-category="visual">
+                    <div class="pg-card-glow"></div>
+                    <div class="pg-card-preview">
+                        <i class="fas fa-tree"></i>
+                    </div>
+                    <div class="pg-card-content">
+                        <h3 class="pg-card-title">Fractal Grove</h3>
+                        <p class="pg-card-description">Procedural recursive tree generator. Explore the math behind
+                            nature's patterns.</p>
+                        <div class="pg-card-tags">
+                            <span class="pg-tag">Math</span>
+                            <span class="pg-tag">Visual</span>
+                            <span class="pg-tag">Nature</span>
+                        </div>
+                        <a href="/playground/demos/fractal-grove.html" class="pg-card-link magnetic-btn">
+                            <span>Explore</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </article>
+                <!-- Card: Pong -->
+                <article class="pg-card" data-category="game">
+                    <div class="pg-card-glow"></div>
+                    <div class="pg-card-preview">
+                        <i class="fas fa-table-tennis"></i>
+                    </div>
+                    <div class="pg-card-content">
+                        <h3 class="pg-card-title">Pong</h3>
+                        <p class="pg-card-description">Classic pong with a neon twist. Battle against the AI in this
+                            glowing arcade experience.</p>
+                        <div class="pg-card-tags">
+                            <span class="pg-tag">Game</span>
+                            <span class="pg-tag">Canvas</span>
+                            <span class="pg-tag">Retro</span>
+                        </div>
+                        <a href="/playground/demos/pong.html" class="pg-card-link magnetic-btn">
+                            <span>Play Now</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Card: Cyber Defense -->
+                <article class="pg-card" data-category="game">
+                    <div class="pg-card-glow"></div>
+                    <div class="pg-card-preview">
+                        <i class="fas fa-shield-virus"></i>
+                    </div>
+                    <div class="pg-card-content">
+                        <h3 class="pg-card-title">Cyber Defense</h3>
+                        <p class="pg-card-description">Defend the mainframe from incoming threats. A fast-paced shooter
+                            game.</p>
+                        <div class="pg-card-tags">
+                            <span class="pg-tag">Game</span>
+                            <span class="pg-tag">Action</span>
+                            <span class="pg-tag">Defense</span>
+                        </div>
+                        <a href="/playground/demos/cyber-defense.html" class="pg-card-link magnetic-btn">
+                            <span>Play Now</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Card: Beat Maker -->
+                <article class="pg-card" data-category="audio">
+                    <div class="pg-card-glow"></div>
+                    <div class="pg-card-preview">
+                        <i class="fas fa-drum"></i>
+                    </div>
+                    <div class="pg-card-content">
+                        <h3 class="pg-card-title">Beat Maker</h3>
+                        <p class="pg-card-description">Create beats in the browser with this 16-step sequencer.
+                            Real-time synthesis.</p>
+                        <div class="pg-card-tags">
+                            <span class="pg-tag">Audio</span>
+                            <span class="pg-tag">Music</span>
+                            <span class="pg-tag">Sequencer</span>
+                        </div>
+                        <a href="/playground/demos/beat-maker.html" class="pg-card-link magnetic-btn">
+                            <span>Create</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </article>
+                <!-- Card 1: Particle System -->
+                <article class="pg-card" data-category="physics">
+                    <div class="pg-card-glow"></div>
+                    <div class="pg-card-preview">
+                        <i class="fas fa-atom"></i>
+                    </div>
+                    <div class="pg-card-content">
+                        <h3 class="pg-card-title">Interactive Particle System</h3>
+                        <p class="pg-card-description">An interactive canvas-based particle system that responds to
+                            mouse movement and gravity.</p>
+                        <div class="pg-card-tags">
+                            <span class="pg-tag">Canvas</span>
+                            <span class="pg-tag">JavaScript</span>
+                            <span class="pg-tag">Animation</span>
+                        </div>
+                        <a href="/playground/demos/particle-system.html" class="pg-card-link magnetic-btn">
+                            <span>Try Now</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Card 2: 3D Scene -->
+                <article class="pg-card" data-category="visual">
+                    <div class="pg-card-glow"></div>
+                    <div class="pg-card-preview">
+                        <i class="fas fa-cube"></i>
+                    </div>
+                    <div class="pg-card-content">
+                        <h3 class="pg-card-title">3D Scene Explorer</h3>
+                        <p class="pg-card-description">An interactive 3D scene built with Three.js featuring geometric
+                            shapes and camera controls.</p>
+                        <div class="pg-card-tags">
+                            <span class="pg-tag">Three.js</span>
+                            <span class="pg-tag">WebGL</span>
+                            <span class="pg-tag">3D</span>
+                        </div>
+                        <a href="/playground/demos/3d-scene.html" class="pg-card-link magnetic-btn">
+                            <span>Try Now</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Card 3: Audio Visualizer -->
+                <article class="pg-card" data-category="audio">
+                    <div class="pg-card-glow"></div>
+                    <div class="pg-card-preview">
+                        <i class="fas fa-music"></i>
+                    </div>
+                    <div class="pg-card-content">
+                        <h3 class="pg-card-title">Audio Visualizer</h3>
+                        <p class="pg-card-description">A real-time audio visualizer that creates dynamic visualizations
+                            using the Web Audio API.</p>
+                        <div class="pg-card-tags">
+                            <span class="pg-tag">Web Audio</span>
+                            <span class="pg-tag">Canvas</span>
+                            <span class="pg-tag">Audio</span>
+                        </div>
+                        <a href="/playground/demos/audio-visualizer.html" class="pg-card-link magnetic-btn">
+                            <span>Try Now</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Card 4: CSS Art Gallery -->
+                <article class="pg-card" data-category="visual">
+                    <div class="pg-card-glow"></div>
+                    <div class="pg-card-preview">
+                        <i class="fas fa-palette"></i>
+                    </div>
+                    <div class="pg-card-content">
+                        <h3 class="pg-card-title">CSS Art Gallery</h3>
+                        <p class="pg-card-description">A collection of creative artworks created using pure CSS with
+                            animations.</p>
+                        <div class="pg-card-tags">
+                            <span class="pg-tag">CSS</span>
+                            <span class="pg-tag">Animation</span>
+                            <span class="pg-tag">Art</span>
+                        </div>
+                        <a href="/playground/demos/css-art.html" class="pg-card-link magnetic-btn">
+                            <span>Try Now</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Card 5: Fractal Explorer -->
+                <article class="pg-card" data-category="visual">
+                    <div class="pg-card-glow"></div>
+                    <div class="pg-card-preview">
+                        <i class="fas fa-project-diagram"></i>
+                    </div>
+                    <div class="pg-card-content">
+                        <h3 class="pg-card-title">Fractal Explorer</h3>
+                        <p class="pg-card-description">Interactive fractal visualization with Mandelbrot and Julia sets,
+                            real-time coloring and zooming.</p>
+                        <div class="pg-card-tags">
+                            <span class="pg-tag">WebGL</span>
+                            <span class="pg-tag">Math</span>
+                            <span class="pg-tag">Fractals</span>
+                        </div>
+                        <a href="/playground/demos/fractal-explorer.html" class="pg-card-link magnetic-btn">
+                            <span>Try Now</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Card 6: Fluid Simulation -->
+                <article class="pg-card" data-category="physics">
+                    <div class="pg-card-glow"></div>
+                    <div class="pg-card-preview">
+                        <i class="fas fa-water"></i>
+                    </div>
+                    <div class="pg-card-content">
+                        <h3 class="pg-card-title">Fluid Simulation</h3>
+                        <p class="pg-card-description">Real-time fluid dynamics simulation using WebGL with interactive
+                            flow fields.</p>
+                        <div class="pg-card-tags">
+                            <span class="pg-tag">WebGL</span>
+                            <span class="pg-tag">Physics</span>
+                            <span class="pg-tag">Simulation</span>
+                        </div>
+                        <a href="/playground/demos/fluid-simulation.html" class="pg-card-link magnetic-btn">
+                            <span>Try Now</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Card 7: Neural Network -->
+                <article class="pg-card" data-category="ai">
+                    <div class="pg-card-glow"></div>
+                    <div class="pg-card-preview">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div class="pg-card-content">
+                        <h3 class="pg-card-title">Neural Network Playground</h3>
+                        <p class="pg-card-description">Interactive visualization of neural networks, create and train
+                            simple networks in real-time.</p>
+                        <div class="pg-card-tags">
+                            <span class="pg-tag">AI</span>
+                            <span class="pg-tag">ML</span>
+                            <span class="pg-tag">Visualization</span>
+                        </div>
+                        <a href="/playground/demos/neural-network.html" class="pg-card-link magnetic-btn">
+                            <span>Try Now</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Card 8: Synthesizer -->
+                <article class="pg-card" data-category="audio">
+                    <div class="pg-card-glow"></div>
+                    <div class="pg-card-preview">
+                        <i class="fas fa-guitar"></i>
+                    </div>
+                    <div class="pg-card-content">
+                        <h3 class="pg-card-title">Web Synthesizer</h3>
+                        <p class="pg-card-description">Interactive web-based synthesizer with multiple waveforms,
+                            effects, and virtual keyboard.</p>
+                        <div class="pg-card-tags">
+                            <span class="pg-tag">Web Audio</span>
+                            <span class="pg-tag">Music</span>
+                            <span class="pg-tag">Interactive</span>
+                        </div>
+                        <a href="/playground/demos/synthesizer.html" class="pg-card-link magnetic-btn">
+                            <span>Try Now</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Card 9: AI Tic-Tac-Toe -->
+                <article class="pg-card" data-category="game">
+                    <div class="pg-card-glow"></div>
+                    <div class="pg-card-preview">
+                        <i class="fas fa-gamepad"></i>
+                    </div>
+                    <div class="pg-card-content">
+                        <h3 class="pg-card-title">AI Tic-Tac-Toe</h3>
+                        <p class="pg-card-description">Play Tic-Tac-Toe against an AI that learns from your moves with
+                            adaptive difficulty.</p>
+                        <div class="pg-card-tags">
+                            <span class="pg-tag">AI</span>
+                            <span class="pg-tag">Game</span>
+                            <span class="pg-tag">ML</span>
+                        </div>
+                        <a href="/playground/demos/ai-tictactoe.html" class="pg-card-link magnetic-btn">
+                            <span>Try Now</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Card 10: Memory Match -->
+                <article class="pg-card" data-category="game">
+                    <div class="pg-card-glow"></div>
+                    <div class="pg-card-preview">
+                        <i class="fas fa-puzzle-piece"></i>
+                    </div>
+                    <div class="pg-card-content">
+                        <h3 class="pg-card-title">Memory Match</h3>
+                        <p class="pg-card-description">Test your memory with this modern card matching game with themes
+                            and animations.</p>
+                        <div class="pg-card-tags">
+                            <span class="pg-tag">Game</span>
+                            <span class="pg-tag">Animation</span>
+                            <span class="pg-tag">Interactive</span>
+                        </div>
+                        <a href="/playground/demos/memory-match.html" class="pg-card-link magnetic-btn">
+                            <span>Try Now</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Card 11: Modern Snake -->
+                <article class="pg-card" data-category="game">
+                    <div class="pg-card-glow"></div>
+                    <div class="pg-card-preview">
+                        <i class="fas fa-staff-snake"></i>
+                    </div>
+                    <div class="pg-card-content">
+                        <h3 class="pg-card-title">Modern Snake</h3>
+                        <p class="pg-card-description">A modern take on the classic Snake game with smooth controls and
+                            power-ups.</p>
+                        <div class="pg-card-tags">
+                            <span class="pg-tag">Game</span>
+                            <span class="pg-tag">Canvas</span>
+                            <span class="pg-tag">Classic</span>
+                        </div>
+                        <a href="/playground/demos/snake.html" class="pg-card-link magnetic-btn">
+                            <span>Try Now</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Card 12: Fractal Tree -->
+                <article class="pg-card" data-category="visual">
+                    <div class="pg-card-glow"></div>
+                    <div class="pg-card-preview">
+                        <i class="fas fa-tree"></i>
+                    </div>
+                    <div class="pg-card-content">
+                        <h3 class="pg-card-title">Fractal Tree Generator</h3>
+                        <p class="pg-card-description">Create beautiful fractal tree patterns with interactive controls
+                            for branching and colors.</p>
+                        <div class="pg-card-tags">
+                            <span class="pg-tag">Canvas</span>
+                            <span class="pg-tag">Fractals</span>
+                            <span class="pg-tag">Interactive</span>
+                        </div>
+                        <a href="/playground/demos/fractal-tree.html" class="pg-card-link magnetic-btn">
+                            <span>Try Now</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Card 13: Color Palette -->
+                <article class="pg-card" data-category="visual">
+                    <div class="pg-card-glow"></div>
+                    <div class="pg-card-preview">
+                        <i class="fas fa-fill-drip"></i>
+                    </div>
+                    <div class="pg-card-content">
+                        <h3 class="pg-card-title">Color Palette Generator</h3>
+                        <p class="pg-card-description">Create beautiful color schemes with harmony rules, accessibility
+                            checking, and export options.</p>
+                        <div class="pg-card-tags">
+                            <span class="pg-tag">Design</span>
+                            <span class="pg-tag">Colors</span>
+                            <span class="pg-tag">Tools</span>
+                        </div>
+                        <a href="/playground/demos/color-palette.html" class="pg-card-link magnetic-btn">
+                            <span>Try Now</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Card 14: Particle Physics -->
+                <article class="pg-card" data-category="physics">
+                    <div class="pg-card-glow"></div>
+                    <div class="pg-card-preview">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <div class="pg-card-content">
+                        <h3 class="pg-card-title">Particle Physics Sandbox</h3>
+                        <p class="pg-card-description">Create and experiment with particle systems. Features gravity,
+                            forces and collisions.</p>
+                        <div class="pg-card-tags">
+                            <span class="pg-tag">Physics</span>
+                            <span class="pg-tag">Simulation</span>
+                            <span class="pg-tag">Interactive</span>
+                        </div>
+                        <a href="/playground/demos/particle-physics.html" class="pg-card-link magnetic-btn">
+                            <span>Try Now</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Card 15: Sentiment Analysis -->
+                <article class="pg-card" data-category="ai">
+                    <div class="pg-card-glow"></div>
+                    <div class="pg-card-preview">
                         <i class="fas fa-laugh"></i>
                     </div>
-                    <div class="card-content">
-                        <h3>Sentiment Analysis Tool</h3>
-                        <p>Analyze the sentiment of text in real-time. Input text and see if it's positive, negative, or neutral using machine learning.</p>
-                        <div class="card-tags">
-                            <span>AI</span>
-                            <span>NLP</span>
-                            <span>Tool</span>
+                    <div class="pg-card-content">
+                        <h3 class="pg-card-title">Sentiment Analysis Tool</h3>
+                        <p class="pg-card-description">Analyze the sentiment of text in real-time. See if it's positive,
+                            negative, or neutral.</p>
+                        <div class="pg-card-tags">
+                            <span class="pg-tag">AI</span>
+                            <span class="pg-tag">NLP</span>
+                            <span class="pg-tag">Tool</span>
                         </div>
-                        <a href="/playground/demos/sentiment-analysis.html" class="try-now-btn">Try Now</a>
+                        <a href="/playground/demos/sentiment-analysis.html" class="pg-card-link magnetic-btn">
+                            <span>Try Now</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
                     </div>
-                </div>
+                </article>
             </div>
         </section>
     </main>
-    <footer id="about" class="about">
-        <p>© 2025 Th3-C0der. All rights reserved.</p>
-        <div class="social-links">
-            <a href="https://github.com/Th3-C0der" target="_blank" class="social-link">
-                <i class="fab fa-github"></i>
-            </a>
-            <a href="https://youtube.com/@Th3Coder" target="_blank" class="social-link">
-                <i class="fab fa-youtube"></i>
-            </a>
-            <a href="https://instagram.com/th3_c0der" target="_blank" class="social-link">
-                <i class="fab fa-instagram"></i>
-            </a>
-            <a href="https://www.linkedin.com/in/Th3-C0der" target="_blank" class="social-link">
-                <i class="fab fa-linkedin"></i>
-            </a>
-            <a href="https://coff.ee/th3coder" target="_blank" class="social-link ko-fi">
-                <i class="fas fa-coffee"></i>
-            </a>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="footer-content">
+            <div class="footer-wave">
+                <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+                    <path
+                        d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z">
+                    </path>
+                </svg>
+            </div>
+            <div class="footer-inner">
+                <p class="copyright">© 2026 Th3-C0der. All rights reserved.</p>
+                <div class="social-links" style="margin-top: 0;">
+                    <a href="https://github.com/Th3-C0der" target="_blank" class="social-link magnetic-btn"
+                        aria-label="GitHub">
+                        <i class="fab fa-github"></i>
+                    </a>
+                    <a href="https://youtube.com/@Th3Coder" target="_blank" class="social-link magnetic-btn"
+                        aria-label="YouTube">
+                        <i class="fab fa-youtube"></i>
+                    </a>
+                    <a href="https://instagram.com/th3_c0der" target="_blank" class="social-link magnetic-btn"
+                        aria-label="Instagram">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="https://www.linkedin.com/in/Th3-C0der" target="_blank" class="social-link magnetic-btn"
+                        aria-label="LinkedIn">
+                        <i class="fab fa-linkedin"></i>
+                    </a>
+                    <a href="https://coff.ee/th3coder" target="_blank" class="social-link magnetic-btn coffee-link"
+                        aria-label="Buy me a coffee">
+                        <i class="fas fa-coffee"></i>
+                    </a>
+                </div>
+            </div>
         </div>
     </footer>
-    <div class="modal" id="contact-modal">
-        <div class="modal-content">
-            <i class="fas fa-times modal-close"></i>
-            <h2>Contact Me</h2>
-            <form class="contact-form" id="contact-form">
-                <div class="form-group">
-                    <label for="name">Name</label>
-                    <input type="text" id="name" name="name" required>
-                </div>
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="subject">Subject</label>
-                    <input type="text" id="subject" name="subject" required>
-                </div>
-                <div class="form-group">
-                    <label for="message">Message</label>
-                    <textarea id="message" name="message" rows="5" required></textarea>
-                </div>
-                <button type="submit" class="submit-btn">
-                    <i class="fas fa-paper-plane"></i>
-                    Send Message
-                </button>
-            </form>
+
+    <!-- Contact Modal -->
+    <div class="modal-overlay" id="contact-modal">
+        <div class="modal-container">
+            <button class="modal-close" id="modal-close" aria-label="Close modal">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="modal-content">
+                <h2 class="modal-title">Get in Touch</h2>
+                <p class="modal-subtitle">I'd love to hear from you!</p>
+                <form class="contact-form" id="contact-form">
+                    <div class="form-group">
+                        <input type="text" id="name" name="name" required placeholder=" ">
+                        <label for="name">Your Name</label>
+                        <span class="input-highlight"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" id="email" name="email" required placeholder=" ">
+                        <label for="email">Email Address</label>
+                        <span class="input-highlight"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="subject" name="subject" required placeholder=" ">
+                        <label for="subject">Subject</label>
+                        <span class="input-highlight"></span>
+                    </div>
+                    <div class="form-group">
+                        <textarea id="message" name="message" rows="4" required placeholder=" "></textarea>
+                        <label for="message">Your Message</label>
+                        <span class="input-highlight"></span>
+                    </div>
+                    <button type="submit" class="submit-btn magnetic-btn">
+                        <span class="btn-text">Send Message</span>
+                        <span class="btn-icon"><i class="fas fa-paper-plane"></i></span>
+                        <span class="btn-loader"></span>
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
-    <button class="back-to-top" aria-label="Back to top">
-        <i class="fas fa-arrow-up"></i>
+
+    <!-- Back to Top -->
+    <button class="back-to-top" id="back-to-top" aria-label="Back to top">
+        <i class="fas fa-chevron-up"></i>
+        <svg class="progress-ring" viewBox="0 0 36 36">
+            <circle cx="18" cy="18" r="16"></circle>
+        </svg>
     </button>
-    <script type="module">
-        import { initPokemonEffect } from '/static/pokemon-effect.js';
-        import ParticleBackground from '/static/background.js';
 
+    <!-- EmailJS -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+    <!-- Main Script -->
+    <script src="static/new-script.js"></script>
+
+    <!-- Playground-specific functionality -->
+    <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Initialize Pokemon effect
-            initPokemonEffect();
-            
-            // Initialize particle background
-            new ParticleBackground();
+            const cards = document.querySelectorAll('.pg-card');
+            const filterBtns = document.querySelectorAll('.filter-btn:not(.random-btn)');
+            const randomBtn = document.querySelector('.random-btn');
+            const grid = document.getElementById('playground-grid');
 
-            const categoryButtons = document.querySelectorAll('.category-btn:not(.random-btn)');
-            const cards = document.querySelectorAll('.playground-card');
-            const randomButton = document.querySelector('.random-btn');
-            let isAnimating = false;
+            // Initial animations
+            anime({
+                targets: '.disclaimer-banner',
+                opacity: [0, 1],
+                translateY: [20, 0],
+                duration: 800,
+                delay: 300,
+                easing: 'easeOutCubic'
+            });
 
-            // Function to shuffle array
-            function shuffleArray(array) {
+            anime({
+                targets: '.section-label',
+                opacity: [0, 1],
+                translateY: [20, 0],
+                duration: 600,
+                delay: 200,
+                easing: 'easeOutCubic'
+            });
+
+            anime({
+                targets: '.title-word',
+                opacity: [0, 1],
+                translateY: [30, 0],
+                duration: 800,
+                delay: anime.stagger(100, { start: 300 }),
+                easing: 'easeOutCubic'
+            });
+
+            anime({
+                targets: '.section-subtitle',
+                opacity: [0, 1],
+                translateY: [20, 0],
+                duration: 600,
+                delay: 500,
+                easing: 'easeOutCubic'
+            });
+
+            // Stats counter animation
+            const statItems = document.querySelectorAll('.stat-item');
+            statItems.forEach((item, index) => {
+                const value = parseInt(item.dataset.value);
+                const numberEl = item.querySelector('.stat-number');
+
+                anime({
+                    targets: item,
+                    opacity: [0, 1],
+                    translateY: [20, 0],
+                    duration: 600,
+                    delay: 600 + index * 100,
+                    easing: 'easeOutCubic'
+                });
+
+                anime({
+                    targets: { val: 0 },
+                    val: value,
+                    duration: 2000,
+                    delay: 800 + index * 100,
+                    round: 1,
+                    easing: 'easeOutExpo',
+                    update: (anim) => {
+                        numberEl.textContent = Math.floor(anim.animations[0].currentValue);
+                    }
+                });
+            });
+
+            // Shuffle function
+            function shuffle(array) {
                 for (let i = array.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
                     [array[i], array[j]] = [array[j], array[i]];
@@ -928,160 +1568,103 @@
                 return array;
             }
 
-            // Function to randomize card order
-            function randomizeCards() {
+            // Initial card shuffle and display
+            function initCards() {
                 const cardsArray = Array.from(cards);
-                const shuffledCards = shuffleArray(cardsArray);
-                const grid = document.querySelector('.playground-grid');
-                
-                // Remove all cards
-                cards.forEach(card => card.remove());
-                
-                // Add cards back in random order
-                shuffledCards.forEach(card => grid.appendChild(card));
+                shuffle(cardsArray);
+                cardsArray.forEach(card => grid.appendChild(card));
+
+                // Staggered entrance
+                anime({
+                    targets: '.pg-card',
+                    opacity: [0, 1],
+                    scale: [0.95, 1],
+                    translateY: [20, 0],
+                    duration: 600,
+                    delay: anime.stagger(50, { start: 700 }),
+                    easing: 'easeOutCubic',
+                    complete: () => {
+                        cards.forEach(card => card.classList.add('visible'));
+                    }
+                });
             }
 
-            // Initial randomization
-            randomizeCards();
+            initCards();
 
-            // Category filtering with improved animation
-            categoryButtons.forEach(button => {
-                button.addEventListener('click', async () => {
-                    if (isAnimating) return;
-                    isAnimating = true;
+            // Filter functionality
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const category = btn.dataset.category;
 
-                    const category = button.dataset.category;
-                    
-                    // Update active button with animation
-                    categoryButtons.forEach(btn => {
-                        if (btn === button) {
-                            btn.classList.add('active');
-                        } else {
-                            btn.classList.remove('active');
-                        }
-                    });
+                    // Update active button
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
 
-                    // Exit animation for all cards
+                    // Filter cards with animation
                     cards.forEach(card => {
                         if (category === 'all' || card.dataset.category === category) {
-                            card.classList.add('exiting');
-                        }
-                    });
-
-                    // Wait for exit animation
-                    await new Promise(resolve => setTimeout(resolve, 400));
-
-                    // Update visibility and start enter animation
-                    cards.forEach(card => {
-                        if (category === 'all' || card.dataset.category === category) {
-                            card.classList.remove('exiting');
                             card.classList.remove('hidden');
-                            card.classList.add('entering');
+                            anime({
+                                targets: card,
+                                opacity: [0, 1],
+                                scale: [0.9, 1],
+                                duration: 400,
+                                easing: 'easeOutCubic'
+                            });
                         } else {
-                            card.classList.add('hidden');
+                            anime({
+                                targets: card,
+                                opacity: [1, 0],
+                                scale: [1, 0.9],
+                                duration: 300,
+                                easing: 'easeInCubic',
+                                complete: () => {
+                                    card.classList.add('hidden');
+                                }
+                            });
                         }
                     });
-
-                    // Wait for enter animation
-                    await new Promise(resolve => setTimeout(resolve, 400));
-
-                    // Clean up classes
-                    cards.forEach(card => {
-                        card.classList.remove('entering');
-                    });
-
-                    // Randomize visible cards
-                    if (category === 'all') {
-                        randomizeCards();
-                    }
-
-                    isAnimating = false;
                 });
             });
 
-            // Random demo functionality with improved animation
-            randomButton.addEventListener('click', async () => {
-                if (isAnimating) return;
-                isAnimating = true;
-
-                const visibleCards = Array.from(cards).filter(card => !card.classList.contains('hidden'));
+            // Random button
+            randomBtn.addEventListener('click', () => {
+                const visibleCards = Array.from(cards).filter(c => !c.classList.contains('hidden'));
                 if (visibleCards.length > 0) {
-                    // Add click animation
-                    randomButton.style.transform = 'scale(0.95)';
-                    await new Promise(resolve => setTimeout(resolve, 100));
-                    randomButton.style.transform = 'translateY(-2px) scale(1.05)';
-
-                    // Select random card and navigate
                     const randomCard = visibleCards[Math.floor(Math.random() * visibleCards.length)];
-                    const demoLink = randomCard.querySelector('.try-now-btn').href;
-                    
-                    // Add transition effect
-                    document.body.style.opacity = '0';
-                    document.body.style.transition = 'opacity 0.3s ease';
-                    
-                    await new Promise(resolve => setTimeout(resolve, 300));
-                    window.location.href = demoLink;
+                    const link = randomCard.querySelector('.pg-card-link').href;
+
+                    // Transition effect
+                    anime({
+                        targets: 'body',
+                        opacity: [1, 0],
+                        duration: 300,
+                        easing: 'easeInCubic',
+                        complete: () => {
+                            window.location.href = link;
+                        }
+                    });
                 }
-                isAnimating = false;
             });
 
-            // Initialize with 'all' category
-            document.querySelector('[data-category="all"]').click();
+            // Card glow effect
+            cards.forEach(card => {
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = ((e.clientX - rect.left) / rect.width) * 100;
+                    const y = ((e.clientY - rect.top) / rect.height) * 100;
+                    card.style.setProperty('--glow-x', x + '%');
+                    card.style.setProperty('--glow-y', y + '%');
+                });
+            });
         });
     </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Smooth scroll for anchor links
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    const targetId = this.getAttribute('href');
-                    if (targetId === '#') return;
-                    
-                    const targetElement = document.querySelector(targetId);
-                    if (targetElement) {
-                        targetElement.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start'
-                        });
-                    }
-                });
-            });
 
-            // Handle links to other pages
-            document.querySelectorAll('a[href^="/"]').forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const href = this.getAttribute('href');
-                    if (href.startsWith('/#')) {
-                        // Handle links to sections on the home page
-                        const sectionId = href.substring(1);
-                        window.location.href = '/' + sectionId;
-                    } else {
-                        // Handle regular page navigation
-                        window.location.href = href;
-                    }
-                });
-            });
-
-            // Back to top button
-            const backToTop = document.querySelector('.back-to-top');
-            
-            window.addEventListener('scroll', () => {
-                if (window.pageYOffset > 300) {
-                    backToTop.classList.add('visible');
-                } else {
-                    backToTop.classList.remove('visible');
-                }
-            });
-
-            backToTop.addEventListener('click', () => {
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                });
-            });
-        });
+    <!-- Pokemon Click Effect -->
+    <script type="module">
+        import { initPokemonEffect } from '/static/pokemon-effect.js';
+        initPokemonEffect();
     </script>
 </body>
-</html> 
+
+</html>

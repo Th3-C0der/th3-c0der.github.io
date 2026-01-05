@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Memory Match - Th3-C0der Playground</title>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718" crossorigin="anonymous"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718"
+        crossorigin="anonymous"></script>
     <style>
         body {
             margin: 0;
@@ -48,7 +50,8 @@
             transform: rotateY(180deg);
         }
 
-        .card-front, .card-back {
+        .card-front,
+        .card-back {
             position: absolute;
             width: 100%;
             height: 100%;
@@ -117,7 +120,8 @@
             transform: rotate(180deg);
         }
 
-        select, button {
+        select,
+        button {
             padding: 0.8rem 1.5rem;
             border: none;
             border-radius: 8px;
@@ -128,7 +132,8 @@
             font-size: 1rem;
         }
 
-        select:hover, button:hover {
+        select:hover,
+        button:hover {
             background: rgba(255, 255, 255, 0.2);
             transform: translateY(-1px);
         }
@@ -191,8 +196,15 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
-            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
         }
 
         .confetti {
@@ -204,8 +216,13 @@
         }
 
         @keyframes confetti-fall {
-            0% { transform: translateY(-100vh) rotate(0deg); }
-            100% { transform: translateY(100vh) rotate(360deg); }
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+            }
+
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+            }
         }
 
         @media (max-width: 600px) {
@@ -241,8 +258,22 @@
                 font-size: 1.5rem;
             }
         }
+
+        .ad-overlay-bottom {
+            position: fixed;
+            bottom: 0px;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            padding: 10px 0;
+            display: flex;
+            justify-content: center;
+        }
     </style>
 </head>
+
 <body>
     <a href="/playground" class="back-btn">← Back to Playground</a>
     <div class="game-container">
@@ -307,7 +338,7 @@
             setupControlsToggle() {
                 const toggle = document.getElementById('controlsToggle');
                 const controls = document.getElementById('gameControls');
-                
+
                 toggle.addEventListener('click', () => {
                     controls.classList.toggle('minimized');
                     toggle.classList.toggle('minimized');
@@ -328,7 +359,7 @@
                 // Reset timeout on user interaction
                 controls.addEventListener('mouseenter', resetTimeout);
                 controls.addEventListener('touchstart', resetTimeout);
-                
+
                 // Initial timeout
                 resetTimeout();
             }
@@ -348,12 +379,12 @@
             createBoard() {
                 const board = document.getElementById('board');
                 board.innerHTML = '';
-                
+
                 const difficulty = document.getElementById('difficulty').value;
                 const theme = document.getElementById('theme').value;
-                
+
                 let rows, cols;
-                switch(difficulty) {
+                switch (difficulty) {
                     case 'easy':
                         rows = 3; cols = 4;
                         break;
@@ -366,7 +397,7 @@
                 }
 
                 board.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-                
+
                 const cardCount = rows * cols;
                 const symbols = this.themes[theme].slice(0, cardCount / 2);
                 this.cards = [...symbols, ...symbols]
@@ -382,17 +413,17 @@
                     const cardElement = document.createElement('div');
                     cardElement.className = 'card';
                     cardElement.dataset.id = card.id;
-                    
+
                     const front = document.createElement('div');
                     front.className = 'card-front';
                     front.textContent = card.symbol;
-                    
+
                     const back = document.createElement('div');
                     back.className = 'card-back';
-                    
+
                     cardElement.appendChild(front);
                     cardElement.appendChild(back);
-                    
+
                     cardElement.addEventListener('click', () => this.flipCard(card.id));
                     board.appendChild(cardElement);
                 });
@@ -400,15 +431,15 @@
 
             flipCard(id) {
                 if (this.isLocked) return;
-                
+
                 const card = this.cards[id];
                 if (card.isFlipped || card.isMatched) return;
-                
+
                 const cardElement = document.querySelector(`[data-id="${id}"]`);
                 cardElement.classList.add('flipped');
                 card.isFlipped = true;
                 this.flippedCards.push(card);
-                
+
                 if (this.flippedCards.length === 2) {
                     this.moves++;
                     this.updateStats();
@@ -419,13 +450,13 @@
             checkMatch() {
                 this.isLocked = true;
                 const [card1, card2] = this.flippedCards;
-                
+
                 if (card1.symbol === card2.symbol) {
                     this.matchedPairs++;
                     card1.isMatched = card2.isMatched = true;
                     this.flippedCards = [];
                     this.isLocked = false;
-                    
+
                     if (this.matchedPairs === this.cards.length / 2) {
                         this.handleWin();
                     }
@@ -433,10 +464,10 @@
                     setTimeout(() => {
                         const card1Element = document.querySelector(`[data-id="${card1.id}"]`);
                         const card2Element = document.querySelector(`[data-id="${card2.id}"]`);
-                        
+
                         card1Element.classList.remove('flipped');
                         card2Element.classList.remove('flipped');
-                        
+
                         card1.isFlipped = card2.isFlipped = false;
                         this.flippedCards = [];
                         this.isLocked = false;
@@ -467,7 +498,7 @@
             handleWin() {
                 this.stopTimer();
                 this.createConfetti();
-                
+
                 const winMessage = document.createElement('div');
                 winMessage.className = 'win-message';
                 winMessage.innerHTML = `
@@ -486,7 +517,7 @@
                     confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
                     confetti.style.animationDelay = Math.random() * 3 + 's';
                     document.body.appendChild(confetti);
-                    
+
                     setTimeout(() => confetti.remove(), 3000);
                 }
             }
@@ -495,5 +526,17 @@
         // Initialize game
         const game = new MemoryGame();
     </script>
+    <div class="ad-overlay-bottom" style="z-index: 1000;">
+        <div style="width:100%; display:flex; flex-direction:column; align-items:center;">
+            <span class="ad-label" style="color:#aaa;">Advertisement</span>
+            <ins class="adsbygoogle" style="display:block; width:100%; height:90px;"
+                data-ad-client="ca-pub-5166575587547718" data-ad-slot="overlay-unit" data-ad-format="auto"
+                data-full-width-responsive="true"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+    </div>
 </body>
-</html> 
+
+</html>

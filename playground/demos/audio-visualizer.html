@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Audio Visualizer - Th3-C0der Playground</title>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718" crossorigin="anonymous"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718"
+        crossorigin="anonymous"></script>
     <style>
         body {
             margin: 0;
@@ -36,7 +38,7 @@
 
         .controls {
             position: fixed;
-            bottom: 20px;
+            bottom: 160px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 2;
@@ -95,7 +97,7 @@
 
         .progress-container {
             position: fixed;
-            bottom: 0;
+            bottom: 100px;
             left: 0;
             right: 0;
             padding: 10px 20px;
@@ -119,7 +121,8 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .controls button, .controls select {
+        .controls button,
+        .controls select {
             background: rgba(255, 255, 255, 0.15);
             border: 1px solid rgba(255, 255, 255, 0.2);
             padding: 12px 15px;
@@ -133,12 +136,14 @@
             font-weight: 500;
         }
 
-        .controls button:hover, .controls select:hover {
+        .controls button:hover,
+        .controls select:hover {
             background: rgba(255, 255, 255, 0.25);
             transform: translateY(-1px);
         }
 
-        .controls button:active, .controls select:active {
+        .controls button:active,
+        .controls select:active {
             transform: translateY(1px);
         }
 
@@ -149,6 +154,7 @@
             border-radius: 4px;
             height: 6px;
             -webkit-appearance: none;
+            appearance: none;
         }
 
         .back-btn {
@@ -279,7 +285,8 @@
                 gap: 8px;
             }
 
-            .controls button, .controls select {
+            .controls button,
+            .controls select {
                 padding: 8px 12px;
                 font-size: 13px;
             }
@@ -319,7 +326,8 @@
                 padding: 8px;
             }
 
-            .controls button, .controls select {
+            .controls button,
+            .controls select {
                 padding: 6px 10px;
                 font-size: 12px;
             }
@@ -329,8 +337,22 @@
                 font-size: 12px;
             }
         }
+
+        .ad-overlay-bottom {
+            position: fixed;
+            bottom: 0px;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            padding: 10px 0;
+            display: flex;
+            justify-content: center;
+        }
     </style>
 </head>
+
 <body>
     <canvas id="visualizer"></canvas>
     <a href="/playground" class="back-btn">← Back to Playground</a>
@@ -422,8 +444,8 @@
 
         function loadAudio(file) {
             const reader = new FileReader();
-            reader.onload = function(e) {
-                audioContext.decodeAudioData(e.target.result, function(buffer) {
+            reader.onload = function (e) {
+                audioContext.decodeAudioData(e.target.result, function (buffer) {
                     audioBuffer = buffer;
                     durationDisplay.textContent = formatTime(buffer.duration);
                     playAudio();
@@ -438,13 +460,13 @@
             }
             source = audioContext.createBufferSource();
             source.buffer = audioBuffer;
-            
+
             // Connect nodes
             source.connect(analyser);
             analyser.connect(bassBoost);
             bassBoost.connect(gainNode);
             gainNode.connect(audioContext.destination);
-            
+
             if (pausedTime) {
                 source.start(0, pausedTime);
                 startTime = audioContext.currentTime - pausedTime;
@@ -452,7 +474,7 @@
                 source.start(0);
                 startTime = audioContext.currentTime;
             }
-            
+
             isPlaying = true;
             draw();
         }
@@ -488,12 +510,12 @@
 
         function updateProgress() {
             if (!isPlaying) return;
-            
+
             const currentTime = audioContext.currentTime - startTime;
             const progress = (currentTime / audioBuffer.duration) * 100;
             progressBar.style.width = `${progress}%`;
             currentTimeDisplay.textContent = formatTime(currentTime);
-            
+
             requestAnimationFrame(updateProgress);
         }
 
@@ -508,7 +530,7 @@
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             const type = visualizerType.value;
-            switch(type) {
+            switch (type) {
                 case 'bars':
                     drawBars();
                     break;
@@ -533,15 +555,15 @@
 
             for (let i = 0; i < dataArray.length; i++) {
                 const barHeight = (dataArray[i] / 255) * canvas.height;
-                
+
                 const gradient = ctx.createLinearGradient(0, canvas.height, 0, 0);
                 gradient.addColorStop(0, '#00ff00');
                 gradient.addColorStop(0.5, '#ffff00');
                 gradient.addColorStop(1, '#ff0000');
-                
+
                 ctx.fillStyle = gradient;
                 ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
-                
+
                 x += barWidth;
             }
         }
@@ -559,7 +581,7 @@
             for (let i = 0; i < dataArray.length; i++) {
                 const angle = (i * 2 * Math.PI) / dataArray.length;
                 const amplitude = (dataArray[i] / 255) * radius * 0.5;
-                
+
                 const x1 = centerX + Math.cos(angle) * radius;
                 const y1 = centerY + Math.sin(angle) * radius;
                 const x2 = centerX + Math.cos(angle) * (radius + amplitude);
@@ -581,7 +603,7 @@
             for (let i = 0; i < dataArray.length; i++) {
                 const x = (i / dataArray.length) * canvas.width;
                 const y = (dataArray[i] / 255) * canvas.height;
-                
+
                 if (i === 0) {
                     ctx.moveTo(x, y);
                 } else {
@@ -602,7 +624,7 @@
             for (let i = 0; i < dataArray.length; i++) {
                 const angle = (i * 2 * Math.PI) / dataArray.length;
                 const amplitude = (dataArray[i] / 255) * radius;
-                
+
                 const x = centerX + Math.cos(angle) * amplitude;
                 const y = centerY + Math.sin(angle) * amplitude;
 
@@ -626,18 +648,18 @@
             for (let i = 0; i < dataArray.length; i++) {
                 const height = (dataArray[i] / 255) * maxHeight;
                 const x = (i - dataArray.length / 2) * barWidth;
-                
+
                 // Draw 3D effect
                 ctx.fillStyle = 'rgba(0, 255, 0, 0.5)';
-                ctx.fillRect(x, -height/2, barWidth, height);
-                
+                ctx.fillRect(x, -height / 2, barWidth, height);
+
                 // Draw top face
                 ctx.fillStyle = 'rgba(0, 255, 0, 0.8)';
                 ctx.beginPath();
-                ctx.moveTo(x, -height/2);
-                ctx.lineTo(x + barWidth, -height/2);
-                ctx.lineTo(x + barWidth, -height/2 - 10);
-                ctx.lineTo(x, -height/2 - 10);
+                ctx.moveTo(x, -height / 2);
+                ctx.lineTo(x + barWidth, -height / 2);
+                ctx.lineTo(x + barWidth, -height / 2 - 10);
+                ctx.lineTo(x, -height / 2 - 10);
                 ctx.closePath();
                 ctx.fill();
             }
@@ -672,7 +694,7 @@
         });
 
         document.addEventListener('keydown', (e) => {
-            switch(e.code) {
+            switch (e.code) {
                 case 'Space':
                     togglePlayPause();
                     break;
@@ -715,7 +737,7 @@
             const toggle = document.getElementById('controlsToggle');
             const controls = document.getElementById('controls');
             const progressContainer = document.getElementById('progressContainer');
-            
+
             toggle.addEventListener('click', () => {
                 controls.classList.toggle('minimized');
                 toggle.classList.toggle('minimized');
@@ -740,7 +762,7 @@
             controls.addEventListener('touchstart', resetTimeout);
             progressContainer.addEventListener('mouseenter', resetTimeout);
             progressContainer.addEventListener('touchstart', resetTimeout);
-            
+
             // Initial timeout
             resetTimeout();
         }
@@ -750,5 +772,17 @@
             setupControlsToggle();
         });
     </script>
+    <div class="ad-overlay-bottom">
+        <div style="width:100%; display:flex; flex-direction:column; align-items:center;">
+            <span class="ad-label" style="color:#aaa;">Advertisement</span>
+            <ins class="adsbygoogle" style="display:block; width:100%; height:90px;"
+                data-ad-client="ca-pub-5166575587547718" data-ad-slot="overlay-unit" data-ad-format="auto"
+                data-full-width-responsive="true"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+    </div>
 </body>
-</html> 
+
+</html>

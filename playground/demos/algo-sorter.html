@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Algo Sorter - Th3-C0der Playground</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718"
+        crossorigin="anonymous"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #111;
+            color: #eee;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .header {
+            width: 100%;
+            padding: 20px;
+            background: #1a1a1a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+            z-index: 10;
+        }
+
+        .back-btn {
+            color: #888;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: color 0.2s;
+        }
+
+        .back-btn:hover {
+            color: #fff;
+        }
+
+        .title {
+            font-size: 1.5rem;
+            color: #00ffaa;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        button {
+            background: #333;
+            color: #fff;
+            border: 1px solid #555;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            background: #444;
+            border-color: #00ffaa;
+        }
+
+        button:active {
+            background: #00ffaa;
+            color: #000;
+        }
+
+        button.active {
+            background: #00ffaa;
+            color: #000;
+            border-color: #00ffaa;
+        }
+
+        .viz-container {
+            flex-grow: 1;
+            width: 100%;
+            padding: 20px;
+            padding-bottom: 110px;
+            /* Space for Ad */
+            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 2px;
+            position: relative;
+        }
+
+        .bar {
+            background: #00ddee;
+            width: 10px;
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+            transition: height 0.1s;
+            /* smooth or snap? Snap is better for exact algo viz often, but 0.1s looks nice */
+        }
+
+        .bar.compare {
+            background: #ff0055;
+        }
+
+        .bar.swap {
+            background: #ffff00;
+        }
+
+        .bar.sorted {
+            background: #00ff66;
+        }
+
+        .stats {
+            position: absolute;
+            top: 10px;
+            left: 20px;
+            font-family: monospace;
+            color: #aaa;
+        }
+
+        .ad-overlay-bottom {
+            position: fixed;
+            bottom: 0px;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            padding: 10px 0;
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <a href="/playground" class="back-btn"><i class="fas fa-arrow-left"></i> Back</a>
+        <div class="title">Algo Sorter</div>
+        <div class="controls">
+            <button id="algoBubble" class="active">Bubble</button>
+            <button id="algoQuick">Quick</button>
+            <button id="algoMerge">Merge</button>
+            <button id="algoHeap">Heap</button>
+            <div style="width: 1px; height: 20px; background: #444;"></div>
+            <button id="resetBtn">Shuffle</button>
+            <button id="startBtn">Sort</button>
+        </div>
+    </div>
+
+    <div class="viz-container" id="container">
+        <div class="stats">
+            Comparisons: <span id="compCount">0</span><br>
+            Swaps: <span id="swapCount">0</span>
+        </div>
+        <!-- Bars injected here -->
+    </div>
+
+    <script>
+        const container = document.getElementById('container');
+        const compEl = document.getElementById('compCount');
+        const swapEl = document.getElementById('swapCount');
+
+        const N = 80;
+        let array = [];
+        let bars = [];
+        let delay = 20;
+
+        let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playNote(val) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+
+            // Map value 0-100 to freq 200-800
+            const freq = 200 + (val / 100) * 600;
+
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+            gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.1);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.1);
+        }
+
+        function initArray() {
+            container.innerHTML = `<div class="stats">
+            Comparisons: <span id="compCount">0</span><br>
+            Swaps: <span id="swapCount">0</span>
+        </div>`;
+            // Re-bind elements because innerHTML wiped them (oops)
+            // Just append bars.
+            // Actually better to just clear bars
+
+            // Re-query stats
+            // The logic above is messy. Let's structure correctly.
+
+            // Clear existing bars
+            const existingBars = document.querySelectorAll('.bar');
+            existingBars.forEach(b => b.remove());
+
+            array = [];
+            bars = [];
+            for (let i = 0; i < N; i++) {
+                const val = Math.floor(Math.random() * 100) + 1;
+                array.push(val);
+
+                const bar = document.createElement('div');
+                bar.classList.add('bar');
+                bar.style.height = `${val}%`;
+                bar.style.width = `${100 / N}%`;
+                container.appendChild(bar);
+                bars.push(bar);
+            }
+
+            document.getElementById('compCount').innerText = '0';
+            document.getElementById('swapCount').innerText = '0';
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        async function swap(i, j) {
+            await sleep(delay);
+            let temp = array[i];
+            array[i] = array[j];
+            array[j] = temp;
+
+            bars[i].style.height = `${array[i]}%`;
+            bars[j].style.height = `${array[j]}%`;
+            bars[i].classList.add('swap');
+            bars[j].classList.add('swap');
+
+            playNote(array[i]);
+
+            updateStats('swap');
+
+            await sleep(delay);
+            bars[i].classList.remove('swap');
+            bars[j].classList.remove('swap');
+        }
+
+        function updateStats(type) {
+            const stats = document.getElementById(type === 'swap' ? 'swapCount' : 'compCount');
+            if (stats) stats.innerText = parseInt(stats.innerText) + 1;
+        }
+
+        async function mark(i, colorClass) {
+            bars[i].classList.add(colorClass);
+        }
+        async function unmark(i, colorClass) {
+            bars[i].classList.remove(colorClass);
+        }
+
+        // ALGOS
+
+        async function bubbleSort() {
+            for (let i = 0; i < N; i++) {
+                for (let j = 0; j < N - i - 1; j++) {
+                    mark(j, 'compare');
+                    mark(j + 1, 'compare');
+                    await sleep(delay);
+                    playNote(array[j]);
+                    updateStats('comp');
+
+                    if (array[j] > array[j + 1]) {
+                        await swap(j, j + 1);
+                    }
+
+                    unmark(j, 'compare');
+                    unmark(j + 1, 'compare');
+                }
+                bars[N - i - 1].classList.add('sorted');
+            }
+        }
+
+        async function quickSort(start, end) {
+            if (start >= end) {
+                if (start >= 0 && start < N) bars[start].classList.add('sorted');
+                return;
+            }
+
+            let index = await partition(start, end);
+            await quickSort(start, index - 1); // left
+            await quickSort(index + 1, end); // right
+        }
+
+        async function partition(start, end) {
+            let pivotIndex = start;
+            let pivotValue = array[end];
+            mark(end, 'swap'); // Pivot visual
+
+            for (let i = start; i < end; i++) {
+                mark(i, 'compare');
+                await sleep(delay);
+                updateStats('comp');
+                playNote(array[i]);
+
+                if (array[i] < pivotValue) {
+                    await swap(i, pivotIndex);
+                    pivotIndex++;
+                }
+                unmark(i, 'compare');
+            }
+            await swap(pivotIndex, end);
+            unmark(end, 'swap');
+
+            bars[pivotIndex].classList.add('sorted'); // Fixed position
+            return pivotIndex;
+        }
+
+        // Merge Sort (Hard to viz in-place easily without aux array, but visual swap style?)
+        // Standard merge uses auxiliary. Let's do simple Merge.
+        async function mergeSort(start, end) {
+            if (start >= end) return;
+            const mid = Math.floor((start + end) / 2);
+            await mergeSort(start, mid);
+            await mergeSort(mid + 1, end);
+            await merge(start, mid, end);
+        }
+
+        async function merge(start, mid, end) {
+            // Visualizing merge requires rewriting values from aux
+            // We can simulate it by shifting elements or overwriting
+
+            let left = array.slice(start, mid + 1);
+            let right = array.slice(mid + 1, end + 1);
+
+            let i = 0, j = 0, k = start;
+
+            while (i < left.length && j < right.length) {
+                await sleep(delay);
+                mark(k, 'compare');
+                updateStats('comp');
+                playNote(array[k]);
+
+                if (left[i] <= right[j]) {
+                    array[k] = left[i];
+                    bars[k].style.height = `${array[k]}%`;
+                    i++;
+                } else {
+                    array[k] = right[j];
+                    bars[k].style.height = `${array[k]}%`;
+                    j++;
+                }
+                unmark(k, 'compare');
+                k++;
+            }
+
+            while (i < left.length) {
+                await sleep(delay);
+                array[k] = left[i];
+                bars[k].style.height = `${array[k]}%`;
+                playNote(array[k]);
+                i++; k++;
+            }
+            while (j < right.length) {
+                await sleep(delay);
+                array[k] = right[j];
+                bars[k].style.height = `${array[k]}%`;
+                playNote(array[k]);
+                j++; k++;
+            }
+        }
+
+        async function heapSort() {
+            let n = N;
+
+            // Build heap
+            for (let i = Math.floor(n / 2) - 1; i >= 0; i--) {
+                await heapify(n, i);
+            }
+
+            // Extract
+            for (let i = n - 1; i > 0; i--) {
+                await swap(0, i);
+                bars[i].classList.add('sorted');
+                await heapify(i, 0);
+            }
+            bars[0].classList.add('sorted');
+        }
+
+        async function heapify(n, i) {
+            let largest = i;
+            let l = 2 * i + 1;
+            let r = 2 * i + 2;
+
+            if (l < n) {
+                updateStats('comp');
+                mark(l, 'compare');
+                if (array[l] > array[largest]) largest = l;
+                await sleep(delay);
+                unmark(l, 'compare');
+            }
+
+            if (r < n) {
+                updateStats('comp');
+                mark(r, 'compare');
+                if (array[r] > array[largest]) largest = r;
+                await sleep(delay);
+                unmark(r, 'compare');
+            }
+
+            if (largest !== i) {
+                await swap(i, largest);
+                await heapify(n, largest);
+            }
+        }
+
+        // Controls
+        let currentAlgo = 'bubble';
+
+        document.querySelectorAll('button').forEach(b => {
+            b.addEventListener('click', e => {
+                const id = b.id;
+                if (id.startsWith('algo')) {
+                    document.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+                    b.classList.add('active');
+                    currentAlgo = id.replace('algo', '').toLowerCase();
+                } else if (id === 'resetBtn') {
+                    // Stop current? Hard to stop async without flag.
+                    // Just reload page or implement cancel token?
+                    // Reload simplest for now or simple cancel flag
+                    location.reload();
+                    // initArray(); 
+                } else if (id === 'startBtn') {
+                    b.disabled = true;
+                    runSort();
+                }
+            });
+        });
+
+        async function runSort() {
+            if (currentAlgo === 'bubble') await bubbleSort();
+            if (currentAlgo === 'quick') {
+                await quickSort(0, N - 1);
+                // Mark all sorted at end to be sure
+                bars.forEach(b => b.classList.add('sorted'));
+            }
+            if (currentAlgo === 'merge') {
+                await mergeSort(0, N - 1);
+                bars.forEach(b => b.classList.add('sorted'));
+            }
+            if (currentAlgo === 'heap') await heapSort();
+        }
+
+        initArray();
+
+    </script>
+    <div class="ad-overlay-bottom">
+        <div style="width:100%; display:flex; flex-direction:column; align-items:center;">
+            <span class="ad-label" style="color:#aaa;">Advertisement</span>
+            <ins class="adsbygoogle" style="display:block; width:100%; height:90px;"
+                data-ad-client="ca-pub-5166575587547718" data-ad-slot="overlay-unit" data-ad-format="auto"
+                data-full-width-responsive="true"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+    </div>
+</body>
+
+</html>

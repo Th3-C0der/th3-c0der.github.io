@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Lissajous Canvas - Th3-C0der Playground</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718"
+        crossorigin="anonymous"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #000;
+            color: #fff;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            height: 100vh;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .controls {
+            width: 300px;
+            background: #111;
+            border-right: 1px solid #333;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+            z-index: 10;
+            padding-bottom: 100px;
+        }
+
+        .canvas-area {
+            flex-grow: 1;
+            position: relative;
+            background: #050505;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: #888;
+            text-decoration: none;
+            margin-bottom: 20px;
+            transition: color 0.3s;
+        }
+
+        .back-btn:hover {
+            color: #fff;
+        }
+
+        h2 {
+            margin: 0;
+            color: #00ddee;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 1.2rem;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-size: 0.85rem;
+            color: #aaa;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            -webkit-appearance: none;
+            appearance: none;
+            background: #333;
+            height: 4px;
+            border-radius: 2px;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #00ddee;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .value-disp {
+            color: #fff;
+            font-family: monospace;
+        }
+
+        button {
+            padding: 10px;
+            background: transparent;
+            border: 1px solid #00ddee;
+            color: #00ddee;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: rgba(0, 221, 238, 0.1);
+        }
+
+        .ad-overlay-bottom {
+            position: fixed;
+            bottom: 0px;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            padding: 10px 0;
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="controls">
+        <a href="/playground" class="back-btn"><i class="fas fa-arrow-left"></i> Back</a>
+        <h2>Lissajous Canvas</h2>
+
+        <div class="control-group">
+            <label>X Frequency <span id="xFreqVal" class="value-disp">3</span></label>
+            <input type="range" id="xFreq" min="1" max="20" value="3">
+        </div>
+
+        <div class="control-group">
+            <label>Y Frequency <span id="yFreqVal" class="value-disp">2</span></label>
+            <input type="range" id="yFreq" min="1" max="20" value="2">
+        </div>
+
+        <div class="control-group">
+            <label>Phase Shift <span id="phaseVal" class="value-disp">90</span></label>
+            <input type="range" id="phase" min="0" max="360" value="90">
+        </div>
+
+        <div class="control-group">
+            <label>Speed <span id="speedVal" class="value-disp">1.0</span></label>
+            <input type="range" id="speed" min="0" max="5" step="0.1" value="1.0">
+        </div>
+
+        <div class="control-group">
+            <label>Trail Length</label>
+            <input type="range" id="trail" min="0.01" max="0.5" step="0.01" value="0.05">
+        </div>
+
+        <div class="control-group">
+            <label>Line Width</label>
+            <input type="range" id="lineWidth" min="1" max="10" value="2">
+        </div>
+
+        <button id="resetBtn">Reset View</button>
+    </div>
+
+    <div class="canvas-area">
+        <canvas id="canvas"></canvas>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const container = document.querySelector('.canvas-area');
+
+        let width, height, cx, cy;
+        let time = 0;
+
+        // Params
+        const params = {
+            ax: 3,
+            ay: 2,
+            delta: Math.PI / 2, // 90 deg
+            speed: 1.0,
+            trail: 0.05,
+            lineWidth: 2,
+            autoRotatePhase: true
+        };
+
+        function resize() {
+            width = container.clientWidth;
+            height = container.clientHeight;
+            canvas.width = width;
+            canvas.height = height;
+            cx = width / 2;
+            cy = height / 2;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        function draw() {
+            // Fade effect for trail
+            ctx.fillStyle = `rgba(0, 0, 0, ${params.trail})`;
+            ctx.fillRect(0, 0, width, height);
+
+            ctx.lineWidth = params.lineWidth;
+
+            // Draw the curve
+            // We draw a segment from t to t+step
+
+            const amplitude = Math.min(width, height) * 0.4;
+            const step = 0.01;
+            const drawLength = 200; // segments per frame?
+
+            // If we animate phase, the whole curve shifts.
+            // If we animate 'time' parameter input to sin, a point moves along the curve.
+            // Let's do both: The curve itself morphs (phase change) + we draw it.
+
+            if (params.autoRotatePhase) {
+                params.delta += 0.01 * params.speed;
+            }
+
+            ctx.beginPath();
+
+            // Drawing the closed loops is tricky with trails.
+            // Let's just draw the entire curve frame by frame?
+            // "Trail" implies motion blur.
+
+            // Let's draw the full Lissajous curve for current Phase
+            // But if we clear heavily, it flickers.
+
+            // Lissajous Table style: A point moving?
+            // Or the whole shape rotating 3D style?
+
+            // Approach: Draw the full shape with current parameters.
+
+            // x = A * sin(ax * t + delta)
+            // y = B * sin(ay * t)
+
+            // We'll draw 0 to 2*PI, sufficient for integer ratios?
+            // Need LCM of periods. 2*PI usually enough for simple integers.
+
+            ctx.strokeStyle = `hsl(${params.delta * 20}, 100%, 50%)`;
+
+            const resolution = 2000;
+            const tEnd = Math.PI * 2 * 10; // Cover generic
+
+            // Optimization: Just draw it.
+            // But if trail is low opacity, we want moving dot.
+
+            // Let's do: Moving Dot leaving trail
+
+            time += 0.02 * params.speed;
+
+            // Calculate point
+            const x = cx + amplitude * Math.sin(params.ax * time + params.delta);
+            const y = cy + amplitude * Math.sin(params.ay * time);
+
+            // We can rely on canvas "trail" clearing to handle the history
+            // We just draw line from last pos
+            if (window.lastX === undefined) { window.lastX = x; window.lastY = y; }
+
+            ctx.beginPath();
+            ctx.moveTo(window.lastX, window.lastY);
+            ctx.lineTo(x, y);
+            ctx.stroke();
+
+            // Draw Head
+            ctx.fillStyle = '#fff';
+            ctx.beginPath();
+            ctx.arc(x, y, params.lineWidth + 2, 0, Math.PI * 2);
+            ctx.fill();
+
+            window.lastX = x;
+            window.lastY = y;
+
+            requestAnimationFrame(draw);
+        }
+
+        draw();
+
+        // Bindings
+        document.getElementById('xFreq').addEventListener('input', e => {
+            params.ax = parseInt(e.target.value);
+            document.getElementById('xFreqVal').innerText = params.ax;
+            // Trail break
+            window.lastX = undefined;
+        });
+        document.getElementById('yFreq').addEventListener('input', e => {
+            params.ay = parseInt(e.target.value);
+            document.getElementById('yFreqVal').innerText = params.ay;
+            window.lastX = undefined;
+        });
+        document.getElementById('phase').addEventListener('input', e => {
+            params.delta = parseInt(e.target.value) * Math.PI / 180;
+            document.getElementById('phaseVal').innerText = e.target.value;
+            params.autoRotatePhase = false; // User took control
+        });
+        document.getElementById('speed').addEventListener('input', e => {
+            params.speed = parseFloat(e.target.value);
+            document.getElementById('speedVal').innerText = params.speed;
+            if (params.speed > 0) params.autoRotatePhase = true;
+        });
+        document.getElementById('trail').addEventListener('input', e => {
+            params.trail = parseFloat(e.target.value);
+        });
+        document.getElementById('lineWidth').addEventListener('input', e => {
+            params.lineWidth = parseInt(e.target.value);
+        });
+
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            params.delta = 0;
+            time = 0;
+            ctx.fillStyle = "#000";
+            ctx.fillRect(0, 0, width, height);
+            window.lastX = undefined;
+            // Reset sliders if desired
+        });
+
+    </script>
+    <div class="ad-overlay-bottom" style="z-index: 1000;">
+        <div style="width:100%; display:flex; flex-direction:column; align-items:center;">
+            <span class="ad-label" style="color:#aaa;">Advertisement</span>
+            <ins class="adsbygoogle" style="display:block; width:100%; height:90px;"
+                data-ad-client="ca-pub-5166575587547718" data-ad-slot="overlay-unit" data-ad-format="auto"
+                data-full-width-responsive="true"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+    </div>
+</body>
+
+</html>

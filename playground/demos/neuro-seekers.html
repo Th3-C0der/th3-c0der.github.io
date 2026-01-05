@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Neuro Seekers - Th3-C0der Playground</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718"
+        crossorigin="anonymous"></script>
+    <style>
+        body {
+            background-color: #050510;
+            color: #fff;
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #0a0a15;
+            border-right: 1px solid #1f1f33;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 10;
+        }
+
+        .canvas-container {
+            flex-grow: 1;
+            position: relative;
+            background: #000;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .back-btn {
+            color: #888;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            transition: color 0.2s;
+        }
+
+        .back-btn:hover {
+            color: #00ffaa;
+        }
+
+        h2 {
+            margin: 0;
+            color: #00ffaa;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-box {
+            background: #111;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #222;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: #aaa;
+            text-transform: uppercase;
+        }
+
+        .stat-val {
+            font-size: 1.2rem;
+            color: #fff;
+            font-family: monospace;
+        }
+
+        .btn {
+            padding: 10px;
+            background: #1a1a2e;
+            color: #00ffaa;
+            border: 1px solid #00ffaa;
+            border-radius: 4px;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            transition: 0.2s;
+        }
+
+        .btn:hover {
+            background: #00ffaa;
+            color: #000;
+        }
+
+        .legend {
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: auto;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 5px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <a href="/playground" class="back-btn"><i class="fas fa-arrow-left"></i> Back</a>
+        <h2>Neuro Seekers</h2>
+        <p style="font-size:0.85rem; color:#aaa;">Genetic learning simulation. Agents evolve to seek food.</p>
+
+        <div class="stat-box">
+            <div class="stat-label">Generation</div>
+            <div class="stat-val" id="genDisp">1</div>
+        </div>
+
+        <div class="stat-box">
+            <div class="stat-label">Best Fitness</div>
+            <div class="stat-val" id="fitDisp">0</div>
+        </div>
+
+        <div class="stat-box">
+            <div class="stat-label">Agents Alive</div>
+            <div class="stat-val" id="aliveDisp">0</div>
+        </div>
+
+        <button class="btn" id="resetBtn">Reset Sim</button>
+        <button class="btn" id="speedBtn">Speed: x1</button>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="dot" style="background:#00ffaa;"></div> Agent
+            </div>
+            <div class="legend-item">
+                <div class="dot" style="background:#ff3366;"></div> Food
+            </div>
+            <div class="legend-item">
+                <div class="dot" style="background:#555;"></div> Poison
+            </div>
+        </div>
+
+        <div style="margin-top:auto; width:100%; border-top:1px solid #1f1f33; padding-top:10px; text-align:center;">
+            <span style="display:block; font-size:0.6rem; color:#444; margin-bottom:5px;">SPONSORED</span>
+            <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-5166575587547718"
+                data-ad-slot="sidebar-unit" data-ad-format="auto" data-full-width-responsive="true"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+    </div>
+
+    <div class="canvas-container">
+        <canvas id="canvas"></canvas>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const container = document.querySelector('.canvas-container');
+
+        let width, height;
+
+        // Sim Params
+        const POPULATION_SIZE = 50;
+        const FOOD_COUNT = 40;
+        const POISON_COUNT = 20;
+        const MUTATION_RATE = 0.1;
+        const AGENT_LIFE = 600; // frames
+
+        let agents = [];
+        let food = [];
+        let poison = [];
+        let generation = 1;
+        let speed = 1;
+        let frameCount = 0; // Current generation frame
+
+        // Simple Neural Net
+        class NeuralNet {
+            constructor(inputCount, hiddenCount, outputCount) {
+                // Weights range -1 to 1
+                this.w1 = this.randomMatrix(inputCount, hiddenCount);
+                this.w2 = this.randomMatrix(hiddenCount, outputCount);
+                this.b1 = this.randomArray(hiddenCount);
+                this.b2 = this.randomArray(outputCount);
+            }
+
+            randomMatrix(rows, cols) {
+                let m = [];
+                for (let i = 0; i < rows * cols; i++) m.push(Math.random() * 2 - 1);
+                return m;
+            }
+            randomArray(len) {
+                let a = [];
+                for (let i = 0; i < len; i++) a.push(Math.random() * 2 - 1);
+                return a;
+            }
+
+            predict(inputs) {
+                // Input -> Hidden
+                // inputs is array of length inputCount
+                // w1 is matrix [inputCount x hiddenCount] flattened?
+                // Actually simpler: 
+                // Let's assume w1 is size [inputs * hidden]
+                // h[j] = sum(inputs[i] * w1[i*hidden + j]) + b1[j]
+
+                // inputs: 4
+                // hidden: 6
+                // output: 2
+
+                let h = new Array(6).fill(0);
+                for (let j = 0; j < 6; j++) {
+                    let sum = 0;
+                    for (let i = 0; i < inputs.length; i++) {
+                        sum += inputs[i] * this.w1[i * 6 + j]; // indexing? i rows, j cols
+                    }
+                    h[j] = Math.tanh(sum + this.b1[j]); // Activation
+                }
+
+                // Hidden -> Output
+                let out = new Array(2).fill(0);
+                for (let k = 0; k < 2; k++) {
+                    let sum = 0;
+                    for (let j = 0; j < 6; j++) {
+                        sum += h[j] * this.w2[j * 2 + k];
+                    }
+                    out[k] = Math.tanh(sum + this.b2[k]);
+                }
+
+                return out;
+            }
+
+            clone() {
+                const nn = new NeuralNet(4, 6, 2);
+                nn.w1 = [...this.w1];
+                nn.w2 = [...this.w2];
+                nn.b1 = [...this.b1];
+                nn.b2 = [...this.b2];
+                return nn;
+            }
+
+            mutate(rate) {
+                const mutateVal = (v) => {
+                    if (Math.random() < rate) {
+                        return v + (Math.random() * 0.4 - 0.2); // slight shift
+                    }
+                    return v;
+                };
+
+                this.w1 = this.w1.map(mutateVal);
+                this.w2 = this.w2.map(mutateVal);
+                this.b1 = this.b1.map(mutateVal);
+                this.b2 = this.b2.map(mutateVal);
+            }
+        }
+
+        class Agent {
+            constructor(x, y, brain) {
+                this.pos = { x: x, y: y };
+                this.vel = { x: 0, y: 0 };
+                this.acc = { x: 0, y: 0 };
+                this.angle = Math.random() * Math.PI * 2;
+
+                this.brain = brain || new NeuralNet(4, 6, 2);
+                this.health = 1.0;
+                this.fitness = 0;
+                this.dead = false;
+
+                // DNA
+                this.maxSpeed = 3;
+                this.maxForce = 0.2;
+                this.sensorDist = 100;
+            }
+
+            update() {
+                if (this.dead) return;
+
+                this.health -= 0.005; // Decay
+                if (this.health <= 0) this.dead = true;
+
+                // Think
+                const inputs = this.sense();
+                const outputs = this.brain.predict(inputs);
+
+                // Output 0: Turn ( -1 to 1 )
+                // Output 1: Speed ( -1 to 1 )
+
+                const turn = outputs[0] * 0.2; // turn rate
+                this.angle += turn;
+
+                const push = (outputs[1] + 1) * 0.5; // 0 to 1
+                const speed = push * this.maxSpeed;
+
+                this.vel.x = Math.cos(this.angle) * speed;
+                this.vel.y = Math.sin(this.angle) * speed;
+
+                this.pos.x += this.vel.x;
+                this.pos.y += this.vel.y;
+
+                // Bounds (Wrap)
+                if (this.pos.x < 0) this.pos.x = width;
+                if (this.pos.x > width) this.pos.x = 0;
+                if (this.pos.y < 0) this.pos.y = height;
+                if (this.pos.y > height) this.pos.y = 0;
+
+                this.fitness += 0.1; // Alive bonus
+
+                this.checkCollisions();
+            }
+
+            sense() {
+                // Find nearest food
+                let recordD = Infinity;
+                let closestFood = null;
+                for (let f of food) {
+                    const d = Math.hypot(this.pos.x - f.x, this.pos.y - f.y);
+                    if (d < recordD && d < this.sensorDist) {
+                        recordD = d;
+                        closestFood = f;
+                    }
+                }
+
+                // Find nearest poison
+                let recordDP = Infinity;
+                let closestPoison = null;
+                for (let p of poison) {
+                    const d = Math.hypot(this.pos.x - p.x, this.pos.y - p.y);
+                    if (d < recordDP && d < this.sensorDist) {
+                        recordDP = d;
+                        closestPoison = p;
+                    }
+                }
+
+                // Inputs:
+                // 1. Distance to food (normalized)
+                // 2. Angle to food (relative to heading)
+                // 3. Distance to poison
+                // 4. Angle to poison
+
+                let inputs = [0, 0, 0, 0];
+
+                if (closestFood) {
+                    inputs[0] = recordD / this.sensorDist;
+                    const angleTo = Math.atan2(closestFood.y - this.pos.y, closestFood.x - this.pos.x);
+                    inputs[1] = angleTo - this.angle; // needs wrap -PI to PI
+                }
+
+                if (closestPoison) {
+                    inputs[2] = recordDP / this.sensorDist;
+                    const angleTo = Math.atan2(closestPoison.y - this.pos.y, closestPoison.x - this.pos.x);
+                    inputs[3] = angleTo - this.angle;
+                }
+
+                return inputs;
+            }
+
+            checkCollisions() {
+                // Food
+                for (let i = food.length - 1; i >= 0; i--) {
+                    const d = Math.hypot(this.pos.x - food[i].x, this.pos.y - food[i].y);
+                    if (d < 10) {
+                        food.splice(i, 1);
+                        this.health = Math.min(1.0, this.health + 0.3);
+                        this.fitness += 50;
+                        // Respawn food random
+                        food.push({ x: Math.random() * width, y: Math.random() * height });
+                    }
+                }
+
+                // Poison
+                for (let i = poison.length - 1; i >= 0; i--) {
+                    const d = Math.hypot(this.pos.x - poison[i].x, this.pos.y - poison[i].y);
+                    if (d < 10) {
+                        // poison.splice(i, 1); // poison stays?
+                        this.health -= 0.5;
+                        this.fitness -= 20;
+                    }
+                }
+            }
+
+            draw() {
+                if (this.dead) return;
+
+                // Color based on health
+                const g = Math.floor(this.health * 255);
+                ctx.save();
+                ctx.translate(this.pos.x, this.pos.y);
+                ctx.rotate(this.angle);
+
+                ctx.fillStyle = `rgb(0, ${g}, ${Math.max(100, g)})`;
+                ctx.beginPath();
+                ctx.moveTo(10, 0); // nose
+                ctx.lineTo(-5, 5);
+                ctx.lineTo(-5, -5);
+                ctx.closePath();
+                ctx.fill();
+
+                // Debug sensor visual (for selected?) - skip for perf
+
+                ctx.restore();
+            }
+        }
+
+        function reset() {
+            width = container.clientWidth;
+            height = container.clientHeight;
+            canvas.width = width;
+            canvas.height = height;
+
+            agents = [];
+            food = [];
+            poison = [];
+
+            for (let i = 0; i < POPULATION_SIZE; i++) {
+                agents.push(new Agent(Math.random() * width, Math.random() * height));
+            }
+
+            for (let i = 0; i < FOOD_COUNT; i++) food.push({ x: Math.random() * width, y: Math.random() * height });
+            for (let i = 0; i < POISON_COUNT; i++) poison.push({ x: Math.random() * width, y: Math.random() * height });
+
+            generation = 1;
+            frameCount = 0;
+            updateStats();
+        }
+
+        function nextGen() {
+            // Genetic Algorithm
+            // 1. Selection
+            // Sort by fitness
+            agents.sort((a, b) => b.fitness - a.fitness);
+
+            const bestFit = agents[0].fitness;
+            document.getElementById('fitDisp').innerText = Math.floor(bestFit);
+
+            const bestBrain = agents[0].brain;
+
+            // 2. Reproduction
+            const newAgents = [];
+
+            // Elitism: Keep top 5
+            for (let i = 0; i < 5; i++) {
+                const a = new Agent(Math.random() * width, Math.random() * height, agents[i].brain.clone());
+                newAgents.push(a);
+            }
+
+            // Fill rest with mutated clones of top 50%
+            const poolSize = Math.floor(POPULATION_SIZE / 2);
+            for (let i = 5; i < POPULATION_SIZE; i++) {
+                const parent = agents[Math.floor(Math.random() * poolSize)];
+                const childBrain = parent.brain.clone();
+                childBrain.mutate(MUTATION_RATE);
+                newAgents.push(new Agent(Math.random() * width, Math.random() * height, childBrain));
+            }
+
+            agents = newAgents;
+
+            // Refill items
+            food = [];
+            poison = [];
+            for (let i = 0; i < FOOD_COUNT; i++) food.push({ x: Math.random() * width, y: Math.random() * height });
+            for (let i = 0; i < POISON_COUNT; i++) poison.push({ x: Math.random() * width, y: Math.random() * height });
+
+            generation++;
+            frameCount = 0;
+            updateStats();
+        }
+
+        function updateStats() {
+            document.getElementById('genDisp').innerText = generation;
+            document.getElementById('aliveDisp').innerText = agents.filter(a => !a.dead).length;
+        }
+
+        function loop() {
+            for (let s = 0; s < speed; s++) {
+                // Logic
+                let aliveCount = 0;
+                for (let a of agents) {
+                    a.update();
+                    if (!a.dead) aliveCount++;
+                }
+
+                frameCount++;
+
+                // End Gen Condition: Time up or all dead
+                if (frameCount > AGENT_LIFE || aliveCount === 0) {
+                    nextGen();
+                    break; // stop speed loop
+                }
+
+                // Random replenish food occasionally
+                if (Math.random() < 0.05) food.push({ x: Math.random() * width, y: Math.random() * height });
+            }
+
+            updateStats(); // Update UI every frame
+
+            // Draw
+            ctx.fillStyle = '#050510';
+            ctx.fillRect(0, 0, width, height);
+
+            // Draw Food
+            ctx.fillStyle = '#ff3366';
+            for (let p of food) {
+                ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI * 2); ctx.fill();
+            }
+
+            // Draw Poison
+            ctx.fillStyle = '#555';
+            for (let p of poison) {
+                ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI * 2); ctx.fill();
+            }
+
+            // Draw Agents
+            for (let a of agents) {
+                a.draw(); // Only draws alive
+            }
+
+            requestAnimationFrame(loop);
+        }
+
+        window.addEventListener('resize', () => {
+            width = container.clientWidth;
+            height = container.clientHeight;
+            canvas.width = width;
+            canvas.height = height;
+        });
+
+        document.getElementById('resetBtn').addEventListener('click', reset);
+        document.getElementById('speedBtn').addEventListener('click', (e) => {
+            if (speed === 1) speed = 5;
+            else if (speed === 5) speed = 20;
+            else speed = 1;
+            e.target.innerText = `Speed: x${speed}`;
+        });
+
+        reset();
+        loop();
+
+    </script>
+    <div class="ad-overlay-bottom"
+        style="position:fixed; bottom:0; left:250px; width:calc(100% - 250px); z-index:1000; display:flex; flex-direction:column; align-items:center; padding-bottom:10px;">
+        <span class="ad-label" style="color:#aaa; font-size:0.8rem; margin-bottom:5px;">Advertisement</span>
+        <ins class="adsbygoogle" style="display:block; width:100%; height:90px;"
+            data-ad-client="ca-pub-5166575587547718" data-ad-slot="overlay-unit" data-ad-format="auto"
+            data-full-width-responsive="true"></ins>
+        <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+    </div>
+</body>
+
+</html>

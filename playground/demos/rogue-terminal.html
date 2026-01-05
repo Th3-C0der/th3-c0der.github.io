@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Rogue Terminal - Th3-C0der Playground</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #000;
+            color: #0f0;
+            margin: 0;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 20px;
+            box-sizing: border-box;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            padding-bottom: 90px;
+            /* Space for Ad */
+        }
+
+        .crt-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
+            z-index: 100;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 2px solid #0f0;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+
+        .back-btn {
+            color: #0f0;
+            text-decoration: none;
+            border: 1px solid #0f0;
+            padding: 5px 10px;
+        }
+
+        .back-btn:hover {
+            background: #0f0;
+            color: #000;
+        }
+
+        .terminal-output {
+            flex-grow: 1;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            margin-bottom: 10px;
+            padding-right: 10px;
+        }
+
+        .terminal-output::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .terminal-output::-webkit-scrollbar-thumb {
+            background: #0f0;
+        }
+
+        .input-line {
+            display: flex;
+            align-items: center;
+            border-top: 1px solid #333;
+            padding-top: 10px;
+        }
+
+        .prompt {
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        input {
+            background: transparent;
+            border: none;
+            color: #0f0;
+            font-family: inherit;
+            font-size: 1.1rem;
+            flex-grow: 1;
+            outline: none;
+        }
+
+        .glitch {
+            animation: glitch 1s infinite;
+        }
+
+        @keyframes glitch {
+            0% {
+                text-shadow: 2px 0 0 red, -2px 0 0 blue;
+            }
+
+            2% {
+                text-shadow: 2px 0 0 red, -2px 0 0 blue;
+            }
+
+            5% {
+                text-shadow: 2px 0 0 red, -2px 0 0 blue;
+            }
+
+            100% {
+                text-shadow: none;
+            }
+        }
+
+        .ad-overlay-bottom {
+            position: fixed;
+            bottom: 0px;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            padding: 10px 0;
+        }
+    </style>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718"
+        crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <div class="crt-overlay"></div>
+
+    <div class="header">
+        <div>ROGUE_TERMINAL v1.0.4</div>
+        <a href="/playground" class="back-btn">DISCONNECT</a>
+    </div>
+
+    <div class="terminal-output" id="output">
+        Initializing connection...
+        Secure channel established.
+        Welcome, Agent.
+
+        Type 'help' for available commands.
+    </div>
+
+    <div class="input-line">
+        <span class="prompt">root@system:~$</span>
+        <input type="text" id="cmdInput" autofocus autocomplete="off">
+    </div>
+
+    <script>
+        const output = document.getElementById('output');
+        const input = document.getElementById('cmdInput');
+
+        let fileSystem = {
+            'home': {
+                'notes.txt': 'Target IP: 192.168.0.X. Need to scan subnet.',
+                'tools': ['scan.exe', 'crack.exe', 'download.exe']
+            },
+            'server_alpha': null
+        };
+
+        let state = {
+            connected: false,
+            targetIP: null,
+            cracked: false
+        };
+
+        const COMMANDS = {
+            'help': 'Available commands: help, clear, ls, cat, scan, connect, disconnect, whoami',
+            'clear': () => { output.innerHTML = ''; return ''; },
+            'ls': () => {
+                // Mock LS
+                return 'notes.txt  tools/  config.sys';
+            },
+            'whoami': 'root (simulated)',
+            'cat': (args) => {
+                if (args[0] === 'notes.txt') return fileSystem.home['notes.txt'];
+                return 'File not found or access denied.';
+            },
+            'scan': async () => {
+                print('Scanning network...');
+                await delay(1000);
+                print('Found active node: 192.168.1.42 (SERVER_ALPHA)');
+                print('Port 22: OPEN');
+                print('Port 80: CLOSED');
+                return 'Scan complete.';
+            },
+            'connect': async (args) => {
+                if (!args[0]) return 'Usage: connect <IP>';
+                if (args[0] === '192.168.1.42') {
+                    print('Handshaking...');
+                    await delay(800);
+                    print('Password required.');
+                    state.targetIP = args[0];
+                    return 'Connection established. Auth needed.';
+                }
+                return 'Connection timed out.';
+            },
+            'crack': async () => {
+                if (!state.targetIP) return 'No target connected.';
+                print('Brute-forcing ssh...');
+
+                const chars = '01';
+                // Fake visual crack
+                for (let i = 0; i < 20; i++) {
+                    let s = '';
+                    for (let j = 0; j < 30; j++) s += chars[Math.floor(Math.random() * 2)];
+                    print(s);
+                    await delay(50);
+                }
+
+                state.cracked = true;
+                return 'Access Granted. Password found: "cyberpunk"';
+            }
+        };
+
+        input.addEventListener('keydown', async (e) => {
+            if (e.key === 'Enter') {
+                const val = input.value.trim();
+                if (!val) return;
+
+                print(`root@system:~$ ${val}`, 'color:#fff;');
+                input.value = '';
+
+                const parts = val.split(' ');
+                const cmd = parts[0].toLowerCase();
+                const args = parts.slice(1);
+
+                if (COMMANDS[cmd]) {
+                    const response = typeof COMMANDS[cmd] === 'function' ? await COMMANDS[cmd](args) : COMMANDS[cmd];
+                    if (response) print(response);
+                } else if (cmd === 'scan.exe') {
+                    print('Executing legacy binary...');
+                    // Just alias scan
+                    const r = await COMMANDS['scan']();
+                    print(r);
+                } else if (cmd === 'crack.exe') {
+                    const r = await COMMANDS['crack']();
+                    print(r);
+                } else {
+                    print(`Command not found: ${cmd}`);
+                }
+
+                // Keep scroll at bottom
+                output.scrollTop = output.scrollHeight;
+            }
+        });
+
+        function print(text, style = '') {
+            const lines = text.split('\n');
+            lines.forEach(l => {
+                const div = document.createElement('div');
+                div.textContent = l;
+                if (style) div.style = style;
+                output.appendChild(div);
+            });
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function delay(ms) {
+            return new Promise(r => setTimeout(r, ms));
+        }
+
+        // Focus input always
+        document.addEventListener('click', () => input.focus());
+
+    </script>
+    <div class="ad-overlay-bottom">
+        <div style="width:100%; display:flex; flex-direction:column; align-items:center;">
+            <span class="ad-label" style="color:#aaa;">Advertisement</span>
+            <ins class="adsbygoogle" style="display:block; width:100%; height:90px;"
+                data-ad-client="ca-pub-5166575587547718" data-ad-slot="overlay-unit" data-ad-format="auto"
+                data-full-width-responsive="true"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+    </div>
+</body>
+
+</html>

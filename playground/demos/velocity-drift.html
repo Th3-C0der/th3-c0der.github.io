@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Velocity Drift - Th3-C0der Playground</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #0b0b0b;
+            color: #fff;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', sans-serif;
+            height: 100vh;
+        }
+
+        canvas {
+            display: block;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .hud {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .hud-item {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px 20px;
+            border-left: 4px solid #ff0055;
+            backdrop-filter: blur(4px);
+        }
+
+        .score-label {
+            font-size: 0.8rem;
+            color: #aaa;
+            text-transform: uppercase;
+        }
+
+        .score-val {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            text-decoration: none;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 15px;
+            border-radius: 4px;
+            transition: 0.3s;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .ad-overlay-bottom {
+            position: fixed;
+            bottom: 0px;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            padding: 10px 0;
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718"
+        crossorigin="anonymous"></script>
+</head>
+
+<body>
+
+    <a href="/playground" class="back-btn">Exit</a>
+
+    <div class="hud">
+        <div class="hud-item">
+            <div class="score-label">Drift Score</div>
+            <div class="score-val" id="score">0</div>
+        </div>
+        <div class="hud-item" style="border-color: #00ccff;">
+            <div class="score-label">Time</div>
+            <div class="score-val" id="time">00:00</div>
+        </div>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let width, height;
+        let keys = {};
+
+        // Car Phys
+        const car = {
+            x: 0, y: 0,
+            angle: 0,
+            speed: 0,
+            maxSpeed: 10,
+            accel: 0.2,
+            friction: 0.98,
+            turnSpeed: 0.05,
+            driftFactor: 0.95
+        };
+
+        const skidMarks = []; // {x, y, alpha}
+        let score = 0;
+        let startTime = Date.now();
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            width = canvas.width;
+            height = canvas.height;
+            car.x = width / 2;
+            car.y = height / 2;
+
+            // Draw track bg one time? No, dynamic.
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        window.addEventListener('keydown', e => keys[e.code] = true);
+        window.addEventListener('keyup', e => keys[e.code] = false);
+
+        function update() {
+            // Physics
+            if (keys['ArrowUp'] || keys['KeyW']) {
+                car.speed += car.accel;
+            } else if (keys['ArrowDown'] || keys['KeyS']) {
+                car.speed -= car.accel;
+            } else {
+                car.speed *= car.friction;
+            }
+
+            // Cap speed
+            if (car.speed > car.maxSpeed) car.speed = car.maxSpeed;
+            if (car.speed < -car.maxSpeed / 2) car.speed = -car.maxSpeed / 2;
+
+            // Turning
+            if (Math.abs(car.speed) > 0.1) {
+                const dir = car.speed > 0 ? 1 : -1;
+                if (keys['ArrowLeft'] || keys['KeyA']) car.angle -= car.turnSpeed * dir;
+                if (keys['ArrowRight'] || keys['KeyD']) car.angle += car.turnSpeed * dir;
+            }
+
+            // Velocity Vector vs Facing Vector
+            // Simple approach: Car moves in direction of angle...
+            // But for drift, we track velocity vector separately?
+            // To keep it simple: We just relax the velocity vector towards angle vector
+
+            // Actually, simplest arcade drift:
+            car.x += Math.cos(car.angle) * car.speed;
+            car.y += Math.sin(car.angle) * car.speed;
+
+            // Drift Score Logic
+            // If turning while fast, add score and skidmarks
+            if (Math.abs(car.speed) > 4 && (keys['ArrowLeft'] || keys['KeyA'] || keys['ArrowRight'] || keys['KeyD'])) {
+                score += Math.floor(Math.abs(car.speed));
+                document.getElementById('score').innerText = score;
+
+                // Add skids
+                // Rear wheels approx
+                const backX = car.x - Math.cos(car.angle) * 15;
+                const backY = car.y - Math.sin(car.angle) * 15;
+
+                // Offset left/right
+                const w = 10;
+                const lx = backX + Math.cos(car.angle - Math.PI / 2) * w;
+                const ly = backY + Math.sin(car.angle - Math.PI / 2) * w;
+                const rx = backX + Math.cos(car.angle + Math.PI / 2) * w;
+                const ry = backY + Math.sin(car.angle + Math.PI / 2) * w;
+
+                skidMarks.push({ x: lx, y: ly, alpha: 1 });
+                skidMarks.push({ x: rx, y: ry, alpha: 1 });
+            }
+
+            // Wrap world
+            if (car.x < 0) car.x = width;
+            if (car.x > width) car.x = 0;
+            if (car.y < 0) car.y = height;
+            if (car.y > height) car.y = 0;
+
+            // Timer
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            const m = Math.floor(elapsed / 60).toString().padStart(2, '0');
+            const s = (elapsed % 60).toString().padStart(2, '0');
+            document.getElementById('time').innerText = `${m}:${s}`;
+        }
+
+        function draw() {
+            ctx.fillStyle = '#111';
+            ctx.fillRect(0, 0, width, height);
+
+            // Grid
+            ctx.strokeStyle = '#222';
+            ctx.lineWidth = 2;
+            const gridSize = 100;
+            // Scroll grid? Nah static world wrap
+            for (let x = 0; x < width; x += gridSize) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke(); }
+            for (let y = 0; y < height; y += gridSize) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke(); }
+
+            // Skids
+            ctx.fillStyle = '#000'; // dark rubber
+            for (let i = 0; i < skidMarks.length; i++) {
+                const s = skidMarks[i];
+                ctx.globalAlpha = s.alpha * 0.5;
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, 2, 0, Math.PI * 2);
+                ctx.fill();
+                s.alpha -= 0.005;
+                if (s.alpha <= 0) {
+                    skidMarks.splice(i, 1);
+                    i--;
+                }
+            }
+            ctx.globalAlpha = 1;
+
+            // Car
+            ctx.save();
+            ctx.translate(car.x, car.y);
+            ctx.rotate(car.angle);
+
+            // Body
+            ctx.fillStyle = '#ff0055';
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = '#ff0055';
+            ctx.fillRect(-20, -10, 40, 20);
+
+            // Roof
+            ctx.fillStyle = '#000';
+            ctx.fillRect(-5, -8, 20, 16);
+
+            // Headlights
+            ctx.fillStyle = '#fff';
+            ctx.shadowColor = '#fff';
+            ctx.fillRect(18, -9, 4, 4);
+            ctx.fillRect(18, 5, 4, 4);
+
+            // Taillights
+            ctx.fillStyle = '#f00';
+            ctx.shadowColor = '#f00';
+            ctx.fillRect(-20, -9, 2, 4);
+            ctx.fillRect(-20, 5, 2, 4);
+
+            ctx.restore();
+        }
+
+        function loop() {
+            update();
+            draw();
+            requestAnimationFrame(loop);
+        }
+        loop();
+
+    </script>
+    <div class="ad-overlay-bottom">
+        <div style="width:100%; display:flex; flex-direction:column; align-items:center;">
+            <span class="ad-label" style="color:#aaa; font-size:0.8rem; margin-bottom:5px;">Advertisement</span>
+            <ins class="adsbygoogle" style="display:block; width:100%; height:90px;"
+                data-ad-client="ca-pub-5166575587547718" data-ad-slot="overlay-unit" data-ad-format="auto"
+                data-full-width-responsive="true"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+    </div>
+</body>
+
+</html>

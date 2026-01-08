@@ -145,6 +145,42 @@
             transform: rotate(180deg);
         }
 
+        /* Search Container */
+        .search-container {
+            max-width: 600px;
+            margin: 0 auto var(--space-lg);
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            background: var(--bg-glass);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-full);
+            padding: var(--space-md) var(--space-xl);
+            padding-left: 50px;
+            color: var(--text-primary);
+            font-family: var(--font-primary);
+            font-size: 1rem;
+            backdrop-filter: blur(10px);
+            transition: all var(--transition-base);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 20px rgba(0, 255, 157, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            pointer-events: none;
+        }
+
         /* Playground Grid */
         .playground-grid {
             display: grid;
@@ -278,6 +314,11 @@
             border-radius: var(--radius-full);
             font-size: 0.75rem;
             color: var(--accent-primary);
+        }
+
+        .pg-card:hover .pg-tag {
+            border-color: var(--accent-primary);
+            background: rgba(0, 255, 157, 0.1);
         }
 
         .pg-card-link {
@@ -477,6 +518,13 @@
                     incomplete, or not fully functional. Feel free to explore and report any issues! 🚧</p>
             </div>
 
+            <!-- Search Bar -->
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="search-input" id="search-input"
+                    placeholder="Search demos, tags, or topics...">
+            </div>
+
             <!-- Category Filter -->
             <div class="category-filter">
                 <button class="filter-btn active" data-category="all">All</button>
@@ -509,7 +557,7 @@
                             <span class="pg-tag">Sim</span>
                             <span class="pg-tag">Quantum</span>
                         </div>
-                        <a href="/playground/demos/quantum-lab.html" class="pg-card-link magnetic-btn">
+                        <a href="/playground/demos/quantum-lab" class="pg-card-link magnetic-btn">
                             <span>Experiment</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>
@@ -530,7 +578,7 @@
                             <span class="pg-tag">Art</span>
                             <span class="pg-tag">Synth</span>
                         </div>
-                        <a href="/playground/demos/sonic-canvas.html" class="pg-card-link magnetic-btn">
+                        <a href="/playground/demos/sonic-canvas" class="pg-card-link magnetic-btn">
                             <span>Draw</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>
@@ -552,7 +600,7 @@
                             <span class="pg-tag">Build</span>
                             <span class="pg-tag">Iso</span>
                         </div>
-                        <a href="/playground/demos/voxel-city.html" class="pg-card-link magnetic-btn">
+                        <a href="/playground/demos/voxel-city" class="pg-card-link magnetic-btn">
                             <span>Build</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>
@@ -574,7 +622,7 @@
                             <span class="pg-tag">Gen</span>
                             <span class="pg-tag">Visual</span>
                         </div>
-                        <a href="/playground/demos/cyber-bloom.html" class="pg-card-link magnetic-btn">
+                        <a href="/playground/demos/cyber-bloom" class="pg-card-link magnetic-btn">
                             <span>Bloom</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>
@@ -596,7 +644,7 @@
                             <span class="pg-tag">Evolution</span>
                             <span class="pg-tag">Sim</span>
                         </div>
-                        <a href="/playground/demos/neuro-seekers.html" class="pg-card-link magnetic-btn">
+                        <a href="/playground/demos/neuro-seekers" class="pg-card-link magnetic-btn">
                             <span>Evolve</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>
@@ -618,7 +666,7 @@
                             <span class="pg-tag">Text</span>
                             <span class="pg-tag">Hack</span>
                         </div>
-                        <a href="/playground/demos/rogue-terminal.html" class="pg-card-link magnetic-btn">
+                        <a href="/playground/demos/rogue-terminal" class="pg-card-link magnetic-btn">
                             <span>Connect</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>
@@ -639,7 +687,7 @@
                             <span class="pg-tag">Physics</span>
                             <span class="pg-tag">Puzzle</span>
                         </div>
-                        <a href="/playground/demos/gravity-assist.html" class="pg-card-link magnetic-btn">
+                        <a href="/playground/demos/gravity-assist" class="pg-card-link magnetic-btn">
                             <span>Launch</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>
@@ -661,7 +709,7 @@
                             <span class="pg-tag">Visual</span>
                             <span class="pg-tag">Art</span>
                         </div>
-                        <a href="/playground/demos/lissajous-canvas.html" class="pg-card-link magnetic-btn">
+                        <a href="/playground/demos/lissajous-canvas" class="pg-card-link magnetic-btn">
                             <span>Visualize</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>
@@ -683,7 +731,7 @@
                             <span class="pg-tag">CS</span>
                             <span class="pg-tag">Sound</span>
                         </div>
-                        <a href="/playground/demos/algo-sorter.html" class="pg-card-link magnetic-btn">
+                        <a href="/playground/demos/algo-sorter" class="pg-card-link magnetic-btn">
                             <span>Sort</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>
@@ -705,7 +753,7 @@
                             <span class="pg-tag">Design</span>
                             <span class="pg-tag">Math</span>
                         </div>
-                        <a href="/playground/demos/bezier-studio.html" class="pg-card-link magnetic-btn">
+                        <a href="/playground/demos/bezier-studio" class="pg-card-link magnetic-btn">
                             <span>Design</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>
@@ -726,7 +774,7 @@
                             <span class="pg-tag">Shooter</span>
                             <span class="pg-tag">Space</span>
                         </div>
-                        <a href="/playground/demos/orbital-defense.html" class="pg-card-link magnetic-btn">
+                        <a href="/playground/demos/orbital-defense" class="pg-card-link magnetic-btn">
                             <span>Defend</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>
@@ -748,7 +796,7 @@
                             <span class="pg-tag">Logic</span>
                             <span class="pg-tag">Hex</span>
                         </div>
-                        <a href="/playground/demos/hex-link.html" class="pg-card-link magnetic-btn">
+                        <a href="/playground/demos/hex-link" class="pg-card-link magnetic-btn">
                             <span>Connect</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>
@@ -769,7 +817,7 @@
                             <span class="pg-tag">Physics</span>
                             <span class="pg-tag">Drift</span>
                         </div>
-                        <a href="/playground/demos/velocity-drift.html" class="pg-card-link magnetic-btn">
+                        <a href="/playground/demos/velocity-drift" class="pg-card-link magnetic-btn">
                             <span>Race</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>
@@ -791,7 +839,7 @@
                             <span class="pg-tag">Puzzle</span>
                             <span class="pg-tag">Hack</span>
                         </div>
-                        <a href="/playground/demos/maze-master.html" class="pg-card-link magnetic-btn">
+                        <a href="/playground/demos/maze-master" class="pg-card-link magnetic-btn">
                             <span>Breach</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>
@@ -813,7 +861,7 @@
                             <span class="pg-tag">Timing</span>
                             <span class="pg-tag">3D</span>
                         </div>
-                        <a href="/playground/demos/tower-blocks.html" class="pg-card-link magnetic-btn">
+                        <a href="/playground/demos/tower-blocks" class="pg-card-link magnetic-btn">
                             <span>Build</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>
@@ -835,7 +883,7 @@
                             <span class="pg-tag">Geometry</span>
                             <span class="pg-tag">Relax</span>
                         </div>
-                        <a href="/playground/demos/neon-spirograph.html" class="pg-card-link magnetic-btn">
+                        <a href="/playground/demos/neon-spirograph" class="pg-card-link magnetic-btn">
                             <span>Draw</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>
@@ -857,7 +905,7 @@
                             <span class="pg-tag">Particles</span>
                             <span class="pg-tag">Interactive</span>
                         </div>
-                        <a href="/playground/demos/particle-vortex.html" class="pg-card-link magnetic-btn">
+                        <a href="/playground/demos/particle-vortex" class="pg-card-link magnetic-btn">
                             <span>Launch</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>
@@ -879,7 +927,7 @@
                             <span class="pg-tag">Simulation</span>
                             <span class="pg-tag">Creative</span>
                         </div>
-                        <a href="/playground/demos/sandbox.html" class="pg-card-link magnetic-btn">
+                        <a href="/playground/demos/sandbox" class="pg-card-link magnetic-btn">
                             <span>Create</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>
@@ -900,7 +948,7 @@
                             <span class="pg-tag">Retro</span>
                             <span class="pg-tag">3D</span>
                         </div>
-                        <a href="/playground/demos/synthwave-run.html" class="pg-card-link magnetic-btn">
+                        <a href="/playground/demos/synthwave-run" class="pg-card-link magnetic-btn">
                             <span>Dive In</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>
@@ -922,7 +970,7 @@
                             <span class="pg-tag">Typing</span>
                             <span class="pg-tag">Hacker</span>
                         </div>
-                        <a href="/playground/demos/code-rusher.html" class="pg-card-link magnetic-btn">
+                        <a href="/playground/demos/code-rusher" class="pg-card-link magnetic-btn">
                             <span>Play Now</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>
@@ -944,7 +992,7 @@
                             <span class="pg-tag">Simulation</span>
                             <span class="pg-tag">Visual</span>
                         </div>
-                        <a href="/playground/demos/fluid-sim.html" class="pg-card-link magnetic-btn">
+                        <a href="/playground/demos/fluid-sim" class="pg-card-link magnetic-btn">
                             <span>Interact</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>
@@ -966,7 +1014,7 @@
                             <span class="pg-tag">Visual</span>
                             <span class="pg-tag">Nature</span>
                         </div>
-                        <a href="/playground/demos/fractal-grove.html" class="pg-card-link magnetic-btn">
+                        <a href="/playground/demos/fractal-grove" class="pg-card-link magnetic-btn">
                             <span>Explore</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>
@@ -987,7 +1035,7 @@
                             <span class="pg-tag">Canvas</span>
                             <span class="pg-tag">Retro</span>
                         </div>
-                        <a href="/playground/demos/pong.html" class="pg-card-link magnetic-btn">
+                        <a href="/playground/demos/pong" class="pg-card-link magnetic-btn">
                             <span>Play Now</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>
@@ -1009,7 +1057,7 @@
                             <span class="pg-tag">Action</span>
                             <span class="pg-tag">Defense</span>
                         </div>
-                        <a href="/playground/demos/cyber-defense.html" class="pg-card-link magnetic-btn">
+                        <a href="/playground/demos/cyber-defense" class="pg-card-link magnetic-btn">
                             <span>Play Now</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>
@@ -1023,16 +1071,102 @@
                         <i class="fas fa-drum"></i>
                     </div>
                     <div class="pg-card-content">
-                        <h3 class="pg-card-title">Beat Maker</h3>
-                        <p class="pg-card-description">Create beats in the browser with this 16-step sequencer.
-                            Real-time synthesis.</p>
+                        <h3 class="pg-card-title">Beat Maker Pro</h3>
+                        <p class="pg-card-description">Advanced 16-step sequencer with filters, effects, remix mode, and
+                            new instrument tracks.</p>
                         <div class="pg-card-tags">
                             <span class="pg-tag">Audio</span>
-                            <span class="pg-tag">Music</span>
+                            <span class="pg-tag">Pro</span>
                             <span class="pg-tag">Sequencer</span>
                         </div>
-                        <a href="/playground/demos/beat-maker.html" class="pg-card-link magnetic-btn">
+                        <a href="/playground/demos/beat-maker" class="pg-card-link magnetic-btn">
                             <span>Create</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Card: Musi Coder -->
+                <article class="pg-card" data-category="audio">
+                    <div class="pg-card-glow"></div>
+                    <div class="pg-card-preview">
+                        <i class="fas fa-terminal"></i>
+                    </div>
+                    <div class="pg-card-content">
+                        <h3 class="pg-card-title">Musi Coder</h3>
+                        <p class="pg-card-description">Live algorithmic music coding. Code beats in real-time with
+                            auto-eval.</p>
+                        <div class="pg-card-tags">
+                            <span class="pg-tag">Code</span>
+                            <span class="pg-tag">Music</span>
+                            <span class="pg-tag">Live</span>
+                        </div>
+                        <a href="/playground/demos/musi-coder" class="pg-card-link magnetic-btn">
+                            <span>Code Music</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Card: Particle Life -->
+                <article class="pg-card" data-category="physics">
+                    <div class="pg-card-glow"></div>
+                    <div class="pg-card-preview">
+                        <i class="fas fa-microchip"></i>
+                    </div>
+                    <div class="pg-card-content">
+                        <h3 class="pg-card-title">Particle Life</h3>
+                        <p class="pg-card-description">Artificial life simulation. Watch complex behaviors emerge from
+                            simple rules.</p>
+                        <div class="pg-card-tags">
+                            <span class="pg-tag">Sim</span>
+                            <span class="pg-tag">Life</span>
+                            <span class="pg-tag">GPU</span>
+                        </div>
+                        <a href="/playground/demos/particle-life" class="pg-card-link magnetic-btn">
+                            <span>Observe</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Card: Retro CRT -->
+                <article class="pg-card" data-category="visual">
+                    <div class="pg-card-glow"></div>
+                    <div class="pg-card-preview">
+                        <i class="fas fa-tv"></i>
+                    </div>
+                    <div class="pg-card-content">
+                        <h3 class="pg-card-title">Retro CRT</h3>
+                        <p class="pg-card-description">Authentic VHS/CRT terminal simulation with glitch effects.</p>
+                        <div class="pg-card-tags">
+                            <span class="pg-tag">Retro</span>
+                            <span class="pg-tag">Vaporwave</span>
+                            <span class="pg-tag">Effect</span>
+                        </div>
+                        <a href="/playground/demos/retro-crt" class="pg-card-link magnetic-btn">
+                            <span>Boot Up</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Card: Chaos Attractors -->
+                <article class="pg-card" data-category="visual">
+                    <div class="pg-card-glow"></div>
+                    <div class="pg-card-preview">
+                        <i class="fas fa-infinity"></i>
+                    </div>
+                    <div class="pg-card-content">
+                        <h3 class="pg-card-title">Chaos Attractors</h3>
+                        <p class="pg-card-description">Visualize the strange beauty of chaotic mathematical systems.</p>
+                        <div class="pg-card-tags">
+                            <span class="pg-tag">Math</span>
+                            <span class="pg-tag">Chaos</span>
+                            <span class="pg-tag">3D</span>
+                        </div>
+                        <a href="/playground/demos/chaos-attractors" class="pg-card-link magnetic-btn">
+                            <span>Visualize</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>
                     </div>
@@ -1052,7 +1186,7 @@
                             <span class="pg-tag">JavaScript</span>
                             <span class="pg-tag">Animation</span>
                         </div>
-                        <a href="/playground/demos/particle-system.html" class="pg-card-link magnetic-btn">
+                        <a href="/playground/demos/particle-system" class="pg-card-link magnetic-btn">
                             <span>Try Now</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>
@@ -1074,7 +1208,7 @@
                             <span class="pg-tag">WebGL</span>
                             <span class="pg-tag">3D</span>
                         </div>
-                        <a href="/playground/demos/3d-scene.html" class="pg-card-link magnetic-btn">
+                        <a href="/playground/demos/3d-scene" class="pg-card-link magnetic-btn">
                             <span>Try Now</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>
@@ -1096,7 +1230,7 @@
                             <span class="pg-tag">Canvas</span>
                             <span class="pg-tag">Audio</span>
                         </div>
-                        <a href="/playground/demos/audio-visualizer.html" class="pg-card-link magnetic-btn">
+                        <a href="/playground/demos/audio-visualizer" class="pg-card-link magnetic-btn">
                             <span>Try Now</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>
@@ -1118,7 +1252,7 @@
                             <span class="pg-tag">Animation</span>
                             <span class="pg-tag">Art</span>
                         </div>
-                        <a href="/playground/demos/css-art.html" class="pg-card-link magnetic-btn">
+                        <a href="/playground/demos/css-art" class="pg-card-link magnetic-btn">
                             <span>Try Now</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>
@@ -1140,7 +1274,7 @@
                             <span class="pg-tag">Math</span>
                             <span class="pg-tag">Fractals</span>
                         </div>
-                        <a href="/playground/demos/fractal-explorer.html" class="pg-card-link magnetic-btn">
+                        <a href="/playground/demos/fractal-explorer" class="pg-card-link magnetic-btn">
                             <span>Try Now</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>
@@ -1162,7 +1296,7 @@
                             <span class="pg-tag">Physics</span>
                             <span class="pg-tag">Simulation</span>
                         </div>
-                        <a href="/playground/demos/fluid-simulation.html" class="pg-card-link magnetic-btn">
+                        <a href="/playground/demos/fluid-simulation" class="pg-card-link magnetic-btn">
                             <span>Try Now</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>
@@ -1184,7 +1318,7 @@
                             <span class="pg-tag">ML</span>
                             <span class="pg-tag">Visualization</span>
                         </div>
-                        <a href="/playground/demos/neural-network.html" class="pg-card-link magnetic-btn">
+                        <a href="/playground/demos/neural-network" class="pg-card-link magnetic-btn">
                             <span>Try Now</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>
@@ -1206,7 +1340,7 @@
                             <span class="pg-tag">Music</span>
                             <span class="pg-tag">Interactive</span>
                         </div>
-                        <a href="/playground/demos/synthesizer.html" class="pg-card-link magnetic-btn">
+                        <a href="/playground/demos/synthesizer" class="pg-card-link magnetic-btn">
                             <span>Try Now</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>
@@ -1228,7 +1362,7 @@
                             <span class="pg-tag">Game</span>
                             <span class="pg-tag">ML</span>
                         </div>
-                        <a href="/playground/demos/ai-tictactoe.html" class="pg-card-link magnetic-btn">
+                        <a href="/playground/demos/ai-tictactoe" class="pg-card-link magnetic-btn">
                             <span>Try Now</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>
@@ -1250,7 +1384,7 @@
                             <span class="pg-tag">Animation</span>
                             <span class="pg-tag">Interactive</span>
                         </div>
-                        <a href="/playground/demos/memory-match.html" class="pg-card-link magnetic-btn">
+                        <a href="/playground/demos/memory-match" class="pg-card-link magnetic-btn">
                             <span>Try Now</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>
@@ -1272,7 +1406,7 @@
                             <span class="pg-tag">Canvas</span>
                             <span class="pg-tag">Classic</span>
                         </div>
-                        <a href="/playground/demos/snake.html" class="pg-card-link magnetic-btn">
+                        <a href="/playground/demos/snake" class="pg-card-link magnetic-btn">
                             <span>Try Now</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>
@@ -1294,7 +1428,7 @@
                             <span class="pg-tag">Fractals</span>
                             <span class="pg-tag">Interactive</span>
                         </div>
-                        <a href="/playground/demos/fractal-tree.html" class="pg-card-link magnetic-btn">
+                        <a href="/playground/demos/fractal-tree" class="pg-card-link magnetic-btn">
                             <span>Try Now</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>
@@ -1316,7 +1450,7 @@
                             <span class="pg-tag">Colors</span>
                             <span class="pg-tag">Tools</span>
                         </div>
-                        <a href="/playground/demos/color-palette.html" class="pg-card-link magnetic-btn">
+                        <a href="/playground/demos/color-palette" class="pg-card-link magnetic-btn">
                             <span>Try Now</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>
@@ -1338,7 +1472,7 @@
                             <span class="pg-tag">Simulation</span>
                             <span class="pg-tag">Interactive</span>
                         </div>
-                        <a href="/playground/demos/particle-physics.html" class="pg-card-link magnetic-btn">
+                        <a href="/playground/demos/particle-physics" class="pg-card-link magnetic-btn">
                             <span>Try Now</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>
@@ -1360,7 +1494,7 @@
                             <span class="pg-tag">NLP</span>
                             <span class="pg-tag">Tool</span>
                         </div>
-                        <a href="/playground/demos/sentiment-analysis.html" class="pg-card-link magnetic-btn">
+                        <a href="/playground/demos/sentiment-analysis" class="pg-card-link magnetic-btn">
                             <span>Try Now</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>
@@ -1567,39 +1701,57 @@
 
             initCards();
 
-            // Filter functionality
+            // Search & Filter functionality
+            const searchInput = document.getElementById('search-input');
+            let currentCategory = 'all';
+
+            function filterGrid() {
+                const query = searchInput.value.toLowerCase();
+
+                cards.forEach(card => {
+                    const text = (
+                        card.querySelector('.pg-card-title').textContent +
+                        " " +
+                        card.querySelector('.pg-card-description').textContent +
+                        " " +
+                        Array.from(card.querySelectorAll('.pg-tag')).map(t => t.textContent).join(" ")
+                    ).toLowerCase();
+
+                    const matchesSearch = text.includes(query);
+                    const matchesCategory = currentCategory === 'all' || card.dataset.category === currentCategory;
+
+                    if (matchesSearch && matchesCategory) {
+                        if (card.classList.contains('hidden')) {
+                            card.classList.remove('hidden');
+                            anime({
+                                targets: card,
+                                opacity: [0, 1],
+                                scale: [0.95, 1],
+                                duration: 400,
+                                easing: 'easeOutCubic'
+                            });
+                        }
+                    } else {
+                        if (!card.classList.contains('hidden')) {
+                            // Fast hide for typing responsiveness
+                            card.style.opacity = 0;
+                            card.classList.add('hidden');
+                        }
+                    }
+                });
+            }
+
+            searchInput.addEventListener('input', filterGrid);
+
             filterBtns.forEach(btn => {
                 btn.addEventListener('click', () => {
-                    const category = btn.dataset.category;
+                    currentCategory = btn.dataset.category;
 
                     // Update active button
                     filterBtns.forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
 
-                    // Filter cards with animation
-                    cards.forEach(card => {
-                        if (category === 'all' || card.dataset.category === category) {
-                            card.classList.remove('hidden');
-                            anime({
-                                targets: card,
-                                opacity: [0, 1],
-                                scale: [0.9, 1],
-                                duration: 400,
-                                easing: 'easeOutCubic'
-                            });
-                        } else {
-                            anime({
-                                targets: card,
-                                opacity: [1, 0],
-                                scale: [1, 0.9],
-                                duration: 300,
-                                easing: 'easeInCubic',
-                                complete: () => {
-                                    card.classList.add('hidden');
-                                }
-                            });
-                        }
-                    });
+                    filterGrid();
                 });
             });
 

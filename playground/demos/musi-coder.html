@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Musi Coder - Th3-C0der Playground</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.39.0/min/vs/loader.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0d0e12;
+            --sidebar: #16181d;
+            --border: #2b303b;
+            --accent: #61afef;
+            --accent-hover: #4d8dc1;
+            --text: #abb2bf;
+            --success: #98c379;
+            --error: #e06c75;
+            --warning: #e5c07b;
+            --header-height: 60px;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', system-ui, sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .header {
+            height: var(--header-height);
+            background: var(--sidebar);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            justify-content: space-between;
+            z-index: 10;
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 12px;
+            background: #21252b;
+            color: #5c6370;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-badge.live {
+            background: rgba(152, 195, 121, 0.15);
+            color: var(--success);
+            box-shadow: 0 0 10px rgba(152, 195, 121, 0.2);
+        }
+
+        .status-badge.paused {
+            background: rgba(229, 192, 123, 0.15);
+            color: var(--warning);
+        }
+
+        .status-badge.error {
+            background: rgba(224, 108, 117, 0.15);
+            color: var(--error);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 100px;
+            justify-content: center;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: #4b5263;
+            color: #fff;
+        }
+
+        .btn.primary {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #0d0e12;
+            font-weight: 700;
+        }
+
+        .btn.primary:hover {
+            background: var(--accent-hover);
+            border-color: var(--accent-hover);
+        }
+
+        .main-container {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 320px 1fr 350px;
+            height: calc(100vh - var(--header-height));
+        }
+
+        /* Sidebar Tabs */
+        .sidebar {
+            background: var(--sidebar);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .tabs {
+            display: flex;
+            background: #21252b;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 15px 0;
+            font-size: 0.85rem;
+            color: #8b949e;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            font-weight: 600;
+        }
+
+        .tab:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text);
+        }
+
+        .tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+            background: rgba(97, 175, 239, 0.05);
+        }
+
+        .tab-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: none;
+        }
+
+        .tab-content.active {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .section-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #5c6370;
+            font-weight: 700;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .doc-item {
+            padding: 12px;
+            background: #21252b;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+            margin-bottom: 10px;
+        }
+
+        .doc-item:hover {
+            transform: translateX(4px);
+            background: #282c34;
+            border-color: var(--accent);
+        }
+
+        .doc-cmd {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent);
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+
+        .doc-desc {
+            font-size: 0.8rem;
+            color: #8b949e;
+            line-height: 1.4;
+        }
+
+        .template-item {
+            background: linear-gradient(135deg, rgba(97, 175, 239, 0.05), rgba(97, 175, 239, 0.02));
+            border: 1px solid rgba(97, 175, 239, 0.1);
+        }
+
+        .template-item:hover {
+            border-color: var(--accent);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .template-tag {
+            display: inline-block;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: rgba(97, 175, 239, 0.2);
+            color: var(--accent);
+            margin-top: 6px;
+            font-weight: 600;
+        }
+
+        .tutorial-block {
+            font-size: 0.85rem;
+            color: #abb2bf;
+            line-height: 1.6;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+
+        .code-inline {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--success);
+            font-size: 0.85em;
+        }
+
+        /* Editor Area */
+        .editor-wrapper {
+            position: relative;
+            background: var(--bg);
+            overflow: hidden;
+        }
+
+        #editor {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Visualizer Panel */
+        .viz-panel {
+            background: var(--sidebar);
+            border-left: 1px solid var(--border);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        canvas {
+            width: 100%;
+            height: 180px;
+            background: #0d0e12;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .console-log {
+            flex: 1;
+            background: #0d0e12;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            padding: 15px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: #abb2bf;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        .console-line {
+            margin-bottom: 5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 2px;
+        }
+
+        .console-line.error {
+            color: var(--error);
+        }
+
+        .console-line.system {
+            color: #5c6370;
+        }
+
+        .console-line.cmd {
+            color: var(--accent);
+        }
+
+        @media (max-width: 1024px) {
+            .main-container {
+                grid-template-columns: 280px 1fr;
+            }
+
+            .viz-panel {
+                display: none;
+            }
+        }
+    </style>
+    <!-- AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718"
+        crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <div class="header">
+        <div class="logo">
+            <i class="fas fa-wave-square"></i> MUSI CODER
+        </div>
+        <div class="controls">
+            <div id="statusBadge" class="status-badge">
+                <div class="status-dot"></div>
+                <span id="statusText">Idle</span>
+            </div>
+            <button class="btn primary" id="playbackBtn"><i class="fas fa-play"></i> Run</button>
+            <button class="btn" onclick="window.location.href='/playground'"><i class="fas fa-sign-out-alt"></i>
+                Exit</button>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="sidebar">
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('docs')">Docs</div>
+                <div class="tab" onclick="switchTab('templates')">Templates</div>
+                <div class="tab" onclick="switchTab('tutorial')">Tutorial</div>
+            </div>
+
+            <!-- DOCS TAB -->
+            <div id="tab-docs" class="tab-content active">
+                <div>
+                    <div class="section-title">Sequence & Rhythm</div>
+                    <div class="doc-item" onclick="insertSample('s(\'kick\', [1,0,1,0])')">
+                        <div class="doc-cmd">s(name, pattern)</div>
+                        <div class="doc-desc">Play samples using an array (0/1).<br>Samples: kick, snare, hh, clap, tom.
+                        </div>
+                    </div>
+                    <div class="doc-item" onclick="insertSample('euclid(5, 16, \'clap\')')">
+                        <div class="doc-cmd">euclid(k, n, sound)</div>
+                        <div class="doc-desc">Euclidean rhythm: K hits in N steps.</div>
+                    </div>
+                    <div class="doc-item" onclick="insertSample('every(4, () => { ... })')">
+                        <div class="doc-cmd">every(n, fn)</div>
+                        <div class="doc-desc">Run a function once every N beats.</div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="section-title">Synths & Melody</div>
+                    <div class="doc-item" onclick="insertSample('bass(\'C2\', 0.25)')">
+                        <div class="doc-cmd">bass(note, dur)</div>
+                        <div class="doc-desc">Filter-swept sawtooth bass.</div>
+                    </div>
+                    <div class="doc-item" onclick="insertSample('lead(\'C4\', 0.5)')">
+                        <div class="doc-cmd">lead(note, dur)</div>
+                        <div class="doc-desc">Bright square wave lead synth.</div>
+                    </div>
+                    <div class="doc-item" onclick="insertSample('note(\'A3\', 1.0, \'sine\')')">
+                        <div class="doc-cmd">note(n, dur, wave)</div>
+                        <div class="doc-desc">Basic synth note (sine, square, saw).</div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="section-title">Globals</div>
+                    <div class="doc-item" onclick="insertSample('bpm(128)')">
+                        <div class="doc-cmd">bpm(val)</div>
+                        <div class="doc-desc">Set tempo (Beats Per Minute).</div>
+                    </div>
+                    <div class="doc-item" onclick="insertSample('setDelay(0.3, 0.4)')">
+                        <div class="doc-cmd">setDelay(time, mix)</div>
+                        <div class="doc-desc">Set global delay effect.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TEMPLATES TAB -->
+            <div id="tab-templates" class="tab-content">
+                <div class="section-title">Genres</div>
+
+                <div class="doc-item template-item" onclick="loadTemplate('acidHouse')">
+                    <div class="doc-cmd">Acid House</div>
+                    <div class="doc-desc">Driving 303-style basslines.</div>
+                    <span class="template-tag">Techno</span> <span class="template-tag">Fast</span>
+                </div>
+
+                <div class="doc-item template-item" onclick="loadTemplate('trapBeat')">
+                    <div class="doc-cmd">Trap / Hip-Hop</div>
+                    <div class="doc-desc">808 Bass and fast Hi-Hats.</div>
+                    <span class="template-tag">70 BPM</span> <span class="template-tag">Heavy</span>
+                </div>
+
+                <div class="doc-item template-item" onclick="loadTemplate('dubTechno')">
+                    <div class="doc-cmd">Dub Techno</div>
+                    <div class="doc-desc">Deep chords and delay textures.</div>
+                    <span class="template-tag">Atmospheric</span>
+                </div>
+
+                <div class="doc-item template-item" onclick="loadTemplate('glitchChaos')">
+                    <div class="doc-cmd">Glitch Chaos</div>
+                    <div class="doc-desc">Randomized beats and bleeps.</div>
+                    <span class="template-tag">Experimental</span>
+                </div>
+
+                <div class="doc-item template-item" onclick="loadTemplate('technoRumble')">
+                    <div class="doc-cmd">Techno Rumble</div>
+                    <div class="doc-desc">Dark, off-beat driven techno pattern.</div>
+                </div>
+
+                <div class="doc-item template-item" onclick="loadTemplate('euclideanJam')">
+                    <div class="doc-cmd">Polyrhythms</div>
+                    <div class="doc-desc">Complex overlapping Euclidean rhythms.</div>
+                </div>
+
+                <div class="doc-item template-item" onclick="loadTemplate('melodicLoop')">
+                    <div class="doc-cmd">Melodic Synth</div>
+                    <div class="doc-desc">Simple sequencing with melody lines.</div>
+                </div>
+
+                <div class="doc-item template-item" onclick="loadTemplate('basicHouse')">
+                    <div class="doc-cmd">Classic House</div>
+                    <div class="doc-desc">Standard 4/4 dance floor rhythm.</div>
+                </div>
+            </div>
+
+            <!-- TUTORIAL TAB -->
+            <div id="tab-tutorial" class="tab-content">
+                <div class="section-title">The Basics</div>
+                <div class="tutorial-block">
+                    <strong>1. The Grid</strong><br>
+                    Everything runs on a synchronized clock.<br>
+                    <span class="code-inline">stack([...])</span> groups your patterns together to play at once.
+                </div>
+
+                <div class="tutorial-block">
+                    <strong>2. Writing Beats</strong><br>
+                    Use <span class="code-inline">s(name, pattern)</span>.<br>
+                    Pattern <span class="code-inline">[1,0,1,0]</span> means: Play, Rest, Play, Rest.
+                    It stretches to fit 1 bar.
+                </div>
+
+                <div class="tutorial-block">
+                    <strong>3. Melodies</strong><br>
+                    Use <span class="code-inline">every(steps, function)</span> to sequence notes.<br>
+                    E.g., <span class="code-inline">every(4, () => bass('C2',0.5))</span> plays a note every 4 beats.
+                </div>
+
+                <div class="tutorial-block">
+                    <strong>4. Effects</strong><br>
+                    Add polish with <span class="code-inline">setDelay(time, feedback)</span> to create spatial depth.
+                </div>
+            </div>
+
+        </div>
+
+        <div class="editor-wrapper">
+            <div id="editor"></div>
+        </div>
+
+        <div class="viz-panel">
+            <div class="section-title">Oscilloscope</div>
+            <canvas id="scope"></canvas>
+
+            <div class="section-title" style="margin-top: 20px;">Console</div>
+            <div id="console" class="console-log">
+                <div class="console-line system">> System Ready.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tone.js (Using a simplified custom engine but structure allows for future Tone.js) -->
+    <script>
+        // --- Monaco Editor Setup ---
+        require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.39.0/min/vs' } });
+
+        let editor;
+        let isAudioContextActive = false;
+        let isPlaying = false;
+
+        // Templates Library
+        const TEMPLATES = {
+            acidHouse: `// ACID HOUSE GENERATOR
+bpm(135)
+setDelay(0.3, 0.2) 
+
+stack([
+  // Driving Kick
+  () => s('kick', [1, 0, 1, 0]),
+  
+  // Off-beat Hats
+  () => s('hh',   [0, 1, 0, 1]),
+  
+  // ACID BASSLINE
+  // We use random probability to create evolving patterns
+  () => {
+    // 16th note grid
+    if(step % 1 === 0) { 
+        if(Math.random() > 0.4) {
+            // Random acid notes
+            const notes = ['C2','C2','C3','G2','D#2'];
+            const n = notes[Math.floor(Math.random() * notes.length)];
+            // Short pluck with filter
+            bass(n, 0.2); 
+        }
+    }
+  },
+  
+  // Occasional Snare roll
+  () => every(16, () => euclid(8, 16, 'snare'))
+])`,
+            trapBeat: `// TRAP BEAT
+bpm(140) // Double time feel (70bpm)
+setDelay(0.3, 0.4)
+
+stack([
+  // Heavy 808-style Kick texture
+  () => s('kick', [1,0,0,0, 0,0,1,0, 0,0,0,0, 0,0,0,0]),
+  
+  // Rolling Hi-Hats (simulated with randomized hits)
+  () => {
+      // Fast rolls
+      if(step % 2 === 0 || Math.random() > 0.7) {
+          s('hh', [1]); // Play hh
+      }
+  },
+  
+  // The Snare on 3
+  () => s('clap', [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0]),
+  
+  // Dark Lead Melody
+  () => every(8, () => {
+      lead('E4', 0.8);
+      setTimeout(() => lead('G4', 0.8), 200);
+      setTimeout(() => lead('B4', 0.8), 400);
+  })
+])`,
+            dubTechno: `// DEEP DUB TECHNO
+bpm(120)
+// Heavy Delay
+setDelay(0.5, 0.6)
+
+stack([
+  // The Pulse
+  () => s('kick', [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0]),
+  
+  // Shakers
+  () => s('hh', "1011101011101011"),
+  
+  // Dub Chords (Simulated with short leads)
+  () => every(8, () => {
+       // Chord Stab
+       lead('C3', 0.1);
+       lead('D#3', 0.1);
+       lead('G3', 0.1);
+  }),
+  
+  // Deep Sub
+  () => every(4, () => bass('C1', 0.5))
+])`,
+            glitchChaos: `// ALGORITHMIC GLITCH
+bpm(160)
+setDelay(0.1, 0.5)
+
+stack([
+  // Randomized Drums
+  () => {
+      if(Math.random() > 0.8) s('kick', [1]);
+      if(Math.random() > 0.7) s('snare', [1]);
+      if(Math.random() > 0.6) s('hh', [1]);
+      if(Math.random() > 0.95) s('tom', [1]);
+  },
+  
+  // Glitchy tones
+  () => {
+      if(step % 2 === 0 && Math.random() > 0.5) {
+          // Random frequency
+          const freq = 200 + Math.random() * 2000;
+          // We can't set freq directly in this simple DSL, 
+          // but we can pick random notes?
+          const notes = ['C3','D#3','F3','A#3','C5'];
+          note(notes[Math.floor(Math.random()*notes.length)], 0.05, 'square');
+      }
+  }
+])`,
+            technoRumble: `// Industrial Techno
+bpm(135)
+
+stack([
+  // Heavy Kick
+  () => s('kick', [1, 0, 1, 0]),
+  
+  // Fast rolling hats
+  () => s('hh', [1,1,1,1, 1,1,1,1]),
+  
+  // Euclidean PERC rhythm
+  () => euclid(5, 16, 'snare'),
+  
+  // Rumbling Bass
+  () => every(1, () => {
+       bass('G1', 0.8)
+  })
+])`,
+            euclideanJam: `// Euclidean Polyrhythms
+bpm(110)
+
+stack([
+  // 3 hits over 8 steps (Tresillo)
+  () => euclid(3, 8, 'kick'),
+  
+  // 5 hits over 16 steps
+  () => euclid(5, 16, 'clap'),
+  
+  // Steady pulse
+  () => s('hh', [1,1,1,1])
+])`,
+            melodicLoop: `// Melodic Sketch
+bpm(100)
+
+stack([
+  () => s('kick', [1, 0, 0, 0]),
+  
+  // Melody Line
+  () => every(4, () => {
+      note('C4', 0.2, 'sine')
+      setTimeout(() => note('E4', 0.2, 'sine'), 200)
+      setTimeout(() => note('G4', 0.2, 'sine'), 400)
+  })
+])`,
+            basicHouse: `// CLASSIC HOUSE
+bpm(128)
+setDelay(0,0) // Dry
+
+stack([
+  () => s('kick', [1,1,1,1]),
+  () => s('hh',   [0,1,0,1]),
+  () => s('clap', [0,1,0,1]),
+  () => every(2, () => bass('G1', 0.3))
+])`
+        };
+
+        require(['vs/editor/editor.main'], function () {
+            monaco.editor.defineTheme('musiTheme', {
+                base: 'vs-dark',
+                inherit: true,
+                rules: [
+                    { token: 'comment', foreground: '5c6370', fontStyle: 'italic' },
+                    { token: 'keyword', foreground: 'c678dd' },
+                    { token: 'string', foreground: '98c379' },
+                    { token: 'number', foreground: 'd19a66' }
+                ],
+                colors: {
+                    'editor.background': '#0d0e12',
+                }
+            });
+
+            editor = monaco.editor.create(document.getElementById('editor'), {
+                value: TEMPLATES.acidHouse,
+                language: 'javascript',
+                theme: 'musiTheme',
+                automaticLayout: true,
+                minimap: { enabled: false },
+                fontSize: 15,
+                fontFamily: 'JetBrains Mono, Consolas, monospace',
+                lineHeight: 24,
+                padding: { top: 20 }
+            });
+
+            // Debounced Auto-Run
+            let debounceTimer;
+            editor.onDidChangeModelContent(() => {
+                clearTimeout(debounceTimer);
+                setStatus('Compiling...', 'pending');
+                debounceTimer = setTimeout(() => {
+                    runCode(editor.getValue());
+                }, 800);
+            });
+        });
+
+        // --- UI Interactions ---
+        window.switchTab = (tabName) => {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+
+            document.getElementById('tab-' + tabName).classList.add('active');
+
+            const tabs = document.querySelectorAll('.tab');
+            if (tabName === 'docs') tabs[0].classList.add('active');
+            if (tabName === 'templates') tabs[1].classList.add('active');
+            if (tabName === 'tutorial') tabs[2].classList.add('active');
+        };
+
+        window.insertSample = (code) => {
+            if (editor) {
+                const position = editor.getPosition();
+                editor.executeEdits("", [{
+                    range: new monaco.Range(position.lineNumber, position.column, position.lineNumber, position.column),
+                    text: code
+                }]);
+                editor.focus();
+            }
+        };
+
+        window.loadTemplate = (key) => {
+            if (editor && TEMPLATES[key]) {
+                editor.setValue(TEMPLATES[key]);
+            }
+        };
+
+        // --- Audio Engine ---
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx;
+        let masterGain;
+        let delayLeft, delayRight, delayMerge;
+        let analyser;
+
+        let delayTimeNode, delayFeedbackNode, delayWetNode;
+
+        // Scheduler
+        let nextNoteTime = 0.0;
+        let current16thNote = 0;
+        let bpmVal = 120;
+        let scheduleAheadTime = 0.1;
+        let lookahead = 25.0;
+        let timerID;
+
+        // Active State
+        let userLoopFunction = null;
+
+        function initAudio() {
+            if (audioCtx) return;
+            audioCtx = new AudioContext();
+
+            // Master Path
+            masterGain = audioCtx.createGain();
+            masterGain.gain.value = 0.5;
+
+            // Delay Bus (Basic ping pong-ish)
+            delayTimeNode = audioCtx.createDelay();
+            delayTimeNode.delayTime.value = 0.3;
+
+            delayFeedbackNode = audioCtx.createGain();
+            delayFeedbackNode.gain.value = 0.3;
+
+            delayWetNode = audioCtx.createGain();
+            delayWetNode.gain.value = 0.0; // Dry by default
+
+            // Wiring
+            analyser = audioCtx.createAnalyser();
+            masterGain.connect(analyser);
+            analyser.connect(audioCtx.destination);
+
+            // Delay Chain
+            const delayIn = audioCtx.createGain();
+
+            delayIn.connect(delayTimeNode);
+            delayTimeNode.connect(delayFeedbackNode);
+            delayFeedbackNode.connect(delayTimeNode);
+
+            delayTimeNode.connect(delayWetNode);
+            delayWetNode.connect(masterGain);
+
+            // Global Bus
+            window.audioBus = audioCtx.createGain();
+            window.audioBus.connect(masterGain);
+            window.audioBus.connect(delayIn);
+
+            nextNoteTime = audioCtx.currentTime + 0.1;
+            drawScope(); // Start visualizer loop
+
+            if (editor) runCode(editor.getValue());
+        }
+
+        const playbackBtn = document.getElementById('playbackBtn');
+
+        playbackBtn.onclick = () => {
+            if (!audioCtx) initAudio();
+
+            if (isPlaying) {
+                // Pause
+                isPlaying = false;
+                if (audioCtx.state === 'running') audioCtx.suspend();
+                playbackBtn.innerHTML = '<i class="fas fa-play"></i> Resume';
+                playbackBtn.classList.remove('primary');
+                setStatus('Paused', 'paused');
+                clearTimeout(timerID);
+            } else {
+                // Play
+                isPlaying = true;
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+
+                // Resync scheduler time to avoid playing catch-up
+                nextNoteTime = Math.max(nextNoteTime, audioCtx.currentTime + 0.1);
+
+                scheduler(); // Restart Loop
+
+                playbackBtn.innerHTML = '<i class="fas fa-pause"></i> Pause';
+                playbackBtn.classList.add('primary');
+                setStatus('Live', 'live');
+            }
+        };
+
+        // --- Instruments & Effects ---
+
+        const SAMPLES = {
+            kick: (t) => {
+                // Punchy Kick
+                const osc = audioCtx.createOscillator();
+                const g = audioCtx.createGain();
+                osc.frequency.setValueAtTime(150, t);
+                osc.frequency.exponentialRampToValueAtTime(0.01, t + 0.5);
+                g.gain.setValueAtTime(0.8, t);
+                g.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
+                osc.connect(g);
+                g.connect(window.audioBus);
+                osc.start(t);
+                osc.stop(t + 0.5);
+            },
+            snare: (t) => createNoise(t, 0.2),
+            hh: (t) => createNoise(t, 0.05, true),
+            clap: (t) => createNoise(t, 0.15, true),
+            tom: (t) => {
+                const osc = audioCtx.createOscillator();
+                const g = audioCtx.createGain();
+                osc.frequency.setValueAtTime(100, t);
+                osc.frequency.exponentialRampToValueAtTime(10, t + 0.3);
+                g.gain.setValueAtTime(0.6, t);
+                g.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+                osc.connect(g);
+                g.connect(window.audioBus);
+                osc.start(t);
+                osc.stop(t + 0.3);
+            }
+        };
+
+        function createNoise(time, dur, highPass = false) {
+            // Simplified for brevity
+            const b = audioCtx.createBuffer(1, audioCtx.sampleRate * dur, audioCtx.sampleRate);
+            const d = b.getChannelData(0);
+            for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+            const s = audioCtx.createBufferSource();
+            s.buffer = b;
+            const g = audioCtx.createGain();
+            g.gain.setValueAtTime(0.4, time);
+            g.gain.exponentialRampToValueAtTime(0.001, time + dur);
+
+            let out = s;
+            if (highPass) {
+                const f = audioCtx.createBiquadFilter();
+                f.type = 'highpass';
+                f.frequency.value = 6000;
+                s.connect(f);
+                out = f;
+            }
+            out.connect(g);
+            g.connect(window.audioBus);
+            s.start(time);
+        }
+
+        function noteToFreq(note) {
+            const notes = { 'C': 0, 'C#': 1, 'D': 2, 'D#': 3, 'E': 4, 'F': 5, 'F#': 6, 'G': 7, 'G#': 8, 'A': 9, 'A#': 10, 'B': 11 };
+            // Simple parser
+            try {
+                // handle "D#2"
+                const key = note.replace(/[0-9]/g, '').toUpperCase();
+                const oct = parseInt(note.replace(/[^0-9]/g, ''));
+                const semis = notes[key] + (oct * 12);
+                return 440 * Math.pow(2, (semis - 69) / 12);
+            } catch (e) { return 440; }
+        }
+
+        // --- DSL ---
+        const DSL = {
+            step: 0,
+            time: 0,
+            bpm: (v) => bpmVal = v,
+
+            s: (name, pat) => {
+                if (Array.isArray(pat)) {
+                    // Logic: Fit pattern to 16 steps
+                    const scale = 16 / pat.length;
+                    // Trigger if we are on a step that aligns
+                    if (DSL.step % scale < 1 && Math.abs((DSL.step % scale)) < 0.1) {
+                        const idx = Math.floor(DSL.step / scale);
+                        if (pat[idx]) {
+                            if (SAMPLES[name]) SAMPLES[name](DSL.time);
+                        }
+                    }
+                    // Handle "High density" patterns (more than 16 steps)?
+                    // Not supported in this simplified scheduler (it ticks 16th notes).
+                } else if (typeof pat === 'string') {
+                    DSL.s(name, pat.split('').map(x => x === '1' ? 1 : 0));
+                }
+            },
+
+            note: (n, dur, type = 'sine') => {
+                const osc = audioCtx.createOscillator();
+                const g = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.value = noteToFreq(n);
+                g.gain.setValueAtTime(0.3, DSL.time);
+                g.gain.linearRampToValueAtTime(0, DSL.time + dur);
+                osc.connect(g);
+                g.connect(window.audioBus);
+                osc.start(DSL.time);
+                osc.stop(DSL.time + dur);
+            },
+
+            bass: (n, dur) => {
+                const t = DSL.time;
+                const f = noteToFreq(n);
+                const osc = audioCtx.createOscillator();
+                osc.type = 'sawtooth';
+                osc.frequency.value = f;
+
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.Q.value = 5; // Resonance!
+                filter.frequency.setValueAtTime(f * 1.5, t);
+                filter.frequency.exponentialRampToValueAtTime(f, t + dur);
+
+                const g = audioCtx.createGain();
+                g.gain.setValueAtTime(0.5, t);
+                g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+
+                osc.connect(filter);
+                filter.connect(g);
+                g.connect(window.audioBus);
+
+                osc.start(t);
+                osc.stop(t + dur);
+            },
+
+            lead: (n, dur) => {
+                const t = DSL.time;
+                const osc = audioCtx.createOscillator();
+                osc.type = 'square';
+                osc.frequency.value = noteToFreq(n);
+
+                const g = audioCtx.createGain();
+                g.gain.setValueAtTime(0.2, t);
+                g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+
+                osc.connect(g);
+                g.connect(window.audioBus);
+                osc.start(t);
+                osc.stop(t + dur);
+            },
+
+            euclid: (k, n, sound) => {
+                if ((DSL.step * k) % n < k) {
+                    if (SAMPLES[sound]) SAMPLES[sound](DSL.time);
+                }
+            },
+
+            every: (n, fn) => {
+                // n is beats (4 steps)
+                if (DSL.step % (n * 4) === 0) fn();
+            },
+
+            stack: (funcs) => funcs.forEach(f => { try { f() } catch (e) { } }),
+
+            setDelay: (time, mix) => {
+                if (delayTimeNode) delayTimeNode.delayTime.setTargetAtTime(time, audioCtx.currentTime, 0.1);
+                if (delayWetNode) delayWetNode.gain.setTargetAtTime(mix, audioCtx.currentTime, 0.1);
+            },
+
+            log: (m) => logToConsole(m)
+        };
+
+        function scheduler() {
+            const secondsPerBeat = 60.0 / bpmVal;
+            const secondsPer16th = secondsPerBeat / 4;
+            while (nextNoteTime < audioCtx.currentTime + scheduleAheadTime) {
+                schedule(current16thNote % 128, nextNoteTime); // Loop counter at 128 to keep numbers sane
+                nextNoteTime += secondsPer16th;
+                current16thNote++;
+            }
+            if (isPlaying) timerID = window.setTimeout(scheduler, lookahead);
+        }
+
+        function schedule(step, time) {
+            DSL.step = step;
+            DSL.time = time;
+            if (userLoopFunction) {
+                try { userLoopFunction(); } catch (e) {
+                    if (step % 16 === 0) logToConsole(e.message, true);
+                }
+            }
+        }
+
+        function runCode(code) {
+            try {
+                const funcBody = `with(DSL) { ${code} }`;
+                const fn = new Function('DSL', funcBody);
+                userLoopFunction = () => fn(DSL);
+                setStatus('Live', 'live');
+            } catch (e) {
+                setStatus('Error', 'error');
+                logToConsole(e.message, true);
+            }
+        }
+
+        function setStatus(text, type) {
+            const badge = document.getElementById('statusBadge');
+            const txt = document.getElementById('statusText');
+            badge.className = 'status-badge ' + type;
+            txt.innerText = text;
+        }
+
+        function logToConsole(msg, isError) {
+            const c = document.getElementById('console');
+            const d = document.createElement('div');
+            d.className = isError ? 'console-line error' : 'console-line';
+            d.innerText = `> ${msg}`;
+            c.appendChild(d);
+            c.scrollTop = c.scrollHeight;
+        }
+
+        function drawScope() {
+            requestAnimationFrame(drawScope);
+            const cvs = document.getElementById('scope');
+            const ctx = cvs.getContext('2d');
+            const w = cvs.width;
+            const h = cvs.height;
+            ctx.fillStyle = 'rgba(13, 14, 18, 0.3)';
+            ctx.fillRect(0, 0, w, h);
+            if (!analyser) return;
+            const data = new Uint8Array(analyser.frequencyBinCount);
+            analyser.getByteTimeDomainData(data);
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#61afef';
+            ctx.beginPath();
+            const slice = w * 1.0 / data.length;
+            let x = 0;
+            for (let i = 0; i < data.length; i++) {
+                const v = data[i] / 128.0;
+                const y = v * h / 2;
+                if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+                x += slice;
+            }
+            ctx.stroke();
+        }
+    </script>
+</body>
+
+</html>

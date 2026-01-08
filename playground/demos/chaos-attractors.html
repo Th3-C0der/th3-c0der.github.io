@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Chaos Attractors - Th3-C0der</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            background: #000;
+            overflow: hidden;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        .ui {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        select,
+        button {
+            background: #222;
+            color: #fff;
+            border: 1px solid #444;
+            padding: 8px;
+            border-radius: 4px;
+            width: 100%;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+    </style>
+    <!-- AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718"
+        crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <div class="ui">
+        <h2>Chaos Attractors</h2>
+        <select id="type">
+            <option value="lorenz">Lorenz</option>
+            <option value="rossler">Rössler</option>
+            <option value="chen">Chen</option>
+        </select>
+        <button id="reset">Reset</button>
+        <div id="stats">Points: 0</div>
+    </div>
+    <canvas id="canvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+
+        // State
+        let points = [];
+        let maxPoints = 3000;
+        let x = 0.1, y = 0, z = 0;
+        let angle = 0;
+        let attractor = 'lorenz';
+
+        // Params
+        const lorenz = { s: 10, r: 28, b: 8 / 3, speed: 0.01, scale: 12 };
+        const rossler = { a: 0.2, b: 0.2, c: 5.7, speed: 0.02, scale: 8 };
+        const chen = { a: 40, b: 3, c: 28, speed: 0.005, scale: 6 };
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        function reset() {
+            points = [];
+            x = 0.1; y = 0; z = 0;
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, width, height);
+        }
+
+        document.getElementById('reset').onclick = reset;
+        document.getElementById('type').onchange = (e) => {
+            attractor = e.target.value;
+            reset();
+        }
+
+        function update() {
+            let dx, dy, dz;
+            let dt = 0.01;
+
+            // Sub-steps for smoothness
+            for (let i = 0; i < 10; i++) {
+                if (attractor === 'lorenz') {
+                    const { s, r, b, speed } = lorenz;
+                    dt = speed;
+                    dx = (s * (y - x)) * dt;
+                    dy = (x * (r - z) - y) * dt;
+                    dz = (x * y - b * z) * dt;
+                } else if (attractor === 'rossler') {
+                    const { a, b, c, speed } = rossler;
+                    dt = speed;
+                    dx = (-y - z) * dt;
+                    dy = (x + a * y) * dt;
+                    dz = (b + z * (x - c)) * dt;
+                } else { // Chen
+                    const { a, b, c, speed } = chen;
+                    dt = speed;
+                    dx = (a * (y - x)) * dt;
+                    dy = ((c - a) * x - x * z + c * y) * dt;
+                    dz = (x * y - b * z) * dt;
+                }
+
+                x += dx;
+                y += dy;
+                z += dz;
+
+                points.push({ x, y, z });
+                if (points.length > maxPoints) points.shift();
+            }
+
+            angle += 0.005;
+        }
+
+        function draw() {
+            // Fade effect
+            ctx.fillStyle = 'rgba(0,0,0,0.1)';
+            ctx.fillRect(0, 0, width, height);
+
+            ctx.save();
+            ctx.translate(width / 2, height / 2);
+
+            let scale = 10;
+            if (attractor === 'lorenz') scale = lorenz.scale;
+            else if (attractor === 'rossler') scale = rossler.scale;
+            else scale = chen.scale;
+
+            // Helper to project 3d point
+            function project(p) {
+                // Rotate Y
+                let px = p.x * Math.cos(angle) - p.z * Math.sin(angle);
+                let pz = p.x * Math.sin(angle) + p.z * Math.cos(angle);
+                // Simple perspective or just ortho
+                return {
+                    x: px * scale,
+                    y: p.y * scale * -1 // flip Y
+                };
+            }
+
+            ctx.beginPath();
+            let prev = points.length > 0 ? project(points[0]) : { x: 0, y: 0 };
+
+            for (let i = 0; i < points.length; i++) {
+                const curr = project(points[i]);
+
+                // Color based on index (rainbow)
+                // We'll draw segment by segment to color vary
+                ctx.strokeStyle = `hsl(${i / points.length * 360}, 100%, 50%)`;
+                ctx.beginPath();
+                ctx.moveTo(prev.x, prev.y);
+                ctx.lineTo(curr.x, curr.y);
+                ctx.stroke();
+
+                prev = curr;
+            }
+            ctx.restore();
+
+            document.getElementById('stats').innerText = `Points: ${points.length}`;
+        }
+
+        function loop() {
+            update();
+            draw();
+            requestAnimationFrame(loop);
+        }
+
+        loop();
+
+    </script>
+</body>
+
+</html>

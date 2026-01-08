@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Retro CRT - Th3-C0der</title>
+    <style>
+        body {
+            margin: 0;
+            background: #000;
+            overflow: hidden;
+            color: #33ff00;
+            font-family: 'Courier New', monospace;
+        }
+
+        canvas {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* CRT Screen Container */
+        .crt-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+            background: #111;
+        }
+
+        /* Effect Layers */
+        #crt-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+
+            /* Scanlines */
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%,
+                    rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg,
+                    rgba(255, 0, 0, 0.06),
+                    rgba(0, 255, 0, 0.02),
+                    rgba(0, 0, 255, 0.06));
+            background-size: 100% 3px, 3px 100%;
+            z-index: 10;
+        }
+
+        /* Vignette & Curve simulation */
+        .vignette {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: radial-gradient(circle, rgba(0, 0, 0, 0) 60%, rgba(0, 0, 0, 0.6) 100%);
+            z-index: 20;
+            box-shadow: inset 0 0 150px rgba(0, 0, 0, 0.9);
+        }
+
+        .screen-curve {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 30;
+            /* Subtle border curve effect */
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+            border: 2px solid #111;
+        }
+    </style>
+    <!-- AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718"
+        crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <div class="crt-container">
+        <div id="crt-overlay"></div>
+        <div class="vignette"></div>
+        <div class="screen-curve"></div>
+        <canvas id="screen"></canvas>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('screen');
+        const ctx = canvas.getContext('2d');
+
+        let width, height;
+        let textLines = [];
+        const lineHeight = 20;
+        let frame = 0;
+
+        // --- Matrix State ---
+        let matrixMode = false;
+        let drops = [];
+        const matrixChars = "0123456789ABCDEF@#$%&";
+
+        // --- Filesystem State ---
+        const fileSystem = {
+            "README.TXT": "WELCOME TO PROTO-LINK.\nTHIS IS A SECURE SYSTEM.",
+            "TODO.LIST": "- FIX FLUX CAPACITOR\n- BUY MILK\n- DECRYPT DATA",
+            "SECRET.DAT": "ACCESS DENIED. ENCRYPTION LEVEL: 5",
+            "GHOST.LOG": "ENTITY DETECTED SECTOR 7G...",
+            "ART.ASC": "   /\\_/\\\n  ( o.o )\n   > ^ <"
+        };
+
+        // --- Boot Sequence ---
+        const bootText = [
+            "BIOS DATE 01/01/95 14:22:54 VER 1.02",
+            "CPU: NEC V60, SPEED: 16 MHz",
+            "640K RAM SYSTEM... OK",
+            "Checking peripherals...",
+            "  KEYBOARD..... DETECTED",
+            "  MOUSE........ DETECTED",
+            "  FDD A:....... 1.44M",
+            "  HDD C:....... 200MB",
+            "",
+            "LOADING OS...",
+            "..........................",
+            "MOUNTING VOLUMES...",
+            "reading sector 0x84F...",
+            "reading sector 0x850...",
+            "INIT KERNEL........ OK",
+            "LOADING SHELL v2.4",
+            "",
+            "WELCOME TO PROTO-Link SYSTEM",
+            "USER: GUEST",
+            "ACCESS LEVEL: RESTRICTED",
+            "TYPE 'HELP' FOR COMMANDS",
+            "",
+            "> "
+        ];
+
+        let typeIndex = 0; // Current line index
+        let charIndex = 0; // Current char index
+        let typingSpeed = 2; // frames per char
+        let typeTimer = 0;
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            ctx.font = "18px 'Courier New', monospace";
+
+            // Re-init drops if sized
+            initMatrix();
+        }
+        window.addEventListener('resize', resize);
+
+        function initMatrix() {
+            const columns = Math.ceil(width / 14); // approx char width
+            drops = [];
+            for (let i = 0; i < columns; i++) {
+                drops[i] = Math.random() * -100; // start above screen
+            }
+        }
+
+        resize();
+
+        function drawText() {
+            ctx.fillStyle = "#33ff00";
+            ctx.shadowColor = "#33ff00";
+            ctx.shadowBlur = 8;
+
+            let y = 40;
+            textLines.forEach((line) => {
+                const subLines = line.toString().split('\n');
+                subLines.forEach(sub => {
+                    ctx.fillText(sub, 40, y);
+                    y += lineHeight;
+                });
+            });
+
+            // Draw Cursor
+            if (frame % 60 < 30) {
+                const currentLine = textLines[textLines.length - 1] || "";
+                // Only measure last part of prompt
+                const lastLinePart = currentLine.toString().split('\n').pop();
+
+                const cx = 40 + ctx.measureText(lastLinePart).width;
+                const cy = y - lineHeight;
+                ctx.fillRect(cx, cy - 14, 12, 18);
+            }
+        }
+
+        function drawMatrix() {
+            ctx.fillStyle = "rgba(0, 0, 0, 0.05)"; // fade trail
+            ctx.fillRect(0, 0, width, height);
+
+            ctx.fillStyle = "#0F0"; // green text
+            ctx.font = "16px monospace";
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = matrixChars.charAt(Math.floor(Math.random() * matrixChars.length));
+                ctx.fillText(text, i * 14, drops[i] * 16);
+
+                if (drops[i] * 16 > height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+            ctx.fillStyle = "#FFF";
+            ctx.fillText("PRESS ANY KEY TO EXIT MATRIX", width / 2 - 100, height - 20);
+        }
+
+        function updateLogic() {
+            if (matrixMode) return;
+            typeTimer++;
+
+            if (typeIndex < bootText.length) {
+                if (typeTimer >= typingSpeed) {
+                    typeTimer = 0;
+                    const targetLine = bootText[typeIndex];
+
+                    if (charIndex <= targetLine.length) {
+                        if (textLines.length <= typeIndex) textLines.push("");
+                        textLines[typeIndex] = targetLine.substring(0, charIndex);
+                        charIndex++;
+                    } else {
+                        typeIndex++;
+                        charIndex = 0;
+                        typeTimer = -2;
+                    }
+                }
+            }
+
+            // Safety scroll
+            const maxVisible = Math.floor((height - 80) / lineHeight);
+            while (textLines.length > maxVisible) {
+                textLines.shift();
+            }
+        }
+
+        function render() {
+            if (matrixMode) {
+                drawMatrix();
+                return;
+            }
+
+            // Background
+            ctx.fillStyle = "#051005";
+            ctx.fillRect(0, 0, width, height);
+
+            // Text with Jitter
+            const jitterX = (Math.random() - 0.5) * 1.0;
+            const jitterY = (Math.random() - 0.5) * 0.5;
+
+            ctx.save();
+            ctx.translate(jitterX, jitterY);
+            drawText();
+            ctx.restore();
+
+            // Lightweight Glitch
+            if (Math.random() > 0.99) {
+                const gy = Math.random() * height;
+                const gh = Math.random() * 20 + 5;
+                ctx.fillStyle = "rgba(50, 255, 50, 0.15)";
+                ctx.fillRect(0, gy, width, gh);
+            }
+        }
+
+        function loop() {
+            frame++;
+            updateLogic();
+            render();
+            requestAnimationFrame(loop);
+        }
+
+        loop();
+
+        // Command Parser
+        function processCommand(cmdRaw) {
+            const cmd = cmdRaw.trim().toUpperCase();
+
+            if (cmd === "HELP") {
+                textLines.push("COMMANDS: HELP, CLEAR, DATE, REBOOT, MATRIX");
+                textLines.push("FILES: LS, CAT <FILENAME>");
+            } else if (cmd === "CLEAR") {
+                textLines = [];
+            } else if (cmd === "DATE") {
+                textLines.push(new Date().toString());
+            } else if (cmd === "REBOOT") {
+                location.reload();
+            } else if (cmd === "MATRIX") {
+                matrixMode = true;
+                ctx.fillStyle = "#000";
+                ctx.fillRect(0, 0, width, height);
+            } else if (cmd === "LS" || cmd === "DIR") {
+                textLines.push("Listing Files...");
+                for (let f in fileSystem) {
+                    textLines.push("  " + f);
+                }
+            } else if (cmd.startsWith("CAT ") || cmd.startsWith("TYPE ")) {
+                const parts = cmd.split(" ");
+                if (parts.length > 1) {
+                    const fname = parts[1];
+                    if (fileSystem[fname]) {
+                        fileSystem[fname].split('\n').forEach(l => textLines.push(l));
+                    } else {
+                        textLines.push("FILE NOT FOUND (404)");
+                    }
+                } else {
+                    textLines.push("USAGE: CAT <FILENAME>");
+                }
+            } else if (cmd.startsWith("ECHO ")) {
+                textLines.push(cmdRaw.substring(5));
+            } else if (cmd !== "") {
+                textLines.push("BAD COMMAND OR FILENAME");
+            }
+
+            // Always add new prompt if we didn't clear (or even if we did, we need one)
+            textLines.push("> ");
+        }
+
+        // Interaction
+        window.addEventListener('keydown', (e) => {
+            if (matrixMode) {
+                matrixMode = false;
+                // force redraw bg immediately 
+                ctx.fillStyle = "#000"; ctx.fillRect(0, 0, width, height);
+                return;
+            }
+
+            // Only allow typing if boot is done
+            if (typeIndex >= bootText.length) {
+                const lastIdx = textLines.length - 1;
+
+                if (["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].indexOf(e.code) > -1) {
+                    // e.preventDefault();
+                }
+
+                if (e.key === 'Enter') {
+                    const rawLine = textLines[lastIdx] || "";
+                    const cmdRaw = rawLine.replace(/^> /, "");
+
+                    // process
+                    processCommand(cmdRaw);
+
+                } else if (e.key === 'Backspace') {
+                    let txt = textLines[lastIdx];
+                    // Logic: don't delete if we are at prompt
+                    const parts = txt.split("> ");
+                    if (parts.length > 1 && parts[1].length > 0) {
+                        textLines[lastIdx] = txt.slice(0, -1);
+                    } else if (parts.length === 1 && txt.length > 0 && !txt.includes(">")) {
+                        textLines[lastIdx] = txt.slice(0, -1);
+                    }
+                    // If it's just "> ", do nothing
+
+                } else if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+                    textLines[lastIdx] += e.key;
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

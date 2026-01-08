@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Particle Life - Th3-C0der</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #000;
+            font-family: 'Inter', sans-serif;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        .controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 8px;
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            width: 250px;
+        }
+
+        .controls h1 {
+            margin: 0 0 10px 0;
+            font-size: 1.2rem;
+            color: #00ff9d;
+        }
+
+        .slider-group {
+            margin-bottom: 10px;
+        }
+
+        .slider-group label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            margin-bottom: 2px;
+        }
+
+        input[type=range] {
+            width: 100%;
+            accent-color: #00ff9d;
+        }
+
+        button {
+            width: 100%;
+            padding: 8px;
+            background: #00ff9d;
+            border: none;
+            border-radius: 4px;
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 8px 16px;
+            border-radius: 20px;
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .back-btn:hover {
+            background: rgba(0, 255, 157, 0.1);
+            color: #00ff9d;
+            border-color: #00ff9d;
+        }
+    </style>
+    <!-- AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718"
+        crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <a href="/playground" class="back-btn"><i class="fas fa-arrow-left"></i> Back</a>
+    <div class="controls">
+        <h1>Particle Life</h1>
+        <div class="slider-group">
+            <label>Particles: <span id="countVal">1000</span></label>
+            <input type="range" id="count" min="500" max="3000" step="100" value="1200">
+        </div>
+        <div class="slider-group">
+            <label>Friction: <span id="fricVal">0.9</span></label>
+            <input type="range" id="friction" min="0.5" max="0.99" step="0.01" value="0.92">
+        </div>
+        <div class="slider-group">
+            <label>Force Multiplier: <span id="forceVal">1.0</span></label>
+            <input type="range" id="force" min="0.1" max="5.0" step="0.1" value="1.0">
+        </div>
+        <button id="randomize">Randomize Rules</button>
+    </div>
+    <canvas id="canvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Config
+        let width, height;
+
+        // Simulation State
+        const types = ['red', 'green', 'blue', 'yellow', 'cyan', 'magenta'];
+        const colors = ['#FF5555', '#50FA7B', '#8BE9FD', '#F1FA8C', '#BD93F9', '#FF79C6'];
+        let particles = [];
+        let rules = {}; // matrix of forces
+
+        // Params
+        let nParticles = 1200;
+        let friction = 0.92;
+        let forceFactor = 1.0;
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        // Initialize Rules
+        function randomRules() {
+            for (let i = 0; i < types.length; i++) {
+                for (let j = 0; j < types.length; j++) {
+                    // Force between type i and type j
+                    // Positive = attract, Negative = repel
+                    rules[calculateKey(i, j)] = (Math.random() * 2 - 1);
+                }
+            }
+        }
+
+        function calculateKey(a, b) { return a + '-' + b; }
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = 0;
+                this.vy = 0;
+                this.type = Math.floor(Math.random() * types.length);
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            for (let i = 0; i < nParticles; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function update() {
+            // Very naive O(N^2) - optimization: spatial partitioning (grid)
+            // For 1200 particles, O(N^2) is ~1.4M interactions, might be slow on JS CPU.
+            // Let's optimize slightly by limiting radius or just keep count low explicitly.
+
+            // Re-implementing simplified "Particle Life" logic
+            // We can group particles by type to avoid iterating all-vs-all randomly? No.
+            // Let's use a lower count for safety if we don't use spatial hash.
+
+            // Or use the "Group" optimization:
+            // Group particles by type.
+            // apply rules(t1, t2) to sets.
+
+            // Basic Loop
+            for (let i = 0; i < particles.length; i++) {
+                let fx = 0;
+                let fy = 0;
+                const a = particles[i];
+
+                for (let j = 0; j < particles.length; j++) {
+                    if (i === j) continue;
+                    const b = particles[j];
+
+                    let dx = b.x - a.x;
+                    let dy = b.y - a.y;
+
+                    // Wrap around
+                    if (dx > width * 0.5) dx -= width;
+                    if (dx < -width * 0.5) dx += width;
+                    if (dy > height * 0.5) dy -= height;
+                    if (dy < -height * 0.5) dy += height;
+
+                    const distSq = dx * dx + dy * dy;
+
+                    if (distSq > 0 && distSq < 6400) { // Radius 80
+                        const dist = Math.sqrt(distSq);
+                        const f = rules[calculateKey(a.type, b.type)] * forceFactor;
+
+                        // Force function: 
+                        // If dist < 20 (collision), repel strongly
+                        // If 20 < dist < 80, apply rule force
+                        let force = 0;
+                        if (dist < 20) {
+                            force = (dist - 20) * 1; // Repel
+                        } else {
+                            // simple linear falloff
+                            // normalize dist to 0-1 range within 20-80
+                            // 20->0, 80->1 ? No
+                            // attraction peaks?
+                            // Standard particle life curve:
+                            // 1/dist based? 
+                            // Let's use simple inverse linear
+                            force = f * (1 - Math.abs(2 * dist - 100) / 100); // peak around 50?
+
+                            // Let's use the standard algo:
+                            // F = G * 1/dist
+                            force = f / dist;
+                        }
+
+                        fx += (dx / dist) * force;
+                        fy += (dy / dist) * force;
+                    }
+                }
+
+                a.vx = (a.vx + fx) * friction;
+                a.vy = (a.vy + fy) * friction;
+
+                a.x += a.vx;
+                a.y += a.vy;
+
+                // Wrap screen
+                if (a.x < 0) a.x += width;
+                if (a.x > width) a.x -= width;
+                if (a.y < 0) a.y += height;
+                if (a.y > height) a.y -= height;
+            }
+        }
+
+        function draw() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.4)'; // trails
+            ctx.fillRect(0, 0, width, height);
+
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
+                ctx.fillStyle = colors[p.type];
+                ctx.fillRect(p.x, p.y, 2, 2);
+            }
+        }
+
+        function loop() {
+            update();
+            draw();
+            requestAnimationFrame(loop);
+        }
+
+        // Init
+        randomRules();
+        initParticles();
+        loop();
+
+        // Controls
+        document.getElementById('randomize').onclick = () => {
+            randomRules();
+            // Maybe respawn particles?
+            // initParticles();
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, width, height);
+        };
+
+        document.getElementById('count').oninput = (e) => {
+            nParticles = parseInt(e.target.value);
+            document.getElementById('countVal').innerText = nParticles;
+            initParticles();
+        };
+
+        document.getElementById('friction').oninput = (e) => {
+            friction = parseFloat(e.target.value);
+            document.getElementById('fricVal').innerText = friction;
+        };
+
+        document.getElementById('force').oninput = (e) => {
+            forceFactor = parseFloat(e.target.value);
+            document.getElementById('forceVal').innerText = forceFactor;
+        };
+    </script>
+</body>
+
+</html>

@@ -575,12 +575,12 @@
 
     /* FORMS */
     .form-group {
-      margin-bottom: 13px
+      margin-bottom: 10px
     }
 
     .form-row {
       display: grid;
-      gap: 12px
+      gap: 10px
     }
 
     .form-row.c2 {
@@ -597,9 +597,9 @@
 
     label {
       display: block;
-      font-size: 11px;
+      font-size: 10px;
       color: var(--text3);
-      margin-bottom: 5px;
+      margin-bottom: 4px;
       font-weight: 500;
       text-transform: uppercase;
       letter-spacing: .06em
@@ -612,12 +612,14 @@
       background: var(--bg3);
       border: 1px solid var(--border2);
       border-radius: var(--r);
-      padding: 8px 10px;
+      padding: 7px 9px;
       color: var(--text);
       font-family: var(--font);
       font-size: 13px;
       outline: none;
-      transition: border .15s
+      transition: border .15s;
+      /* Better touch targets on mobile */
+      min-height: 36px
     }
 
     input:focus,
@@ -633,7 +635,7 @@
 
     textarea {
       resize: vertical;
-      min-height: 60px
+      min-height: 54px
     }
 
     input[type=date]::-webkit-calendar-picker-indicator {
@@ -706,11 +708,11 @@
       color: var(--text3);
       text-transform: uppercase;
       letter-spacing: .08em;
-      padding-bottom: 8px;
+      padding-bottom: 6px;
       border-bottom: 1px solid var(--border);
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       font-weight: 500;
-      margin-top: 16px
+      margin-top: 12px
     }
 
     /* Dynamic cost/income rows */
@@ -809,11 +811,11 @@
       border: 1px solid var(--border2);
       border-radius: var(--r3);
       width: 100%;
-      max-width: 720px;
-      max-height: 92vh;
+      max-width: 680px;
+      max-height: 88dvh;
       overflow-y: auto;
       transform: translateY(12px);
-      transition: transform .18s
+      transition: transform .2s cubic-bezier(.34,1.2,.64,1)
     }
 
     .overlay.open .modal {
@@ -821,28 +823,38 @@
     }
 
     .modal-hd {
-      padding: 18px 20px 0;
+      padding: 14px 16px 0;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 14px
+      margin-bottom: 12px;
+      position: sticky;
+      top: 0;
+      background: var(--bg2);
+      z-index: 1;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px
     }
 
     .modal-title {
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 600
     }
 
     .modal-bd {
-      padding: 0 20px 20px
+      padding: 0 16px 16px
     }
 
     .modal-ft {
-      padding: 14px 20px;
+      padding: 10px 16px;
       border-top: 1px solid var(--border);
       display: flex;
       justify-content: flex-end;
-      gap: 8px
+      gap: 8px;
+      position: sticky;
+      bottom: 0;
+      background: var(--bg2);
+      z-index: 1
     }
 
     /* TOOLBAR */
@@ -1197,41 +1209,37 @@
         box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
       }
 
-      .sidebar.open {
-        left: 0;
-      }
+      .sidebar.open { left: 0; }
 
       .content {
-        padding: 14px 14px 40px 14px;
+        padding: 12px 12px 80px 12px;
         min-width: 0;
       }
 
       .stat-grid {
         grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
+        gap: 7px;
+        margin-bottom: 12px;
       }
 
       .stat-card {
-        padding: 12px;
+        padding: 10px 12px;
         min-width: 0;
       }
 
-      .stat-value.sm {
-        font-size: 14px;
-      }
+      .stat-value.sm { font-size: 13px; }
 
       .stat-value {
-        font-size: 18px;
+        font-size: 17px;
         word-break: break-all;
       }
 
-      .grid-2 {
-        grid-template-columns: 1fr;
-      }
+      .stat-label { font-size: 9px; margin-bottom: 5px; }
 
-      .card {
-        padding: 14px;
-      }
+      .grid-2 { grid-template-columns: 1fr; gap: 10px; }
+
+      .card { padding: 12px; margin-bottom: 10px; }
+      .card-header { margin-bottom: 10px; }
 
       .form-row.c2,
       .form-row.c3,
@@ -1239,44 +1247,43 @@
         grid-template-columns: 1fr
       }
 
+      /* Keep some 2-col rows on medium-small phones */
+      .form-row.c2.keep2 {
+        grid-template-columns: 1fr 1fr;
+      }
+
       .extra-row {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
         padding-bottom: 8px;
         border-bottom: 1px dashed var(--border2);
         margin-bottom: 8px;
       }
 
-      .extra-row select {
-        width: 100%;
+      .extra-row .extra-label-col {
+        grid-column: 1 / -1;
       }
+
+      .extra-row select { width: 100%; }
 
       .btn-remove {
         width: 100%;
         text-align: center;
-        margin-top: 4px;
+        margin-top: 2px;
         display: block;
+        grid-column: 1 / -1;
       }
 
-      .topbar {
-        padding: 0 12px;
-      }
-
-      .topbar-sub {
-        display: none;
-      }
-
-      .hide-mobile {
-        display: none;
-      }
+      .topbar { padding: 0 10px; height: 48px; }
+      .topbar-sub { display: none; }
+      .hide-mobile { display: none; }
 
       .topbar .btn {
-        padding: 8px;
+        padding: 7px;
         font-size: 0;
       }
 
-      .topbar .btn svg {
-        margin-right: 0 !important;
-      }
+      .topbar .btn svg { margin-right: 0 !important; }
 
       .sidebar-close-btn {
         display: flex;
@@ -1290,32 +1297,57 @@
         cursor: pointer;
       }
 
-      .sidebar-close-btn:hover {
-        background: var(--bg3);
-      }
+      .sidebar-close-btn:hover { background: var(--bg3); }
+      .btn { padding: 6px 10px; font-size: 12px; }
 
-      .btn {
-        padding: 6px 10px;
-        font-size: 12px;
+      /* Bottom-sheet modal on mobile */
+      .overlay {
+        padding: 0;
+        align-items: flex-end;
       }
 
       .modal {
         max-width: 100% !important;
-        min-height: 100vh;
-        border-radius: 0;
-        border: none;
+        max-height: 94dvh;
+        border-radius: var(--r3) var(--r3) 0 0;
+        border-bottom: none;
         overflow-y: auto;
         display: flex;
         flex-direction: column;
+        transform: translateY(40px);
       }
 
-      .modal-bd {
-        flex: 1;
+      .overlay.open .modal { transform: translateY(0); }
+
+      .modal-bd { flex: 1; padding: 0 12px 12px; }
+      .modal-hd { padding: 12px 12px 10px; }
+
+      /* Drag handle for bottom-sheet feel */
+      .modal::before {
+        content: '';
+        display: block;
+        width: 36px;
+        height: 4px;
+        background: var(--bg4);
+        border-radius: 99px;
+        margin: 8px auto 0;
+        flex-shrink: 0;
       }
 
-      .overlay {
-        padding: 0;
+      /* Floating Action Button on mobile */
+      .fab {
+        display: flex !important;
       }
+    }
+
+    @media(max-width:480px) {
+      .form-row.c2 {
+        grid-template-columns: 1fr;
+      }
+      .extra-row {
+        grid-template-columns: 1fr;
+      }
+      .stat-value { font-size: 15px; }
     }
 
     .login-screen {
@@ -1363,6 +1395,599 @@
       text-align: center;
       width: 100%;
       box-sizing: border-box;
+    }
+
+    /* ───────── RENEWAL ALERT BANNER ───────── */
+    .renewal-alert-bar {
+      background: rgba(239,68,68,.08);
+      border-bottom: 1px solid rgba(239,68,68,.2);
+      padding: 8px 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      color: var(--red2);
+      flex-shrink: 0;
+      flex-wrap: wrap;
+    }
+    .renewal-alert-bar .rab-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--redDim);
+      padding: 3px 8px;
+      border-radius: 99px;
+      font-weight: 500;
+    }
+    .renewal-alert-bar .rab-title {
+      font-weight: 600;
+      color: var(--red2);
+      margin-right: 4px;
+    }
+
+    /* ───────── KANBAN BOARD ───────── */
+    .kanban-board {
+      display: flex;
+      gap: 14px;
+      overflow-x: auto;
+      padding-bottom: 12px;
+      align-items: flex-start;
+    }
+    .kanban-col {
+      min-width: 220px;
+      max-width: 240px;
+      flex-shrink: 0;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--r2);
+      display: flex;
+      flex-direction: column;
+    }
+    .kanban-col-hd {
+      padding: 10px 12px 8px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .kanban-col-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .kanban-col-count {
+      margin-left: auto;
+      background: var(--bg4);
+      color: var(--text3);
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 99px;
+    }
+    .kanban-cards {
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-height: 60px;
+    }
+    .kanban-card {
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      border-radius: var(--r);
+      padding: 10px 12px;
+      cursor: grab;
+      transition: all .15s;
+      font-size: 13px;
+    }
+    .kanban-card:active { cursor: grabbing; }
+    .kanban-card:hover {
+      border-color: var(--accent);
+      background: var(--bg4);
+    }
+    .kanban-card.drag-over {
+      border-color: var(--accent);
+      background: var(--accentDim);
+    }
+    .kanban-col.drop-target {
+      border-color: var(--accent);
+      background: rgba(16,185,129,.04);
+    }
+    .kanban-card-name { font-weight: 500; margin-bottom: 4px; }
+    .kanban-card-sub { font-size: 11px; color: var(--text3); }
+    .kanban-card-money { font-family: var(--mono); font-size: 11px; color: var(--accent2); margin-top: 4px; }
+
+    /* ───────── TASK / MILESTONE ───────── */
+    .task-list { display: flex; flex-direction: column; gap: 4px; margin-top: 6px; }
+    .task-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      padding: 4px 0;
+      cursor: pointer;
+      color: var(--text2);
+      transition: color .1s;
+    }
+    .task-item:hover { color: var(--text); }
+    .task-item input[type=checkbox] {
+      width: 14px;
+      height: 14px;
+      accent-color: var(--accent);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .task-item.done span { text-decoration: line-through; color: var(--text3); }
+    .task-progress-wrap { margin-top: 8px; }
+    .task-progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text3);
+      margin-bottom: 4px;
+    }
+
+    /* ───────── PARTIAL PAYMENT ───────── */
+    .payment-summary {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 10px 12px;
+      font-size: 12px;
+      margin-top: 8px;
+    }
+    .payment-summary .ps-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 2px 0;
+    }
+    .payment-summary .ps-bar {
+      height: 5px;
+      background: var(--bg4);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-top: 8px;
+      margin-bottom: 2px;
+    }
+    .payment-summary .ps-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 99px;
+      transition: width .5s;
+    }
+    .payment-summary .ps-pct {
+      font-size: 11px;
+      color: var(--text3);
+      margin-top: 2px;
+      text-align: right;
+    }
+
+    /* ───────── COMMAND PALETTE ───────── */
+    .cmd-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.7);
+      z-index: 3000;
+      display: none;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 14vh;
+    }
+    .cmd-overlay.open { display: flex; }
+    .cmd-box {
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: var(--r3);
+      width: 100%;
+      max-width: 540px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.6);
+      overflow: hidden;
+    }
+    .cmd-search {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .cmd-search input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      font-size: 16px;
+      color: var(--text);
+      outline: none;
+    }
+    .cmd-search input::placeholder { color: var(--text3); }
+    .cmd-results { padding: 8px; max-height: 360px; overflow-y: auto; }
+    .cmd-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: var(--r);
+      cursor: pointer;
+      font-size: 13px;
+      transition: background .1s;
+    }
+    .cmd-item:hover, .cmd-item.selected {
+      background: var(--accentDim);
+      color: var(--accent2);
+    }
+    .cmd-item-ico {
+      width: 28px;
+      height: 28px;
+      background: var(--bg3);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+    .cmd-item-label { font-weight: 500; }
+    .cmd-item-sub { font-size: 11px; color: var(--text3); margin-left: auto; }
+    .cmd-section-label {
+      font-size: 10px;
+      color: var(--text3);
+      padding: 8px 12px 4px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-weight: 500;
+    }
+
+    /* ───────── UNDO TOAST ───────── */
+    .undo-toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: var(--r2);
+      padding: 10px 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+      z-index: 4000;
+      box-shadow: 0 8px 30px rgba(0,0,0,.5);
+      transition: transform .3s cubic-bezier(.34,1.56,.64,1);
+      white-space: nowrap;
+    }
+    .undo-toast.show { transform: translateX(-50%) translateY(0); }
+    .undo-toast-btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: var(--r);
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font);
+    }
+    .undo-bar {
+      height: 2px;
+      background: var(--accent);
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      border-radius: 99px;
+      transition: width linear;
+    }
+
+    /* ───────── AI INSIGHTS ───────── */
+    .insight-card {
+      background: linear-gradient(135deg, rgba(139,92,246,.08) 0%, rgba(16,185,129,.06) 100%);
+      border: 1px solid rgba(139,92,246,.2);
+      border-radius: var(--r2);
+      padding: 16px 18px;
+      margin-bottom: 14px;
+    }
+    .insight-hd {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      font-size: 12px;
+      color: var(--purple);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .insight-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 7px 0;
+      border-bottom: 1px solid rgba(255,255,255,.04);
+      font-size: 13px;
+      color: var(--text2);
+    }
+    .insight-item:last-child { border-bottom: none; }
+    .insight-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--purple);
+      margin-top: 5px;
+      flex-shrink: 0;
+    }
+
+    /* ───────── HEALTH SCORE ───────── */
+    .health-stars { color: var(--gold2); font-size: 12px; letter-spacing: 1px; }
+
+    /* ───────── CLIENT PORTAL ───────── */
+    .portal-link {
+      font-size: 11px;
+      color: var(--blue2);
+      font-family: var(--mono);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 2px;
+    }
+
+    /* ───────── PROJECT ATTACHMENTS ───────── */
+    .attach-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 8px;
+    }
+    .attach-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      border-radius: var(--r);
+      padding: 3px 8px;
+      font-size: 11px;
+      color: var(--blue2);
+      text-decoration: none;
+      cursor: pointer;
+      transition: all .1s;
+    }
+    .attach-link:hover {
+      background: var(--blueDim);
+      border-color: var(--blue2);
+    }
+
+    /* ───────── PROFIT BY PROJECT TABLE ───────── */
+    .profit-proj-row {
+      display: grid;
+      grid-template-columns: 1fr 100px 80px 90px;
+      gap: 10px;
+      align-items: center;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+    .profit-proj-row:last-child { border-bottom: none; }
+    .profit-proj-row .medal { font-size: 15px; }
+
+    /* ───────── BADGE AWAITING PAYMENT ───────── */
+    .badge-awaiting { background: rgba(245,158,11,.12); color: var(--gold2); }
+
+    /* ───────── FLOATING ACTION BUTTON ───────── */
+    .fab {
+      position: fixed;
+      bottom: 20px;
+      right: 18px;
+      z-index: 900;
+      display: none; /* shown in mobile media query */
+      flex-direction: column-reverse;
+      align-items: flex-end;
+      gap: 10px;
+    }
+    .fab-main {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: var(--accent);
+      border: none;
+      color: #fff;
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(16,185,129,.4);
+      transition: transform .2s, box-shadow .2s;
+      line-height: 1;
+    }
+    .fab-main:hover, .fab-main.open {
+      transform: scale(1.08) rotate(45deg);
+      box-shadow: 0 6px 28px rgba(16,185,129,.55);
+    }
+    .fab-items {
+      display: flex;
+      flex-direction: column-reverse;
+      align-items: flex-end;
+      gap: 8px;
+      overflow: hidden;
+      max-height: 0;
+      transition: max-height .25s ease;
+    }
+    .fab-items.open { max-height: 300px; }
+    .fab-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      animation: fabIn .2s ease both;
+    }
+    @keyframes fabIn {
+      from { opacity: 0; transform: translateX(10px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    .fab-item-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      color: var(--text);
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 12px rgba(0,0,0,.4);
+      flex-shrink: 0;
+    }
+    .fab-item-label {
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: var(--r);
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 500;
+      white-space: nowrap;
+      box-shadow: 0 2px 8px rgba(0,0,0,.3);
+    }
+
+    /* ───────── QUICK-ADD STRIP ───────── */
+    .quick-add-strip {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+      padding: 10px 12px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--r2);
+    }
+    .quick-add-strip .qa-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      color: var(--text2);
+      border-radius: var(--r);
+      padding: 5px 10px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all .15s;
+      font-family: var(--font);
+    }
+    .quick-add-strip .qa-btn:hover {
+      background: var(--accentDim);
+      border-color: var(--accent);
+      color: var(--accent2);
+    }
+
+    /* ───────── NOTES / TIMELINE ───────── */
+    .note-item {
+      display: flex;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+    }
+    .note-item:last-child { border-bottom: none; }
+    .note-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      margin-top: 5px;
+      flex-shrink: 0;
+    }
+    .note-time { color: var(--text3); font-size: 10px; white-space: nowrap; }
+
+    /* ───────── COMPACT CARD ACTIONS ───────── */
+    .card-actions-strip {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border);
+    }
+    .card-actions-strip .btn-sm {
+      flex: 1;
+      justify-content: center;
+      min-width: 60px;
+    }
+
+    /* ───────── MINI STAT PILL ───────── */
+    .mini-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 99px;
+      background: var(--bg3);
+      color: var(--text2);
+      border: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    /* ───────── SWIPE HINT (mobile) ───────── */
+    @media(max-width:768px) {
+      .kanban-board {
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+      }
+      .kanban-col {
+        scroll-snap-align: start;
+        min-width: 85vw;
+      }
+      .profit-proj-row {
+        grid-template-columns: 1fr 80px 70px;
+      }
+      .profit-proj-row span:nth-child(3) { display: none; } /* hide costs col */
+      .quick-add-strip { display: none; } /* hidden on mobile, use FAB */
+    }
+
+    /* ───────── DARK SHIMMER LOADER ───────── */
+    @keyframes shimmer {
+      0% { background-position: -400px 0; }
+      100% { background-position: 400px 0; }
+    }
+    .shimmer {
+      background: linear-gradient(90deg, var(--bg2) 25%, var(--bg3) 50%, var(--bg2) 75%);
+      background-size: 800px 100%;
+      animation: shimmer 1.4s infinite linear;
+      border-radius: var(--r);
+      height: 14px;
+    }
+
+    /* ───────── PROGRESS RING ───────── */
+    .ring-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .ring-label {
+      position: absolute;
+      font-size: 9px;
+      font-family: var(--mono);
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    /* ───────── INLINE NOTES MODAL ───────── */
+    .notes-area {
+      width: 100%;
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      border-radius: var(--r);
+      padding: 8px;
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 13px;
+      resize: vertical;
+      min-height: 80px;
+      line-height: 1.5;
     }
   </style>
 </head>
@@ -1492,6 +2117,7 @@
               <polyline points="16 17 21 12 16 7"></polyline>
               <line x1="21" y1="12" x2="9" y2="12"></line>
             </svg><span class="hide-mobile">Logout</span></button>
+          <button class="btn btn-ghost btn-sm" title="Command Palette (Ctrl+K)" onclick="openCmdPalette()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg><span class="hide-mobile">Search</span> <span class="hide-mobile" style="font-size:10px;opacity:.5">⌘K</span></button>
           <button class="btn btn-ghost btn-sm" onclick="exportJSON()"><svg width="14" height="14" viewBox="0 0 24 24"
               fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
               style="margin-right:4px">
@@ -1509,6 +2135,9 @@
               onchange="importJSON(event)"></label>
         </div>
       </div>
+
+      <!-- RENEWAL ALERT BAR -->
+      <div class="renewal-alert-bar" id="renewalAlertBar" style="display:none"></div>
 
       <div class="content">
 
@@ -1569,11 +2198,27 @@
                 </svg></span><input id="clientSearch" placeholder="Search clients…" oninput="renderClients()"></div>
             <button class="btn btn-primary btn-sm" onclick="openModal('client')">+ Add Client</button>
           </div>
+          <div class="quick-add-strip">
+            <span style="font-size:11px;color:var(--text3);margin-right:4px;display:flex;align-items:center;">Quick Add:</span>
+            <div class="qa-btn" onclick="openModal('project')">✦ Project</div>
+            <div class="qa-btn" onclick="openModal('domain')">🌐 Domain</div>
+          </div>
           <div id="clientsTable"></div>
         </div>
 
         <!-- PROJECTS -->
         <div class="section" id="sec-projects">
+          <div class="tab-bar" style="margin-bottom:10px">
+            <div class="tab active" id="projTabList" onclick="switchProjView('list',this)">📋 List View</div>
+            <div class="tab" id="projTabKanban" onclick="switchProjView('kanban',this)">🎯 Kanban Board</div>
+          </div>
+          <div class="quick-add-strip">
+            <span style="font-size:11px;color:var(--text3);margin-right:4px;display:flex;align-items:center;">Quick Add:</span>
+            <div class="qa-btn" onclick="openModal('project')">✦ New Project</div>
+            <div class="qa-btn" onclick="openModal('client')">👤 New Client</div>
+            <div class="qa-btn" onclick="openModal('domain')">🌐 New Domain</div>
+          </div>
+          <div id="projListView">
           <div class="toolbar">
             <div class="search-box"><span class="search-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"
                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1598,6 +2243,14 @@
             <button class="btn btn-primary btn-sm" onclick="openModal('project')">+ Add Project</button>
           </div>
           <div id="projectsTable"></div>
+          </div>
+          <div id="projKanbanView" style="display:none">
+            <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+              <button class="btn btn-primary btn-sm" onclick="openModal('project')">+ Add Project</button>
+            </div>
+            <div class="kanban-board" id="kanbanBoard"></div>
+          </div>
+
         </div>
 
         <!-- MAINTENANCE -->
@@ -1720,6 +2373,25 @@
           </div>
         </div>
 
+      </div>
+    </div>
+  </div>
+
+  <!-- FLOATING ACTION BUTTON (MOBILE) -->
+  <div class="fab" id="mobileFab">
+    <button class="fab-main" id="fabMainBtn" onclick="toggleFab()">+</button>
+    <div class="fab-items" id="fabItems">
+      <div class="fab-item" onclick="toggleFab(); openModal('project')">
+        <div class="fab-item-label">New Project</div>
+        <div class="fab-item-btn" style="color:var(--purple)">✦</div>
+      </div>
+      <div class="fab-item" onclick="toggleFab(); openModal('client')">
+        <div class="fab-item-label">New Client</div>
+        <div class="fab-item-btn" style="color:var(--blue2)">👤</div>
+      </div>
+      <div class="fab-item" onclick="toggleFab(); openModal('domain')">
+        <div class="fab-item-label">New Domain</div>
+        <div class="fab-item-btn" style="color:var(--accent2)">🌐</div>
       </div>
     </div>
   </div>
@@ -1909,14 +2581,21 @@
           </div>
         </div>
         <div class="form-row c2">
-          <div class="form-group"><label>DNS Provider</label><input id="d_dns" placeholder="Cloudflare, AWS Route53…">
-          </div>
-          <div class="form-group"><label>Registration Date</label><input id="d_registered" type="date"
-              onchange="setDomainExpiry()"></div>
+          <div class="form-group"><label>DNS Provider</label><input id="d_dns" placeholder="Cloudflare, AWS Route53…"></div>
+          <div class="form-group"><label>Registration Date</label><input id="d_registered" type="date" onchange="setDomainExpiry()"></div>
         </div>
         <div class="form-row c2">
-          <div class="form-group"><label>Expiry Date</label><input id="d_expiry" type="date"></div>
-          <div class="form-group"></div>
+          <div class="form-group">
+            <label>Registration Period</label>
+            <select id="d_reg_period" onchange="setDomainExpiry()">
+              <option value="1">1 Year</option>
+              <option value="2">2 Years</option>
+              <option value="3">3 Years</option>
+              <option value="5">5 Years</option>
+              <option value="10">10 Years</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Expiry Date <span style="color:var(--text3);font-size:10px">(auto or override)</span></label><input id="d_expiry" type="date"></div>
         </div>
         <div class="form-sec-label">Costs</div>
         <div class="form-row c2">
@@ -2003,6 +2682,72 @@
     </div>
   </div>
 
+  <!-- COMMAND PALETTE -->
+  <div class="cmd-overlay" id="cmdOverlay" onclick="closeCmdPalette(event)">
+    <div class="cmd-box" onclick="event.stopPropagation()">
+      <div class="cmd-search">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text3);flex-shrink:0"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input id="cmdInput" placeholder="Search or type a command…" oninput="renderCmdResults()" onkeydown="cmdKeyNav(event)" autocomplete="off">
+        <kbd style="background:var(--bg3);border:1px solid var(--border2);border-radius:4px;padding:2px 6px;font-size:11px;color:var(--text3)">ESC</kbd>
+      </div>
+      <div class="cmd-results" id="cmdResults"></div>
+    </div>
+  </div>
+
+  <!-- UNDO TOAST -->
+  <div class="undo-toast" id="undoToast">
+    <span id="undoMsg">Item deleted.</span>
+    <button class="undo-toast-btn" onclick="undoDelete()">Undo</button>
+    <div class="undo-bar" id="undoBar" style="width:100%"></div>
+  </div>
+
+  <!-- TASK MODAL -->
+  <div class="overlay" id="modal-tasks">
+    <div class="modal" style="max-width:480px">
+      <div class="modal-hd">
+        <div class="modal-title" id="tasksModalTitle">Tasks &amp; Milestones</div>
+        <button class="btn btn-ghost btn-icon" onclick="closeModal('tasks')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+      </div>
+      <div class="modal-bd">
+        <input type="hidden" id="tasksProjectId">
+        <div style="font-size:12px;color:var(--text3);margin-bottom:10px">Check off tasks. Progress bar updates automatically on the dashboard.</div>
+        <div id="tasksList"></div>
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <input id="newTaskInput" placeholder="Add a new task or milestone…" style="flex:1" onkeydown="if(event.key==='Enter')addTaskFromInput()">
+          <button class="btn btn-primary btn-sm" onclick="addTaskFromInput()">Add</button>
+        </div>
+      </div>
+      <div class="modal-ft">
+        <button class="btn btn-ghost" onclick="closeModal('tasks')">Close</button>
+        <button class="btn btn-primary" onclick="saveTasks()">Save Tasks</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ATTACHMENTS MODAL -->
+  <div class="overlay" id="modal-attachments">
+    <div class="modal" style="max-width:480px">
+      <div class="modal-hd">
+        <div class="modal-title" id="attachModalTitle">Project Attachments</div>
+        <button class="btn btn-ghost btn-icon" onclick="closeModal('attachments')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+      </div>
+      <div class="modal-bd">
+        <input type="hidden" id="attachProjectId">
+        <div class="form-group"><label>GitHub URL</label><input id="att_github" placeholder="https://github.com/…"></div>
+        <div class="form-group"><label>Live Site URL</label><input id="att_live" placeholder="https://…"></div>
+        <div class="form-group"><label>Figma / Design URL</label><input id="att_figma" placeholder="https://figma.com/…"></div>
+        <div class="form-group"><label>Google Drive URL</label><input id="att_drive" placeholder="https://drive.google.com/…"></div>
+        <div class="form-group"><label>Documentation URL</label><input id="att_docs" placeholder="https://…"></div>
+        <div class="form-group"><label>Invoice URL</label><input id="att_invoice" placeholder="https://…"></div>
+        <div class="form-group"><label>Client Portal URL</label><input id="att_portal" placeholder="https://client.th3.is-a.dev/clientname"></div>
+      </div>
+      <div class="modal-ft">
+        <button class="btn btn-ghost" onclick="closeModal('attachments')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveAttachments()">Save Links</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     // ════════════════════════════════════════════════════════
     //  DATA MODEL
@@ -2014,13 +2759,26 @@
     function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
 
     // ── AUTH & SYNC ──
+    // SECURITY: PAT is NEVER stored in localStorage (XSS protection).
+    // Only the non-secret gistId is persisted. Token lives in sessionStorage only.
     let syncConfig = { token: '', gistId: '' };
     function loadConfig() {
-      const conf = localStorage.getItem('th3_sync_config');
-      if (conf) syncConfig = JSON.parse(conf);
+      // Restore gistId from localStorage (non-secret), token from sessionStorage (cleared on tab close)
+      const gistId = localStorage.getItem('th3_gist_id') || '';
+      const token = sessionStorage.getItem('th3_pat_session') || '';
+      syncConfig = { token, gistId };
+    }
+    function saveConfig() {
+      // Only persist non-secret gistId to localStorage
+      if (syncConfig.gistId) localStorage.setItem('th3_gist_id', syncConfig.gistId);
+      // PAT goes to sessionStorage ONLY (cleared when tab/browser closes)
+      if (syncConfig.token) sessionStorage.setItem('th3_pat_session', syncConfig.token);
     }
     function handleLogout() {
-      localStorage.removeItem('th3_sync_config');
+      localStorage.removeItem('th3_gist_id');
+      localStorage.removeItem('th3_sync_config'); // remove old format too
+      sessionStorage.removeItem('th3_pat_session');
+      syncConfig = { token: '', gistId: '' };
       location.reload();
     }
     async function handleLogin() {
@@ -2054,7 +2812,7 @@
           }
         }
         syncConfig = { token: token, gistId: targetGist.id };
-        localStorage.setItem('th3_sync_config', JSON.stringify(syncConfig));
+        saveConfig(); // Secure: PAT→sessionStorage, gistId→localStorage only
         document.getElementById('loginScreen').style.display = 'none';
         document.getElementById('mainApp').style.display = '';
         const btnSync = document.getElementById('btnManualSync');
@@ -2139,6 +2897,8 @@
               if (p.value) p.payments.push({ label: 'Initial Payment', amount: p.value, date: p.payDate || p.createdAt || '' });
             }
             if (p.expectedValue === undefined) p.expectedValue = 0;
+            if (!p.tasks) p.tasks = [];
+            if (!p.attachments) p.attachments = {};
           });
           updateStorageInfo(raw);
         } catch (e) { }
@@ -2398,9 +3158,10 @@
     // ════════════════════════════════════════════════════════
     function setDomainExpiry() {
       const reg = document.getElementById('d_registered').value;
+      const period = parseInt(document.getElementById('d_reg_period')?.value || '1');
       if (reg) {
         const d = new Date(reg);
-        d.setFullYear(d.getFullYear() + 1);
+        d.setFullYear(d.getFullYear() + period);
         document.getElementById('d_expiry').value = d.toISOString().slice(0, 10);
       }
     }
@@ -3056,13 +3817,599 @@
       load();
       loadConfig();
       if (syncConfig.token) {
-        document.getElementById('loginMsg').textContent = 'Auto-logging in...';
+        // Token exists in sessionStorage — auto-login this session
+        document.getElementById('loginMsg').textContent = 'Resuming session...';
         await handleLogin();
+      } else if (syncConfig.gistId) {
+        // gistId remembered but PAT not in session — pre-fill hint
+        document.getElementById('loginMsg').textContent = 'Session expired. Please re-enter your PAT.';
+        document.getElementById('loginMsg').style.color = 'var(--gold)';
+      }
+      // App remains hidden, login screen remains visible
+    }
+
+    // ════════════════════════════════════════════════════════
+    //  KANBAN BOARD (#3)
+    // ════════════════════════════════════════════════════════
+    let _projView = 'list';
+    const KANBAN_COLS = [
+      { status: 'Active', color: '#10B981', label: 'Active' },
+      { status: 'Ongoing', color: '#4B8EF1', label: 'Ongoing' },
+      { status: 'Awaiting Payment', color: '#F59E0B', label: 'Awaiting Payment' },
+      { status: 'Completed', color: '#9C6EFF', label: 'Completed' },
+      { status: 'On Hold', color: '#71717a', label: 'On Hold' },
+    ];
+    function switchProjView(view, el) {
+      _projView = view;
+      document.querySelectorAll('#sec-projects .tab').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+      document.getElementById('projListView').style.display = view === 'list' ? '' : 'none';
+      document.getElementById('projKanbanView').style.display = view === 'kanban' ? '' : 'none';
+      if (view === 'kanban') renderKanban();
+    }
+    function renderKanban() {
+      const board = document.getElementById('kanbanBoard'); if (!board) return;
+      board.innerHTML = KANBAN_COLS.map(col => {
+        const projs = DB.projects.filter(p => p.status === col.status);
+        const cards = projs.map(p => {
+          const actRev = projectActualRev(p);
+          const tasksDone = (p.tasks || []).filter(t => t.done).length;
+          const tasksTotal = (p.tasks || []).length;
+          return `<div class="kanban-card" draggable="true" data-id="${p.id}"
+            ondragstart="kanbanDragStart(event,'${p.id}')"
+            ondragover="event.preventDefault()"
+            ondrop="kanbanDrop(event,'${col.status}')">
+            <div class="kanban-card-name">${p.name}</div>
+            <div class="kanban-card-sub">${clientName(p.clientId)}${tasksTotal ? ` · ${tasksDone}/${tasksTotal} tasks` : ''}</div>
+            ${actRev ? `<div class="kanban-card-money">${fMoneyRaw(actRev)}</div>` : ''}
+          </div>`;
+        }).join('');
+        return `<div class="kanban-col"
+          ondragover="event.preventDefault();this.classList.add('drop-target')"
+          ondragleave="this.classList.remove('drop-target')"
+          ondrop="kanbanDrop(event,'${col.status}');this.classList.remove('drop-target')">
+          <div class="kanban-col-hd">
+            <div class="kanban-col-dot" style="background:${col.color}"></div>
+            ${col.label}
+            <span class="kanban-col-count">${projs.length}</span>
+          </div>
+          <div class="kanban-cards">${cards}</div>
+        </div>`;
+      }).join('');
+    }
+    let _dragId = null;
+    function kanbanDragStart(e, id) { _dragId = id; e.dataTransfer.effectAllowed = 'move'; }
+    function kanbanDrop(e, newStatus) {
+      e.preventDefault();
+      if (!_dragId) return;
+      const p = DB.projects.find(p => p.id === _dragId);
+      if (p && p.status !== newStatus) {
+        p.status = newStatus;
+        save(); renderKanban();
+      }
+      _dragId = null;
+    }
+
+    // ════════════════════════════════════════════════════════
+    //  TASKS & MILESTONES (#4)
+    // ════════════════════════════════════════════════════════
+    let _editingTasks = [];
+    function openTasksModal(projId) {
+      const p = DB.projects.find(x => x.id === projId); if (!p) return;
+      document.getElementById('tasksProjectId').value = projId;
+      document.getElementById('tasksModalTitle').textContent = p.name + ' — Tasks';
+      _editingTasks = JSON.parse(JSON.stringify(p.tasks || []));
+      renderTasksList();
+      document.getElementById('modal-tasks').classList.add('open');
+    }
+    function renderTasksList() {
+      const el = document.getElementById('tasksList'); if (!el) return;
+      if (_editingTasks.length === 0) { el.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:8px 0">No tasks yet. Add one below.</div>'; return; }
+      el.innerHTML = _editingTasks.map((t, i) => `
+        <div class="task-item ${t.done ? 'done' : ''}" onclick="toggleTask(${i})">
+          <input type="checkbox" ${t.done ? 'checked' : ''} onclick="event.stopPropagation();toggleTask(${i})">
+          <span style="flex:1">${t.label}</span>
+          <button style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;padding:0 4px" onclick="event.stopPropagation();removeTask(${i})">×</button>
+        </div>`).join('');
+    }
+    function toggleTask(i) { _editingTasks[i].done = !_editingTasks[i].done; renderTasksList(); }
+    function removeTask(i) { _editingTasks.splice(i, 1); renderTasksList(); }
+    function addTaskFromInput() {
+      const inp = document.getElementById('newTaskInput');
+      const label = inp.value.trim(); if (!label) return;
+      _editingTasks.push({ label, done: false });
+      inp.value = '';
+      renderTasksList();
+    }
+    function saveTasks() {
+      const id = document.getElementById('tasksProjectId').value;
+      const p = DB.projects.find(x => x.id === id); if (!p) return;
+      p.tasks = _editingTasks;
+      save(); closeModal('tasks'); renderProjects();
+    }
+    function taskProgressHTML(p) {
+      const tasks = p.tasks || [];
+      if (tasks.length === 0) return '';
+      const done = tasks.filter(t => t.done).length;
+      const pct = Math.round((done / tasks.length) * 100);
+      const color = pct === 100 ? 'var(--accent)' : pct >= 50 ? 'var(--blue)' : 'var(--gold)';
+      return `<div class="task-progress-wrap">
+        <div class="task-progress-label"><span>Progress</span><span>${done}/${tasks.length} · ${pct}%</span></div>
+        <div class="prog-bar" style="height:5px"><div class="prog-fill" style="width:${pct}%;background:${color}"></div></div>
+      </div>`;
+    }
+
+    // ════════════════════════════════════════════════════════
+    //  PARTIAL PAYMENT SUMMARY (#5)
+    // ════════════════════════════════════════════════════════
+    function paymentSummaryHTML(p) {
+      const expected = p.expectedValue || 0;
+      const received = sum((p.payments || []).map(e => e.amount));
+      if (!expected && !received) return '';
+      const remaining = Math.max(0, expected - received);
+      const pct = expected > 0 ? Math.min(100, Math.round((received / expected) * 100)) : 100;
+      const color = pct === 100 ? 'var(--accent)' : pct >= 50 ? 'var(--gold)' : 'var(--red)';
+      return `<div class="payment-summary">
+        <div class="ps-row"><span style="color:var(--text3)">Expected</span><span class="td-mono">${fMoneyRaw(expected)}</span></div>
+        <div class="ps-row"><span style="color:var(--accent2)">Received</span><span class="td-mono text-green">${fMoneyRaw(received)}</span></div>
+        ${remaining > 0 ? `<div class="ps-row"><span style="color:var(--red2)">Remaining</span><span class="td-mono text-red">${fMoneyRaw(remaining)}</span></div>` : ''}
+        <div class="ps-bar"><div class="ps-fill" style="width:${pct}%;background:${color}"></div></div>
+        <div class="ps-pct">${pct}% Paid</div>
+      </div>`;
+    }
+
+    // ════════════════════════════════════════════════════════
+    //  PROJECT ATTACHMENTS (#10)
+    // ════════════════════════════════════════════════════════
+    function openAttachModal(projId) {
+      const p = DB.projects.find(x => x.id === projId); if (!p) return;
+      document.getElementById('attachProjectId').value = projId;
+      document.getElementById('attachModalTitle').textContent = p.name + ' — Links';
+      const att = p.attachments || {};
+      ['github','live','figma','drive','docs','invoice','portal'].forEach(k => {
+        const el = document.getElementById('att_' + k);
+        if (el) el.value = att[k] || '';
+      });
+      document.getElementById('modal-attachments').classList.add('open');
+    }
+    function saveAttachments() {
+      const id = document.getElementById('attachProjectId').value;
+      const p = DB.projects.find(x => x.id === id); if (!p) return;
+      p.attachments = {};
+      ['github','live','figma','drive','docs','invoice','portal'].forEach(k => {
+        const val = (document.getElementById('att_' + k)?.value || '').trim();
+        if (val) p.attachments[k] = val;
+      });
+      save(); closeModal('attachments'); renderProjects();
+    }
+    function attachLinksHTML(p) {
+      const att = p.attachments || {};
+      const links = [
+        { key:'github', label:'GitHub', ico:'🐱' },
+        { key:'live', label:'Live', ico:'🌐' },
+        { key:'figma', label:'Design', ico:'🎨' },
+        { key:'drive', label:'Drive', ico:'📁' },
+        { key:'docs', label:'Docs', ico:'📄' },
+        { key:'invoice', label:'Invoice', ico:'🧾' },
+        { key:'portal', label:'Portal', ico:'🔗' },
+      ].filter(l => att[l.key]);
+      if (links.length === 0) return '';
+      return `<div class="attach-links">${links.map(l =>
+        `<a class="attach-link" href="${att[l.key]}" target="_blank" rel="noopener">${l.ico} ${l.label}</a>`
+      ).join('')}</div>`;
+    }
+
+    // ════════════════════════════════════════════════════════
+    //  CLIENT HEALTH SCORE (#7)
+    // ════════════════════════════════════════════════════════
+    function clientHealthScore(c) {
+      const combined = [...DB.finance, ...getAutoLedger()];
+      const projs = DB.projects.filter(p => p.clientId === c.id);
+      const completedProjs = projs.filter(p => p.status === 'Completed').length;
+      const totalRev = combined.filter(f => f.type === 'revenue' && f.clientId === c.id).reduce((s,f) => s+f.amount, 0);
+      const awaitingPayment = projs.filter(p => p.status === 'Awaiting Payment').length;
+      let score = 3; // baseline
+      if (totalRev > 50000) score++;
+      if (completedProjs >= 2) score++;
+      if (awaitingPayment > 0) score--;
+      score = Math.max(1, Math.min(5, score));
+      const stars = '★'.repeat(score) + '☆'.repeat(5 - score);
+      const labels = ['', 'Always delays', 'Often late', 'Occasional delays', 'Usually on time', 'Pays on time'];
+      return { score, stars, label: labels[score] };
+    }
+    function healthHTML(c) {
+      const h = clientHealthScore(c);
+      return `<div class="health-stars" title="Client health: ${h.label}">${h.stars}</div><div style="font-size:10px;color:var(--text3)">${h.label}</div>`;
+    }
+
+    // ════════════════════════════════════════════════════════
+    //  UNDO DELETE (#14)
+    // ════════════════════════════════════════════════════════
+    let _undoStack = null;
+    let _undoTimer = null;
+    let _undoBarTimer = null;
+    function softDelete(table, id, label) {
+      const idx = DB[table].findIndex(x => x.id === id);
+      if (idx < 0) return;
+      const item = DB[table][idx];
+      _undoStack = { table, idx, item };
+      DB[table].splice(idx, 1);
+      save();
+      ({ clients: renderClients, projects: renderProjects, maintenance: renderMaintenance, domains: renderDomains, finance: renderFinance })[table]?.();
+      showUndoToast(label || 'Item deleted.');
+    }
+    function showUndoToast(msg) {
+      clearTimeout(_undoTimer);
+      const toast = document.getElementById('undoToast');
+      const bar = document.getElementById('undoBar');
+      document.getElementById('undoMsg').textContent = msg;
+      toast.classList.add('show');
+      bar.style.transition = 'none';
+      bar.style.width = '100%';
+      setTimeout(() => {
+        bar.style.transition = 'width 10s linear';
+        bar.style.width = '0%';
+      }, 50);
+      _undoTimer = setTimeout(() => {
+        toast.classList.remove('show');
+        _undoStack = null;
+      }, 10000);
+    }
+    function undoDelete() {
+      if (!_undoStack) return;
+      const { table, idx, item } = _undoStack;
+      DB[table].splice(idx, 0, item);
+      _undoStack = null;
+      save();
+      ({ clients: renderClients, projects: renderProjects, maintenance: renderMaintenance, domains: renderDomains, finance: renderFinance })[table]?.();
+      clearTimeout(_undoTimer);
+      document.getElementById('undoToast').classList.remove('show');
+    }
+
+    // ════════════════════════════════════════════════════════
+    //  COMMAND PALETTE (#13)
+    // ════════════════════════════════════════════════════════
+    let _cmdSelected = 0;
+    const CMD_ACTIONS = [
+      { label: 'Add Project', ico: '◈', sub: 'New project', fn: () => openModal('project') },
+      { label: 'Add Client', ico: '◉', sub: 'New client', fn: () => openModal('client') },
+      { label: 'Add Domain', ico: '◎', sub: 'New domain', fn: () => openModal('domain') },
+      { label: 'Add Finance Entry', ico: '◆', sub: 'Manual entry', fn: () => openModal('finance') },
+      { label: 'Add Maintenance', ico: '◌', sub: 'Maintenance plan', fn: () => openModal('maintenance') },
+      { label: 'Open Dashboard', ico: '⊞', sub: 'Navigate', fn: () => navigate('dashboard', document.getElementById('nav-dashboard')) },
+      { label: 'Open Clients', ico: '◉', sub: 'Navigate', fn: () => navigate('clients', document.getElementById('nav-clients')) },
+      { label: 'Open Projects', ico: '◈', sub: 'Navigate', fn: () => navigate('projects', document.getElementById('nav-projects')) },
+      { label: 'Open Domains', ico: '◎', sub: 'Navigate', fn: () => navigate('domains', document.getElementById('nav-domains')) },
+      { label: 'Open Finance', ico: '◆', sub: 'Navigate', fn: () => navigate('finance', document.getElementById('nav-finance')) },
+      { label: 'Open Analytics', ico: '▤', sub: 'Navigate', fn: () => navigate('analytics', document.getElementById('nav-analytics')) },
+      { label: 'Export Data', ico: '⬇', sub: 'JSON backup', fn: () => exportJSON() },
+      { label: 'Sync to Cloud', ico: '↻', sub: 'Save to Gist', fn: () => forceSync() },
+      { label: 'Logout', ico: '⟵', sub: 'Sign out', fn: () => handleLogout() },
+    ];
+    function buildCmdItems(q) {
+      const query = (q || '').toLowerCase();
+      let items = [...CMD_ACTIONS];
+      // Add dynamic project/client searches
+      if (query) {
+        DB.projects.filter(p => p.name.toLowerCase().includes(query)).slice(0,4).forEach(p => {
+          items.unshift({ label: p.name, ico: '◈', sub: 'Project · ' + clientName(p.clientId), fn: () => { navigate('projects', document.getElementById('nav-projects')); } });
+        });
+        DB.clients.filter(c => c.name.toLowerCase().includes(query)).slice(0,3).forEach(c => {
+          items.unshift({ label: c.name, ico: '◉', sub: 'Client · ' + (c.org || ''), fn: () => { navigate('clients', document.getElementById('nav-clients')); } });
+        });
+        items = items.filter(i => i.label.toLowerCase().includes(query) || (i.sub||'').toLowerCase().includes(query));
+      }
+      return items.slice(0, 12);
+    }
+    function renderCmdResults() {
+      const q = document.getElementById('cmdInput')?.value || '';
+      const items = buildCmdItems(q);
+      _cmdSelected = 0;
+      const el = document.getElementById('cmdResults');
+      if (!el) return;
+      if (items.length === 0) { el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text3);font-size:13px">No results</div>'; return; }
+      el.innerHTML = (q ? '' : '<div class="cmd-section-label">Quick Actions</div>') +
+        items.map((item, i) => `<div class="cmd-item ${i === 0 ? 'selected' : ''}" data-idx="${i}" onclick="runCmdItem(${i})" onmouseover="selectCmdItem(${i})">
+          <div class="cmd-item-ico">${item.ico}</div>
+          <span class="cmd-item-label">${item.label}</span>
+          <span class="cmd-item-sub">${item.sub || ''}</span>
+        </div>`).join('');
+    }
+    function selectCmdItem(i) {
+      _cmdSelected = i;
+      document.querySelectorAll('.cmd-item').forEach((el, idx) => el.classList.toggle('selected', idx === i));
+    }
+    function runCmdItem(i) {
+      const q = document.getElementById('cmdInput')?.value || '';
+      const items = buildCmdItems(q);
+      if (items[i]) { items[i].fn(); closeCmdPalette(); }
+    }
+    function cmdKeyNav(e) {
+      const q = document.getElementById('cmdInput')?.value || '';
+      const items = buildCmdItems(q);
+      if (e.key === 'ArrowDown') { e.preventDefault(); _cmdSelected = Math.min(_cmdSelected + 1, items.length - 1); selectCmdItem(_cmdSelected); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); _cmdSelected = Math.max(_cmdSelected - 1, 0); selectCmdItem(_cmdSelected); }
+      else if (e.key === 'Enter') { runCmdItem(_cmdSelected); }
+      else if (e.key === 'Escape') { closeCmdPalette(); }
+    }
+    function openCmdPalette() {
+      const ov = document.getElementById('cmdOverlay');
+      ov.classList.add('open');
+      const inp = document.getElementById('cmdInput');
+      inp.value = '';
+      renderCmdResults();
+      setTimeout(() => inp.focus(), 50);
+    }
+    function closeCmdPalette(e) {
+      if (e && e.target !== document.getElementById('cmdOverlay')) return;
+      document.getElementById('cmdOverlay').classList.remove('open');
+    }
+    document.addEventListener('keydown', e => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); openCmdPalette(); }
+      if (e.key === 'Escape') { document.getElementById('cmdOverlay')?.classList.remove('open'); }
+    });
+
+    // ════════════════════════════════════════════════════════
+    //  RENEWAL ALERT BANNER (#9)
+    // ════════════════════════════════════════════════════════
+    function renderRenewalAlertBar() {
+      const bar = document.getElementById('renewalAlertBar'); if (!bar) return;
+      const urgent = DB.domains.filter(d => daysUntil(d.expiry) >= 0 && daysUntil(d.expiry) <= 7);
+      const warn30 = DB.domains.filter(d => daysUntil(d.expiry) > 7 && daysUntil(d.expiry) <= 30);
+      const warn90 = DB.domains.filter(d => daysUntil(d.expiry) > 30 && daysUntil(d.expiry) <= 90);
+      const all = [...urgent, ...warn30, ...warn90];
+      if (all.length === 0) { bar.style.display = 'none'; return; }
+      bar.style.display = 'flex';
+      const topItems = all.slice(0,4);
+      bar.innerHTML = `<span class="rab-title">⚠ Renewals:</span>` + topItems.map(d => {
+        const days = daysUntil(d.expiry);
+        return `<span class="rab-item">${d.name} in ${days}d</span>`;
+      }).join('') + (all.length > 4 ? `<span style="color:var(--text3)">+${all.length-4} more</span>` : '');
+    }
+
+    // ════════════════════════════════════════════════════════
+    //  AI INSIGHTS (#15)
+    // ════════════════════════════════════════════════════════
+    function generateInsights() {
+      const fin = calcFinancials();
+      const combined = [...DB.finance, ...getAutoLedger()];
+      const insights = [];
+
+      // Client concentration
+      if (DB.clients.length > 0) {
+        const clientRevs = DB.clients.map(c => ({ name: c.name, rev: combined.filter(f => f.type === 'revenue' && f.clientId === c.id).reduce((s,f)=>s+f.amount,0) })).filter(c => c.rev > 0).sort((a,b) => b.rev-a.rev);
+        if (clientRevs.length > 0 && fin.totalActualRev > 0) {
+          const topPct = Math.round((clientRevs[0].rev / fin.totalActualRev) * 100);
+          if (topPct >= 40) insights.push({ text: `${clientRevs[0].name} generates ${topPct}% of your revenue. High dependency.`, type: 'warn' });
+        }
+      }
+
+      // Pending payments
+      const pending = DB.projects.filter(p => p.status === 'Awaiting Payment');
+      const pendingAmt = pending.reduce((s,p) => s + (p.expectedValue || 0) - projectActualRev(p), 0);
+      if (pendingAmt > 0) insights.push({ text: `${fMoneyRaw(pendingAmt)} in pending payments across ${pending.length} project${pending.length > 1 ? 's' : ''}.`, type: 'info' });
+
+      // Domain renewals this month
+      const now = new Date().toISOString().slice(0,7);
+      const renewThisMonth = DB.domains.filter(d => d.expiry?.startsWith(now)).length;
+      if (renewThisMonth > 0) insights.push({ text: `${renewThisMonth} domain${renewThisMonth > 1 ? 's' : ''} expiring this month. Check renewals.`, type: 'warn' });
+
+      // Active projects
+      const activeCount = DB.projects.filter(p => ['Active','Ongoing'].includes(p.status)).length;
+      if (activeCount > 0) insights.push({ text: `${activeCount} active project${activeCount > 1 ? 's' : ''} currently in progress.`, type: 'info' });
+
+      // Maintenance income
+      if (fin.totalMaintRev > 0) insights.push({ text: `Recurring maintenance brings ${fMoneyRaw(Math.round(fin.totalMaintRev/12))}/month passively.`, type: 'good' });
+
+      // Expected vs actual gap
+      const gap = fin.totalExpectedRev - fin.totalActualRev;
+      if (gap > 0) insights.push({ text: `${fMoneyRaw(gap)} in expected revenue still to be collected.`, type: 'info' });
+
+      // Domain costs
+      const domainCosts = DB.domains.reduce((s,d) => s + (d.renewal_cost||0), 0);
+      if (domainCosts > 0) insights.push({ text: `Annual domain renewal costs: ${fMoneyRaw(domainCosts)}.`, type: 'info' });
+
+      return insights;
+    }
+    function renderInsights(targetEl) {
+      if (!targetEl) return;
+      const insights = generateInsights();
+      if (insights.length === 0) { targetEl.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:8px 0">Not enough data yet.</div>'; return; }
+      const colorMap = { warn: 'var(--gold)', info: 'var(--purple)', good: 'var(--accent)' };
+      targetEl.innerHTML = insights.map(i => `<div class="insight-item"><div class="insight-dot" style="background:${colorMap[i.type]||'var(--purple)'}"></div><span>${i.text}</span></div>`).join('');
+    }
+
+    // ════════════════════════════════════════════════════════
+    //  PROFIT BY PROJECT (#8)
+    // ════════════════════════════════════════════════════════
+    function renderProfitByProject(targetEl) {
+      if (!targetEl) return;
+      const projs = DB.projects.map(p => ({
+        name: p.name,
+        client: clientName(p.clientId),
+        rev: projectActualRev(p),
+        costs: projectCosts(p),
+        profit: projectActualProfit(p)
+      })).filter(p => p.rev > 0 || p.costs > 0).sort((a,b) => b.profit - a.profit);
+      if (projs.length === 0) { targetEl.innerHTML = '<div class="empty"><div class="empty-sub">No project revenue data yet</div></div>'; return; }
+      const medals = ['🥇','🥈','🥉'];
+      targetEl.innerHTML = `
+        <div class="profit-proj-row" style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">
+          <span>Project</span><span style="text-align:right">Revenue</span><span style="text-align:right">Costs</span><span style="text-align:right">Profit</span>
+        </div>` +
+        projs.slice(0,10).map((p,i) => `<div class="profit-proj-row">
+          <span><span class="medal">${medals[i]||''}</span> <span style="font-weight:500">${p.name}</span><br><span style="font-size:10px;color:var(--text3)">${p.client}</span></span>
+          <span class="td-mono text-green" style="text-align:right">${fMoneyRaw(p.rev)}</span>
+          <span class="td-mono text-red" style="text-align:right">${p.costs ? fMoneyRaw(p.costs) : '—'}</span>
+          <span class="td-mono ${p.profit>=0?'text-green':'text-red'}" style="text-align:right;font-weight:600">${fMoneyRaw(p.profit)}</span>
+        </div>`).join('');
+    }
+
+    // ════════════════════════════════════════════════════════
+    //  OVERRIDDEN RENDERS (patch existing to add new features)
+    // ════════════════════════════════════════════════════════
+    const _origRenderProjects = renderProjects;
+    renderProjects = function() {
+      _origRenderProjects();
+      if (_projView === 'kanban') renderKanban();
+    };
+
+    const _origRenderDashboard = renderDashboard;
+    renderDashboard = function() {
+      _origRenderDashboard();
+      renderRenewalAlertBar();
+    };
+
+    const _origRenderAnalytics = renderAnalytics;
+    renderAnalytics = function() {
+      _origRenderAnalytics();
+      // Inject profit by project & AI insights into analytics section
+      const sec = document.getElementById('sec-analytics');
+      if (!sec) return;
+      // Remove old injected panels to avoid duplication
+      sec.querySelectorAll('.injected-panel').forEach(el => el.remove());
+      // Profit by project
+      const profProjCard = document.createElement('div');
+      profProjCard.className = 'card injected-panel';
+      profProjCard.style.marginBottom = '14px';
+      profProjCard.innerHTML = `<div class="card-header"><div class="card-title">💰 Profit by Project</div></div><div id="profitByProjEl"></div>`;
+      sec.querySelector('.content') && sec.append(profProjCard) || sec.append(profProjCard);
+      renderProfitByProject(document.getElementById('profitByProjEl'));
+      // AI Insights
+      const insightCard = document.createElement('div');
+      insightCard.className = 'insight-card injected-panel';
+      insightCard.innerHTML = `<div class="insight-hd">✦ AI Insights <span style="font-size:9px;color:var(--text3);font-weight:400;text-transform:none;letter-spacing:0">Generated locally · No external AI</span></div><div id="insightsEl"></div>`;
+      sec.append(insightCard);
+      renderInsights(document.getElementById('insightsEl'));
+    };
+
+    // Patch renderProjects to show tasks/attachments/payment summary in cards
+    const _origProfitBreakdownHTML = profitBreakdownHTML;
+    const _patchedProfitBreakdownHTML = function(p) {
+      return _origProfitBreakdownHTML(p);
+    };
+
+    // Override deleteEntry to use soft delete with undo
+    const _origDeleteEntry = deleteEntry;
+    deleteEntry = function(table, id) {
+      const item = DB[table].find(x => x.id === id);
+      const label = item ? `"${item.name || item.desc || 'Item'}" deleted.` : 'Item deleted.';
+      softDelete(table, id, label);
+    };
+
+    // ── Patch renderProjects to include task/payment/attachment UI in cards ──
+    renderProjects = function() {
+      const q = (document.getElementById('projectSearch')?.value || '').toLowerCase();
+      const sf = document.getElementById('projectStatusFilter')?.value || '';
+      const tf = document.getElementById('projectTypeFilter')?.value || '';
+      const list = DB.projects.filter(p => (!q || p.name.toLowerCase().includes(q) || clientName(p.clientId).toLowerCase().includes(q)) && (!sf || p.status === sf) && (!tf || p.type === tf));
+      const el = document.getElementById('projectsTable'); if (!el) return;
+      if (list.length === 0) { el.innerHTML = `<div class="empty"><div class="empty-ico">◈</div><div class="empty-title">No projects found</div><div class="empty-sub">Add your first project</div></div>`; return; }
+      el.innerHTML = list.map(p => {
+        const domains = DB.domains.filter(d => d.projectId === p.id);
+        const taskProg = taskProgressHTML(p);
+        const pymtSumm = paymentSummaryHTML(p);
+        const attachHtml = attachLinksHTML(p);
+        return `<div class="card" style="margin-bottom:12px">
+      <div class="card-header">
+        <div>
+          <div style="font-weight:600;font-size:14px">${p.name} ${typeBadge(p.type)} ${statusBadge(p.status)}</div>
+          <div class="td-muted" style="font-size:12px;margin-top:3px">${clientName(p.clientId)}${domains.length ? ' · ' + domains.map(d => d.name).join(', ') : ''}</div>
+          ${p.notes ? `<div class="td-muted" style="font-size:11px;margin-top:3px">${p.notes}</div>` : ''}
+        </div>
+        <div class="flex gap-4">
+          <button class="btn btn-ghost btn-sm" onclick="openTasksModal('${p.id}')" title="Tasks">☑</button>
+          <button class="btn btn-ghost btn-sm" onclick="openAttachModal('${p.id}')" title="Links">🔗</button>
+          <button class="btn btn-ghost btn-sm" onclick="openModal('project','${p.id}')">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="confirmDelete('Delete project?',()=>deleteEntry('projects','${p.id}'))">Del</button>
+        </div>
+      </div>
+      <div class="${p.hasMaint ? 'grid-2' : ''}">
+        ${profitBreakdownHTML(p)}
+      </div>
+      ${pymtSumm}
+      ${taskProg}
+      ${attachHtml}
+      ${p.hasMaint ? `<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <span style="font-size:12px;color:var(--text3)">Maintenance:</span>
+        ${statusBadge(p.maintStatus)}
+        <span style="font-size:12px;color:var(--text2)">Next: ${fDate(p.maintNext)}</span>
+        ${renewalBadge(daysUntil(p.maintNext))}
+      </div>`: ''}
+    </div>`;
+      }).join('');
+      if (_projView === 'kanban') renderKanban();
+    };
+
+    // Patch renderClients to show health score
+    const _origRenderClients = renderClients;
+    renderClients = function() {
+      const q = (document.getElementById('clientSearch')?.value || '').toLowerCase();
+      const list = DB.clients.filter(c => !q || c.name.toLowerCase().includes(q) || (c.org || '').toLowerCase().includes(q));
+      const el = document.getElementById('clientsTable'); if (!el) return;
+      if (list.length === 0) { el.innerHTML = `<div class="empty"><div class="empty-ico">◉</div><div class="empty-title">${q ? 'No clients match' : 'No clients yet'}</div><div class="empty-sub">${q ? '' : 'Add your first client to get started'}</div></div>`; return; }
+      const combined = [...DB.finance, ...getAutoLedger()];
+      el.innerHTML = '<div class="card"><div class="table-wrap"><table><thead><tr><th>Client</th><th>Organization</th><th>Projects</th><th>Health</th><th>Actual Revenue</th><th>Actions</th></tr></thead><tbody>' +
+        list.map(c => {
+          const projs = DB.projects.filter(p => p.clientId === c.id);
+          const rev = combined.filter(f => f.type === 'revenue' && f.clientId === c.id).reduce((s,f) => s+f.amount, 0);
+          const col = avatarColor(c.name);
+          const portal = (DB.projects.find(p => p.clientId === c.id && p.attachments?.portal) || {}).attachments?.portal || '';
+          return `<tr><td><div class="flex items-center gap-8"><div class="avatar" style="background:${col}18;color:${col}">${initials(c.name)}</div><div><div style="font-weight:500">${c.name}</div>${c.email ? `<div class="td-muted" style="font-size:11px">${c.email}</div>` : ''}${portal ? `<a class="portal-link" href="${portal}" target="_blank">🔗 Portal</a>` : ''}</div></div></td><td class="td-muted">${c.org || '—'}</td><td><span class="badge badge-plain">${projs.length} project${projs.length !== 1 ? 's' : ''}</span></td><td>${healthHTML(c)}</td><td class="td-mono ${rev > 0 ? 'text-green' : ''}">${rev > 0 ? fMoneyRaw(rev) : '—'}</td><td><div class="td-actions"><button class="btn btn-ghost btn-sm" onclick="openModal('client','${c.id}')">Edit</button><button class="btn btn-danger btn-sm" onclick="confirmDelete('Delete client?',()=>deleteEntry('clients','${c.id}'))">Del</button></div></td></tr>`;
+        }).join('') + '</tbody></table></div></div>';
+    };
+
+    // Patch save() to also update renewal alert bar
+    const _origSave = save;
+    save = function() {
+      _origSave();
+      renderRenewalAlertBar();
+    };
+
+    // ── Domain modal: reset period field on edit ──
+    const _origOpenModal = openModal;
+    openModal = function(type, id) {
+      _origOpenModal(type, id);
+      if (type === 'domain') {
+        // Reset period to 1yr on new domain
+        if (!id) {
+          const pEl = document.getElementById('d_reg_period');
+          if (pEl) pEl.value = '1';
+        }
+      }
+    };
+
+    // ── Floating Action Button (FAB) Logic ──
+    function toggleFab() {
+      const btn = document.getElementById('fabMainBtn');
+      const items = document.getElementById('fabItems');
+      if (btn.classList.contains('open')) {
+        btn.classList.remove('open');
+        btn.style.transform = 'rotate(0deg)';
+        items.classList.remove('open');
       } else {
-        // App remains hidden, login screen remains visible
+        btn.classList.add('open');
+        btn.style.transform = 'rotate(45deg)';
+        items.classList.add('open');
       }
     }
+
+    // Close FAB when clicking outside
+    document.addEventListener('click', function(e) {
+      const fab = document.getElementById('mobileFab');
+      if (fab && !fab.contains(e.target)) {
+        const btn = document.getElementById('fabMainBtn');
+        const items = document.getElementById('fabItems');
+        if (btn.classList.contains('open')) {
+          btn.classList.remove('open');
+          btn.style.transform = 'rotate(0deg)';
+          items.classList.remove('open');
+        }
+      }
+    });
+
     initApp();
+
   </script>
 </body>
 

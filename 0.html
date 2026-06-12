@@ -1,0 +1,3069 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Th3-C0der · Projects Dashboard</title>
+  <meta name="description" content="Th3-C0der Projects dashboard — clients, projects, domains, finances.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    :root {
+      --bg: #09090b;
+      --bg2: #18181b;
+      --bg3: #27272a;
+      --bg4: #3f3f46;
+      --border: #27272a;
+      --border2: #3f3f46;
+      --text: #fafafa;
+      --text2: #a1a1aa;
+      --text3: #71717a;
+      --accent: #10b981;
+      --accent2: #34d399;
+      --accentDim: rgba(16, 185, 129, 0.15);
+      --gold: #f59e0b;
+      --gold2: #fbbf24;
+      --goldDim: rgba(245, 158, 11, 0.15);
+      --red: #ef4444;
+      --red2: #f87171;
+      --redDim: rgba(239, 68, 68, 0.15);
+      --blue: #3b82f6;
+      --blue2: #60a5fa;
+      --blueDim: rgba(59, 130, 246, 0.15);
+      --purple: #8b5cf6;
+      --purpleDim: rgba(139, 92, 246, 0.15);
+      --font: 'Inter', sans-serif;
+      --mono: 'JetBrains Mono', monospace;
+      --r: 8px;
+      --r2: 12px;
+      --r3: 16px;
+    }
+
+    html,
+    body {
+      height: 100%;
+      overflow: hidden
+    }
+
+    /* CUSTOM SCROLLBAR */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border2);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--text3);
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.5
+    }
+
+    @keyframes pulse-glow {
+      0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); border-color: var(--accent); color: var(--accent2); }
+      70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); border-color: var(--accent); color: var(--accent2); }
+      100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); border-color: var(--accent); color: var(--accent2); }
+    }
+    .btn-sync-glow {
+      animation: pulse-glow 2s infinite;
+      background: rgba(16, 185, 129, 0.1);
+    }
+
+    /* LAYOUT */
+    .app {
+      display: flex;
+      height: 100dvh;
+      overflow: hidden
+    }
+
+    .sidebar {
+      width: 210px;
+      min-width: 210px;
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      flex-shrink: 0
+    }
+
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      min-width: 0
+    }
+
+    /* SIDEBAR */
+    .logo {
+      padding: 22px 18px 18px;
+      border-bottom: 1px solid var(--border)
+    }
+
+    .logo-name {
+      font-family: var(--mono);
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: .04em;
+      color: var(--accent)
+    }
+
+    .logo-sub {
+      font-size: 10px;
+      color: var(--text3);
+      margin-top: 3px;
+      text-transform: uppercase;
+      letter-spacing: .1em
+    }
+
+    .nav {
+      padding: 10px 0;
+      flex: 1
+    }
+
+    .nav-group {
+      padding: 6px 14px 2px;
+      font-size: 10px;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      margin-top: 6px
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 8px 14px;
+      cursor: pointer;
+      color: var(--text2);
+      transition: all .15s;
+      border-left: 2px solid transparent;
+      font-size: 13px;
+      user-select: none
+    }
+
+    .nav-item:hover {
+      background: rgba(255, 255, 255, .03);
+      color: var(--text)
+    }
+
+    .nav-item.active {
+      background: var(--accentDim);
+      color: var(--accent2);
+      border-left-color: var(--accent)
+    }
+
+    .nav-icon {
+      font-size: 15px;
+      min-width: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center
+    }
+
+    .nav-badge {
+      margin-left: auto;
+      background: var(--red);
+      color: #fff;
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 99px;
+      font-weight: 600;
+      display: none
+    }
+
+    .sidebar-foot {
+      padding: 14px 16px;
+      border-top: 1px solid var(--border)
+    }
+
+    .storage-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text3);
+      margin-bottom: 5px
+    }
+
+    .storage-bar {
+      height: 2px;
+      background: var(--bg4);
+      border-radius: 99px;
+      overflow: hidden
+    }
+
+    .storage-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 99px;
+      transition: width .4s
+    }
+
+    /* TOPBAR */
+    .topbar {
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      height: 54px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0
+    }
+
+    .topbar-heading {
+      font-size: 15px;
+      font-weight: 600
+    }
+
+    .topbar-sub {
+      font-size: 11px;
+      color: var(--text3);
+      margin-top: 1px
+    }
+
+    .topbar-spacer {
+      flex: 1
+    }
+
+    /* BUTTONS */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      border-radius: var(--r);
+      border: none;
+      cursor: pointer;
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 500;
+      transition: all .15s;
+      white-space: nowrap
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff
+    }
+
+    .btn-primary:hover {
+      background: var(--accent2);
+      transform: translateY(-1px)
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text2);
+      border: 1px solid var(--border2)
+    }
+
+    .btn-ghost:hover {
+      background: var(--bg3);
+      color: var(--text)
+    }
+
+    .btn-danger {
+      background: var(--redDim);
+      color: var(--red2);
+      border: 1px solid rgba(224, 82, 82, .2)
+    }
+
+    .btn-danger:hover {
+      background: rgba(224, 82, 82, .22)
+    }
+
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 12px
+    }
+
+    .btn-icon {
+      padding: 6px;
+      aspect-ratio: 1;
+      border-radius: var(--r)
+    }
+
+    /* CONTENT */
+    .content {
+      padding: 22px 24px;
+      flex: 1
+    }
+
+    .section {
+      display: none
+    }
+
+    .section.active {
+      display: block
+    }
+
+    /* STAT CARDS */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      margin-bottom: 20px
+    }
+
+    .stat-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--r2);
+      padding: 16px 18px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color .2s
+    }
+
+    .stat-card:hover {
+      border-color: var(--border2)
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px
+    }
+
+    .stat-card.c-accent::before {
+      background: var(--accent)
+    }
+
+    .stat-card.c-gold::before {
+      background: var(--gold)
+    }
+
+    .stat-card.c-red::before {
+      background: var(--red)
+    }
+
+    .stat-card.c-blue::before {
+      background: var(--blue)
+    }
+
+    .stat-card.c-green::before {
+      background: var(--accent)
+    }
+
+    .stat-card.c-purple::before {
+      background: var(--purple)
+    }
+
+    .stat-label {
+      font-size: 10px;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 7px;
+      font-weight: 500
+    }
+
+    .stat-value {
+      font-family: var(--mono);
+      font-size: 22px;
+      font-weight: 500;
+      color: var(--text);
+      line-height: 1
+    }
+
+    .stat-value.sm {
+      font-size: 16px
+    }
+
+    .stat-sub {
+      font-size: 11px;
+      color: var(--text3);
+      margin-top: 5px
+    }
+
+    /* CARDS */
+    .card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--r2);
+      padding: 18px;
+      margin-bottom: 14px;
+      min-width: 0;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      gap: 8px
+    }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: 600
+    }
+
+    .card-sub {
+      font-size: 11px;
+      color: var(--text3);
+      margin-top: 2px
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    /* TABLE */
+    .table-wrap {
+      overflow-x: auto
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse
+    }
+
+    thead th {
+      text-align: left;
+      font-size: 10px;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+      font-weight: 500
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background .1s
+    }
+
+    tbody tr:hover {
+      background: rgba(255, 255, 255, .02)
+    }
+
+    tbody tr:last-child {
+      border-bottom: none
+    }
+
+    td {
+      padding: 10px 12px;
+      font-size: 13px;
+      vertical-align: middle
+    }
+
+    .td-mono {
+      font-family: var(--mono);
+      font-size: 12px
+    }
+
+    .td-muted {
+      color: var(--text2)
+    }
+
+    .td-actions {
+      display: flex;
+      gap: 4px;
+      justify-content: flex-end;
+      flex-wrap: wrap
+    }
+
+    /* BADGES */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 500;
+      white-space: nowrap
+    }
+
+    .badge-active {
+      background: rgba(16, 185, 129, .12);
+      color: var(--accent2)
+    }
+
+    .badge-ongoing {
+      background: rgba(75, 142, 241, .12);
+      color: var(--blue2)
+    }
+
+    .badge-completed {
+      background: rgba(156, 110, 255, .12);
+      color: var(--purple)
+    }
+
+    .badge-onhold {
+      background: var(--goldDim);
+      color: var(--gold2)
+    }
+
+    .badge-archived {
+      background: rgba(139, 148, 158, .12);
+      color: var(--text2)
+    }
+
+    .badge-urgent {
+      background: var(--redDim);
+      color: var(--red2)
+    }
+
+    .badge-warning {
+      background: var(--goldDim);
+      color: var(--gold2)
+    }
+
+    .badge-ok {
+      background: rgba(16, 185, 129, .12);
+      color: var(--accent2)
+    }
+
+    .badge-type-client {
+      background: var(--accentDim);
+      color: var(--accent2)
+    }
+
+    .badge-type-freelance {
+      background: var(--purpleDim);
+      color: var(--purple)
+    }
+
+    .badge-type-personal {
+      background: var(--blueDim);
+      color: var(--blue2)
+    }
+
+    .badge-plain {
+      background: var(--bg3);
+      color: var(--text2)
+    }
+
+    /* FORMS */
+    .form-group {
+      margin-bottom: 13px
+    }
+
+    .form-row {
+      display: grid;
+      gap: 12px
+    }
+
+    .form-row.c2 {
+      grid-template-columns: 1fr 1fr
+    }
+
+    .form-row.c3 {
+      grid-template-columns: 1fr 1fr 1fr
+    }
+
+    .form-row.c4 {
+      grid-template-columns: 1fr 1fr 1fr 1fr
+    }
+
+    label {
+      display: block;
+      font-size: 11px;
+      color: var(--text3);
+      margin-bottom: 5px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: .06em
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      border-radius: var(--r);
+      padding: 8px 10px;
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 13px;
+      outline: none;
+      transition: border .15s
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--accent);
+      background: var(--bg4)
+    }
+
+    select option {
+      background: var(--bg3)
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 60px
+    }
+
+    input[type=date]::-webkit-calendar-picker-indicator {
+      filter: invert(.4)
+    }
+
+    input[type=number] {
+      -moz-appearance: textfield
+    }
+
+    .field-note {
+      font-size: 11px;
+      color: var(--text3);
+      margin-top: 4px
+    }
+
+    .toggle-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px
+    }
+
+    .toggle {
+      position: relative;
+      width: 34px;
+      height: 18px;
+      cursor: pointer;
+      flex-shrink: 0
+    }
+
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute
+    }
+
+    .toggle-track {
+      position: absolute;
+      inset: 0;
+      background: var(--bg4);
+      border-radius: 99px;
+      transition: .2s;
+      border: 1px solid var(--border2)
+    }
+
+    .toggle-thumb {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      left: 2px;
+      top: 2px;
+      background: var(--text3);
+      border-radius: 50%;
+      transition: .2s
+    }
+
+    .toggle input:checked~.toggle-track {
+      background: var(--accent);
+      border-color: var(--accent)
+    }
+
+    .toggle input:checked~.toggle-thumb {
+      transform: translateX(16px);
+      background: #fff
+    }
+
+    .form-sec-label {
+      font-size: 10px;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 12px;
+      font-weight: 500;
+      margin-top: 16px
+    }
+
+    /* Dynamic cost/income rows */
+    .extra-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 6px
+    }
+
+    .extra-row {
+      display: grid;
+      grid-template-columns: 1fr 130px 140px auto auto;
+      gap: 8px;
+      align-items: center
+    }
+
+    .extra-row input {
+      margin: 0
+    }
+
+    .extra-row select {
+      margin: 0;
+      width: 95px;
+      padding: 8px 4px
+    }
+
+    .btn-remove {
+      background: var(--redDim);
+      color: var(--red2);
+      border: 1px solid rgba(224, 82, 82, .2);
+      border-radius: var(--r);
+      padding: 4px 8px;
+      cursor: pointer;
+      font-size: 12px;
+      white-space: nowrap
+    }
+
+    .btn-add-row {
+      background: var(--bg3);
+      border: 1px dashed var(--border2);
+      border-radius: var(--r);
+      padding: 6px 12px;
+      color: var(--text3);
+      font-size: 12px;
+      cursor: pointer;
+      width: 100%;
+      text-align: center;
+      transition: all .15s
+    }
+
+    .btn-add-row:hover {
+      border-color: var(--accent);
+      color: var(--accent)
+    }
+
+    .chart-range-sel {
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      color: var(--text2);
+      font-size: 11px;
+      padding: 5px 8px;
+      border-radius: var(--r);
+      cursor: pointer;
+      outline: none;
+      width: auto;
+      font-family: var(--font)
+    }
+
+    .chart-range-sel:focus {
+      border-color: var(--accent)
+    }
+
+    /* MODAL */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .65);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .18s
+    }
+
+    .overlay.open {
+      opacity: 1;
+      pointer-events: all
+    }
+
+    .modal {
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: var(--r3);
+      width: 100%;
+      max-width: 720px;
+      max-height: 92vh;
+      overflow-y: auto;
+      transform: translateY(12px);
+      transition: transform .18s
+    }
+
+    .overlay.open .modal {
+      transform: translateY(0)
+    }
+
+    .modal-hd {
+      padding: 18px 20px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px
+    }
+
+    .modal-title {
+      font-size: 15px;
+      font-weight: 600
+    }
+
+    .modal-bd {
+      padding: 0 20px 20px
+    }
+
+    .modal-ft {
+      padding: 14px 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px
+    }
+
+    /* TOOLBAR */
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+      flex-wrap: wrap
+    }
+
+    .search-box {
+      position: relative;
+      flex: 1;
+      min-width: 160px
+    }
+
+    .search-box input {
+      padding-left: 30px
+    }
+
+    .search-ico {
+      position: absolute;
+      left: 9px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text3);
+      font-size: 14px;
+      pointer-events: none
+    }
+
+    /* TABS */
+    .tab-bar {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 18px
+    }
+
+    .tab {
+      padding: 9px 14px;
+      font-size: 13px;
+      color: var(--text3);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: all .15s;
+      white-space: nowrap
+    }
+
+    .tab:hover {
+      color: var(--text)
+    }
+
+    .tab.active {
+      color: var(--accent2);
+      border-bottom-color: var(--accent)
+    }
+
+    /* CHARTS */
+    .chart-box {
+      position: relative;
+      height: 200px;
+      width: 100%;
+      min-width: 0;
+    }
+
+    /* EMPTY */
+    .empty {
+      text-align: center;
+      padding: 44px 20px;
+      color: var(--text3)
+    }
+
+    .empty-ico {
+      font-size: 36px;
+      margin-bottom: 12px;
+      opacity: .3
+    }
+
+    .empty-title {
+      font-size: 13px;
+      color: var(--text2);
+      margin-bottom: 5px;
+      font-weight: 500
+    }
+
+    .empty-sub {
+      font-size: 12px
+    }
+
+    /* RENEWAL */
+    .renewal-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 0;
+      border-bottom: 1px solid var(--border)
+    }
+
+    .renewal-row:last-child {
+      border-bottom: none
+    }
+
+    .renewal-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0
+    }
+
+    .renewal-info {
+      flex: 1;
+      min-width: 0
+    }
+
+    .renewal-name {
+      font-size: 13px;
+      font-weight: 500;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap
+    }
+
+    .renewal-sub {
+      font-size: 11px;
+      color: var(--text3);
+      margin-top: 1px
+    }
+
+    .renewal-days {
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 500;
+      white-space: nowrap
+    }
+
+    /* PROFIT BREAKDOWN */
+    .profit-box {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--r2);
+      padding: 12px 14px;
+      font-size: 12px
+    }
+
+    .profit-box .pb-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 3px 0;
+      color: var(--text2)
+    }
+
+    .profit-box .pb-row.add {
+      color: var(--accent2)
+    }
+
+    .profit-box .pb-row.sub {
+      color: var(--red2)
+    }
+
+    .profit-box .pb-row.total {
+      font-weight: 600;
+      color: var(--text);
+      border-top: 1px solid var(--border2);
+      padding-top: 7px;
+      margin-top: 4px
+    }
+
+    .profit-box .pb-row .label {
+      font-family: var(--mono);
+      font-size: 11px
+    }
+
+    /* CONFIRM */
+    .confirm-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .65);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px
+    }
+
+    .confirm-box {
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: var(--r2);
+      padding: 24px;
+      max-width: 340px;
+      width: 100%
+    }
+
+    .confirm-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 6px
+    }
+
+    .confirm-sub {
+      font-size: 13px;
+      color: var(--text2);
+      margin-bottom: 18px
+    }
+
+    /* UTILS */
+    .text-green {
+      color: var(--accent2)
+    }
+
+    .text-red {
+      color: var(--red2)
+    }
+
+    .text-gold {
+      color: var(--gold2)
+    }
+
+    .text-blue {
+      color: var(--blue2)
+    }
+
+    .text-muted {
+      color: var(--text3)
+    }
+
+    .text-mono {
+      font-family: var(--mono)
+    }
+
+    .flex {
+      display: flex
+    }
+
+    .items-center {
+      align-items: center
+    }
+
+    .justify-between {
+      justify-content: space-between
+    }
+
+    .gap-8 {
+      gap: 8px
+    }
+
+    .gap-4 {
+      gap: 4px
+    }
+
+    .mt-8 {
+      margin-top: 8px
+    }
+
+    .mt-14 {
+      margin-top: 14px
+    }
+
+    .mb-8 {
+      margin-bottom: 8px
+    }
+
+    .mb-12 {
+      margin-bottom: 12px
+    }
+
+    .prog-bar {
+      height: 3px;
+      background: var(--bg4);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-top: 6px
+    }
+
+    .prog-fill {
+      height: 100%;
+      border-radius: 99px;
+      transition: width .4s
+    }
+
+    .avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 500;
+      flex-shrink: 0
+    }
+
+    .avatar-sm {
+      width: 28px;
+      height: 28px;
+      font-size: 10px;
+      border-radius: 6px
+    }
+
+    .hamburger {
+      display: none;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      cursor: pointer;
+      padding: 6px;
+      margin-right: 12px;
+      border-radius: var(--r);
+    }
+
+    .hamburger:hover {
+      background: var(--bg3);
+    }
+
+    .sidebar-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(2px);
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+
+    .sidebar-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .sidebar-close-btn {
+      display: none;
+    }
+
+    @media(max-width:768px) {
+      .hamburger {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .sidebar {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: -280px;
+        width: 260px;
+        z-index: 1001;
+        transition: left 0.3s ease;
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
+      }
+
+      .sidebar.open {
+        left: 0;
+      }
+
+      .content {
+        padding: 14px 14px 40px 14px;
+        min-width: 0;
+      }
+
+      .stat-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+      }
+
+      .stat-card {
+        padding: 12px;
+        min-width: 0;
+      }
+
+      .stat-value.sm {
+        font-size: 14px;
+      }
+
+      .stat-value {
+        font-size: 18px;
+        word-break: break-all;
+      }
+
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+
+      .card {
+        padding: 14px;
+      }
+
+      .form-row.c2,
+      .form-row.c3,
+      .form-row.c4 {
+        grid-template-columns: 1fr
+      }
+
+      .extra-row {
+        grid-template-columns: 1fr;
+        padding-bottom: 8px;
+        border-bottom: 1px dashed var(--border2);
+        margin-bottom: 8px;
+      }
+
+      .extra-row select {
+        width: 100%;
+      }
+
+      .btn-remove {
+        width: 100%;
+        text-align: center;
+        margin-top: 4px;
+        display: block;
+      }
+
+      .topbar {
+        padding: 0 12px;
+      }
+
+      .topbar-sub {
+        display: none;
+      }
+
+      .hide-mobile {
+        display: none;
+      }
+
+      .topbar .btn {
+        padding: 8px;
+        font-size: 0;
+      }
+
+      .topbar .btn svg {
+        margin-right: 0 !important;
+      }
+
+      .sidebar-close-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+        border: none;
+        color: var(--text);
+        padding: 6px;
+        border-radius: var(--r);
+        cursor: pointer;
+      }
+
+      .sidebar-close-btn:hover {
+        background: var(--bg3);
+      }
+
+      .btn {
+        padding: 6px 10px;
+        font-size: 12px;
+      }
+
+      .modal {
+        max-width: 100% !important;
+        min-height: 100vh;
+        border-radius: 0;
+        border: none;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .modal-bd {
+        flex: 1;
+      }
+
+      .overlay {
+        padding: 0;
+      }
+    }
+
+    .login-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--bg1);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      padding: 20px;
+    }
+
+    .login-box {
+      background: var(--bg2);
+      padding: 32px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .login-box .logo-name {
+      font-size: 24px;
+      margin-bottom: 8px;
+      color: var(--text1);
+      font-weight: 600;
+      letter-spacing: -0.5px;
+    }
+
+    .login-box .logo-sub {
+      margin-bottom: 24px;
+      color: var(--text2);
+      font-size: 14px;
+    }
+
+    .login-box input {
+      margin-bottom: 16px;
+      text-align: center;
+      width: 100%;
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Login Screen -->
+  <div id="loginScreen" class="login-screen">
+    <div class="login-box">
+      <div class="logo-name">Th3-C0der</div>
+      <div class="logo-sub">Projects Dashboard • Secure Login</div>
+      <input type="password" id="loginToken" placeholder="GitHub Personal Access Token (PAT)" class="form-group"
+        style="padding:10px; border-radius:6px; border:1px solid var(--border); background:var(--bg3); color:var(--text1)">
+      <button class="btn btn-primary" style="width:100%" onclick="handleLogin()" id="loginBtn">Login &
+        Auto-Sync</button>
+      <div id="loginMsg" style="margin-top:12px; font-size:13px; color:var(--text3)"></div>
+    </div>
+  </div>
+
+  <div class="app" id="mainApp" style="display:none;">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="logo" style="display: flex; justify-content: space-between; align-items: flex-start;">
+        <div>
+          <div class="logo-name">Th3-C0der</div>
+          <div class="logo-sub">Projects Dashboard</div>
+        </div>
+        <button class="sidebar-close-btn" onclick="toggleSidebar()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <nav class="nav">
+        <div class="nav-group">Overview</div>
+        <div class="nav-item active" data-section="dashboard" id="nav-dashboard" onclick="navigate('dashboard',this)">
+          <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="7"></rect>
+              <rect x="14" y="3" width="7" height="7"></rect>
+              <rect x="14" y="14" width="7" height="7"></rect>
+              <rect x="3" y="14" width="7" height="7"></rect>
+            </svg></span><span>Dashboard</span>
+        </div>
+        <div class="nav-group">Business</div>
+        <div class="nav-item" data-section="clients" id="nav-clients" onclick="navigate('clients',this)"><span
+            class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg></span><span>Clients</span></div>
+        <div class="nav-item" data-section="projects" id="nav-projects" onclick="navigate('projects',this)"><span
+            class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+            </svg></span><span>Projects</span></div>
+        <div class="nav-item" data-section="maintenance" id="nav-maintenance" onclick="navigate('maintenance',this)">
+          <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path
+                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+              </path>
+            </svg></span><span>Maintenance</span>
+        </div>
+        <div class="nav-group">Infrastructure</div>
+        <div class="nav-item" data-section="domains" id="nav-domains" onclick="navigate('domains',this)"><span
+            class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="2" y1="12" x2="22" y2="12"></line>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
+              </path>
+            </svg></span><span>Domains</span><span class="nav-badge" id="domainBadge">!</span></div>
+        <div class="nav-group">Finance</div>
+        <div class="nav-item" data-section="finance" id="nav-finance" onclick="navigate('finance',this)"><span
+            class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="1" x2="12" y2="23"></line>
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            </svg></span><span>Finance</span></div>
+        <div class="nav-item" data-section="analytics" id="nav-analytics" onclick="navigate('analytics',this)"><span
+            class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="20" x2="18" y2="10"></line>
+              <line x1="12" y1="20" x2="12" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg></span><span>Analytics</span></div>
+      </nav>
+      <div class="sidebar-foot">
+        <div class="storage-row"><span>Storage</span><span id="storageSize" style="font-family:var(--mono)">0 KB</span>
+        </div>
+        <div class="storage-bar">
+          <div class="storage-fill" id="storageFill" style="width:1%"></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <div class="main">
+      <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+      <div class="topbar">
+        <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+        <div>
+          <div class="topbar-heading" id="topbarTitle">Dashboard</div>
+          <div class="topbar-sub" id="topbarSub">Overview of your freelance business</div>
+        </div>
+        <div class="topbar-spacer"></div>
+        <div class="flex gap-8">
+          <button class="btn btn-ghost btn-sm" id="btnManualSync" style="display:none;" onclick="forceSync()" title="Sync to Cloud"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px"><path d="M21 2v6h-6"></path><path d="M3 12a9 9 0 1 0 2.63-6.37L2 8"></path></svg><span class="hide-mobile">Sync Cloud</span></button>
+          <button class="btn btn-ghost btn-sm" id="btnDiscardSync" style="display:none;" onclick="discardChanges()" title="Discard Local Changes"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px"><polyline points="1 4 1 10 7 10"></polyline><polyline points="23 20 23 14 17 14"></polyline><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path></svg><span class="hide-mobile">Discard</span></button>
+          <button class="btn btn-ghost btn-sm" title="Logout" onclick="handleLogout()"><svg width="14" height="14"
+              viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" style="margin-right:4px">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg><span class="hide-mobile">Logout</span></button>
+          <button class="btn btn-ghost btn-sm" onclick="exportJSON()"><svg width="14" height="14" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              style="margin-right:4px">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg><span class="hide-mobile">Export</span></button>
+          <label class="btn btn-ghost btn-sm" style="cursor:pointer"><svg width="14" height="14" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              style="margin-right:4px">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg><span class="hide-mobile">Import</span><input type="file" accept=".json" style="display:none"
+              onchange="importJSON(event)"></label>
+        </div>
+      </div>
+
+      <div class="content">
+
+        <!-- DASHBOARD -->
+        <div class="section active" id="sec-dashboard">
+          <div class="stat-grid" id="dashStats"></div>
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-header" style="align-items:center">
+                <div>
+                  <div class="card-title">Revenue &amp; Expenses</div>
+                  <div class="card-sub" id="revExpSub">Last 6 months</div>
+                </div>
+                <select id="dashChartRange" onchange="renderRevExpChart()" class="chart-range-sel">
+                  <option value="6m">Last 6 Months</option>
+                  <option value="12m">Last 12 Months</option>
+                  <option value="ty">This Year</option>
+                  <option value="ly">Last Year</option>
+                  <option value="all">All Time</option>
+                </select>
+              </div>
+              <div class="chart-box"><canvas id="chartRevExp"></canvas></div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Upcoming Renewals</div>
+                  <div class="card-sub">Domains &amp; maintenance</div>
+                </div><button class="btn btn-ghost btn-sm"
+                  onclick="navigate('domains',document.getElementById('nav-domains'))">View all</button>
+              </div>
+              <div id="renewalList"></div>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">Revenue Breakdown</div>
+              </div>
+              <div class="chart-box"><canvas id="chartByClient"></canvas></div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">Project Types</div>
+              </div>
+              <div class="chart-box"><canvas id="chartTypes"></canvas></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CLIENTS -->
+        <div class="section" id="sec-clients">
+          <div class="toolbar">
+            <div class="search-box"><span class="search-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg></span><input id="clientSearch" placeholder="Search clients…" oninput="renderClients()"></div>
+            <button class="btn btn-primary btn-sm" onclick="openModal('client')">+ Add Client</button>
+          </div>
+          <div id="clientsTable"></div>
+        </div>
+
+        <!-- PROJECTS -->
+        <div class="section" id="sec-projects">
+          <div class="toolbar">
+            <div class="search-box"><span class="search-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg></span><input id="projectSearch" placeholder="Search projects…" oninput="renderProjects()"></div>
+            <select id="projectStatusFilter" onchange="renderProjects()" style="width:145px">
+              <option value="">All Status</option>
+              <option>Active</option>
+              <option>Ongoing</option>
+              <option>Awaiting Payment</option>
+              <option>Completed</option>
+              <option>On Hold</option>
+              <option>Archived</option>
+            </select>
+            <select id="projectTypeFilter" onchange="renderProjects()" style="width:120px">
+              <option value="">All Types</option>
+              <option>Client</option>
+              <option>Freelance</option>
+              <option>Personal</option>
+            </select>
+            <button class="btn btn-primary btn-sm" onclick="openModal('project')">+ Add Project</button>
+          </div>
+          <div id="projectsTable"></div>
+        </div>
+
+        <!-- MAINTENANCE -->
+        <div class="section" id="sec-maintenance">
+          <div class="toolbar">
+            <div class="search-box"><span class="search-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg></span><input id="maintSearch" placeholder="Search…" oninput="renderMaintenance()"></div>
+            <button class="btn btn-primary btn-sm" onclick="openModal('maintenance')">+ Add Plan</button>
+          </div>
+          <div class="stat-grid" id="maintStats"></div>
+          <div id="maintenanceTable"></div>
+        </div>
+
+        <!-- DOMAINS -->
+        <div class="section" id="sec-domains">
+          <div class="toolbar">
+            <div class="search-box"><span class="search-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg></span><input id="domainSearch" placeholder="Search domains…" oninput="renderDomains()"></div>
+            <button class="btn btn-primary btn-sm" onclick="openModal('domain')">+ Add Domain</button>
+          </div>
+          <div class="stat-grid" id="domainStats"></div>
+          <div id="domainsTable"></div>
+        </div>
+
+        <!-- FINANCE -->
+        <div class="section" id="sec-finance">
+          <div class="tab-bar">
+            <div class="tab active" onclick="switchFinTab('all',this)">All</div>
+            <div class="tab" onclick="switchFinTab('revenue',this)">Revenue</div>
+            <div class="tab" onclick="switchFinTab('expense',this)">Expenses</div>
+          </div>
+          <div class="toolbar">
+            <div class="search-box"><span class="search-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg></span><input id="financeSearch" placeholder="Search manual entries…" oninput="renderFinance()">
+            </div>
+            <select id="financeMonthFilter" onchange="renderFinance()" style="width:150px">
+              <option value="">All Time</option>
+            </select>
+            <button class="btn btn-primary btn-sm" onclick="openModal('finance')">+ Add Manual Entry</button>
+          </div>
+          <div class="stat-grid" id="financeStats"></div>
+          <div id="financeTable"></div>
+        </div>
+
+        <!-- ANALYTICS -->
+        <div class="section" id="sec-analytics">
+          <div class="stat-grid" id="analyticsStats"></div>
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-header" style="align-items:center">
+                <div>
+                  <div class="card-title">Actual Profit Trend</div>
+                  <div class="card-sub" id="profitSub">Last 12 months</div>
+                </div>
+                <select id="profitChartRange" onchange="renderProfitChart()" class="chart-range-sel">
+                  <option value="6m">Last 6 Months</option>
+                  <option value="12m" selected>Last 12 Months</option>
+                  <option value="ty">This Year</option>
+                  <option value="ly">Last Year</option>
+                  <option value="all">All Time</option>
+                </select>
+              </div>
+              <div class="chart-box" style="height:230px"><canvas id="chartProfit"></canvas></div>
+            </div>
+            <div class="card">
+              <div class="card-header" style="align-items:center">
+                <div>
+                  <div class="card-title">Domain Renewal Forecast</div>
+                  <div class="card-sub" id="domainForecastSub">Next 6 months</div>
+                </div>
+                <select id="domainForecastRange" onchange="renderDomainForecastChart()" class="chart-range-sel">
+                  <option value="0m">Current Month</option>
+                  <option value="1m">Next Month</option>
+                  <option value="3m">Next 3 Months</option>
+                  <option value="6m" selected>Next 6 Months</option>
+                  <option value="12m">Next 12 Months</option>
+                </select>
+              </div>
+              <div class="chart-box" style="height:230px"><canvas id="chartDomainForecast"></canvas></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header" style="align-items:center">
+              <div>
+                <div class="card-title">Actual Revenue Timeline</div>
+                <div class="card-sub" id="timelineSub">Last 12 months</div>
+              </div>
+              <select id="timelineChartRange" onchange="renderRevTimelineChart()" class="chart-range-sel">
+                <option value="6m">Last 6 Months</option>
+                <option value="12m" selected>Last 12 Months</option>
+                <option value="ty">This Year</option>
+                <option value="ly">Last Year</option>
+                <option value="all">All Time</option>
+              </select>
+            </div>
+            <div class="chart-box" style="height:220px"><canvas id="chartRevTimeline"></canvas></div>
+          </div>
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">Top Clients by Actual Revenue</div>
+              </div>
+              <div id="topClientsEl"></div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">Recurring Revenue Projection</div>
+              </div>
+              <div id="maintProjectionEl"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- CLIENT MODAL -->
+  <div class="overlay" id="modal-client">
+    <div class="modal" style="max-width:500px">
+      <div class="modal-hd">
+        <div class="modal-title" id="clientModalTitle">Add Client</div><button class="btn btn-ghost btn-icon"
+          onclick="closeModal('client')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg></button>
+      </div>
+      <div class="modal-bd">
+        <input type="hidden" id="clientEditId">
+        <div class="form-row c2">
+          <div class="form-group"><label>Client Name *</label><input id="c_name" placeholder="e.g. Rahul Sharma"></div>
+          <div class="form-group"><label>Organization</label><input id="c_org" placeholder="e.g. Tech Startup Pvt Ltd">
+          </div>
+        </div>
+        <div class="form-row c2">
+          <div class="form-group"><label>Email</label><input id="c_email" type="email" placeholder="client@example.com">
+          </div>
+          <div class="form-group"><label>Phone</label><input id="c_phone" placeholder="+91 98765 43210"></div>
+        </div>
+        <div class="form-group"><label>Notes</label><textarea id="c_notes" placeholder="Any notes…"></textarea></div>
+      </div>
+      <div class="modal-ft"><button class="btn btn-ghost" onclick="closeModal('client')">Cancel</button><button
+          class="btn btn-primary" onclick="saveClient()">Save Client</button></div>
+    </div>
+  </div>
+
+  <!-- PROJECT MODAL -->
+  <div class="overlay" id="modal-project">
+    <div class="modal">
+      <div class="modal-hd">
+        <div class="modal-title" id="projectModalTitle">Add Project</div><button class="btn btn-ghost btn-icon"
+          onclick="closeModal('project')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg></button>
+      </div>
+      <div class="modal-bd">
+        <input type="hidden" id="projectEditId">
+        <div class="form-row c2">
+          <div class="form-group"><label>Project Name *</label><input id="p_name" placeholder="e.g. E-commerce Website">
+          </div>
+          <div class="form-group"><label>Client</label><select id="p_client">
+              <option value="">— No Client —</option>
+            </select></div>
+        </div>
+        <div class="form-row c3">
+          <div class="form-group"><label>Type</label><select id="p_type">
+              <option>Client</option>
+              <option>Freelance</option>
+              <option>Personal</option>
+            </select></div>
+          <div class="form-group"><label>Status</label><select id="p_status">
+              <option>Active</option>
+              <option>Ongoing</option>
+              <option>Awaiting Payment</option>
+              <option>Completed</option>
+              <option>On Hold</option>
+              <option>Archived</option>
+            </select></div>
+          <div class="form-group"><label>Expected Rev. (₹)</label><input id="p_exp_value" type="number" min="0"
+              placeholder="0"></div>
+        </div>
+
+        <div class="form-sec-label">Payments Received</div>
+        <div class="extra-rows" id="p_payment_rows"></div>
+        <button class="btn-add-row" onclick="addExtraRow('p_payment_rows','payment')">+ Add Payment (advance, milestone,
+          final…)</button>
+
+        <div class="form-sec-label">Additional Project Income</div>
+        <div class="extra-rows" id="p_income_rows"></div>
+        <button class="btn-add-row" onclick="addExtraRow('p_income_rows','income')">+ Add Income Entry (feature
+          requests, modules, revisions…)</button>
+
+        <div class="form-sec-label">Additional Project Costs</div>
+        <div class="extra-rows" id="p_cost_rows"></div>
+        <button class="btn-add-row" onclick="addExtraRow('p_cost_rows','cost')">+ Add Cost Entry (server, DB, hosting,
+          subscriptions…)</button>
+
+        <div class="form-sec-label">Yearly Maintenance</div>
+        <div class="toggle-wrap mb-8">
+          <label class="toggle"><input type="checkbox" id="p_has_maint" onchange="toggleMaintFields()">
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+          <span style="font-size:13px;color:var(--text2)">Yearly maintenance applies to this project</span>
+        </div>
+        <div id="maintFields" style="display:none">
+          <div class="form-row c2">
+            <div class="form-group"><label>Annual Maintenance Fee (₹)</label><input id="p_maint_fee" type="number"
+                min="0" placeholder="0"></div>
+            <div class="form-group"><label>Maintenance Status</label><select id="p_maint_status">
+                <option>Active</option>
+                <option>Due</option>
+                <option>Expired</option>
+                <option>Cancelled</option>
+              </select></div>
+          </div>
+          <div class="form-row c2">
+            <div class="form-group"><label>Last Renewed</label><input id="p_maint_last" type="date"></div>
+            <div class="form-group"><label>Next Renewal</label><input id="p_maint_next" type="date"></div>
+          </div>
+          <div class="form-sec-label">Recurring Operational Costs (deducted from maintenance income)</div>
+          <div class="extra-rows" id="p_op_cost_rows"></div>
+          <button class="btn-add-row" onclick="addExtraRow('p_op_cost_rows','opcost')">+ Add Operational Cost (server,
+            DB, hosting per year…)</button>
+          <div class="form-sec-label">Additional Maintenance Income</div>
+          <div class="extra-rows" id="p_maint_income_rows"></div>
+          <button class="btn-add-row" onclick="addExtraRow('p_maint_income_rows','maintincome')">+ Add Maintenance
+            Income Entry</button>
+        </div>
+
+        <div class="form-group" style="margin-top:16px"><label>Notes</label><textarea id="p_notes"
+            placeholder="Scope, requirements, links…"></textarea></div>
+      </div>
+      <div class="modal-ft"><button class="btn btn-ghost" onclick="closeModal('project')">Cancel</button><button
+          class="btn btn-primary" onclick="saveProject()">Save Project</button></div>
+    </div>
+  </div>
+
+  <!-- MAINTENANCE MODAL -->
+  <div class="overlay" id="modal-maintenance">
+    <div class="modal" style="max-width:520px">
+      <div class="modal-hd">
+        <div class="modal-title" id="maintModalTitle">Add Maintenance Plan</div><button class="btn btn-ghost btn-icon"
+          onclick="closeModal('maintenance')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg></button>
+      </div>
+      <div class="modal-bd">
+        <input type="hidden" id="maintEditId">
+        <div class="form-row c2">
+          <div class="form-group"><label>Plan Name *</label><input id="m_name" placeholder="e.g. Annual Website Care">
+          </div>
+          <div class="form-group"><label>Client</label><select id="m_client">
+              <option value="">— No Client —</option>
+            </select></div>
+        </div>
+        <div class="form-row c2">
+          <div class="form-group"><label>Annual Fee (₹)</label><input id="m_fee" type="number" min="0" placeholder="0">
+          </div>
+          <div class="form-group"><label>Status</label><select id="m_status">
+              <option>Active</option>
+              <option>Due</option>
+              <option>Expired</option>
+              <option>Cancelled</option>
+            </select></div>
+        </div>
+        <div class="form-row c2">
+          <div class="form-group"><label>Last Renewed</label><input id="m_last" type="date"></div>
+          <div class="form-group"><label>Next Renewal</label><input id="m_next" type="date"></div>
+        </div>
+        <div class="form-group"><label>Notes</label><textarea id="m_notes" placeholder="What's included…"></textarea>
+        </div>
+      </div>
+      <div class="modal-ft"><button class="btn btn-ghost" onclick="closeModal('maintenance')">Cancel</button><button
+          class="btn btn-primary" onclick="saveMaintenance()">Save Plan</button></div>
+    </div>
+  </div>
+
+  <!-- DOMAIN MODAL -->
+  <div class="overlay" id="modal-domain">
+    <div class="modal" style="max-width:560px">
+      <div class="modal-hd">
+        <div class="modal-title" id="domainModalTitle">Add Domain</div><button class="btn btn-ghost btn-icon"
+          onclick="closeModal('domain')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg></button>
+      </div>
+      <div class="modal-bd">
+        <input type="hidden" id="domainEditId">
+        <div class="form-row c2">
+          <div class="form-group"><label>Domain Name *</label><input id="d_name" placeholder="example.com"></div>
+          <div class="form-group"><label>Registrar</label><input id="d_registrar" placeholder="GoDaddy, Namecheap…">
+          </div>
+        </div>
+        <div class="form-row c2">
+          <div class="form-group"><label>DNS Provider</label><input id="d_dns" placeholder="Cloudflare, AWS Route53…">
+          </div>
+          <div class="form-group"><label>Registration Date</label><input id="d_registered" type="date"
+              onchange="setDomainExpiry()"></div>
+        </div>
+        <div class="form-row c2">
+          <div class="form-group"><label>Expiry Date</label><input id="d_expiry" type="date"></div>
+          <div class="form-group"></div>
+        </div>
+        <div class="form-sec-label">Costs</div>
+        <div class="form-row c2">
+          <div class="form-group">
+            <label>Initial Registration Cost (₹)</label>
+            <input id="d_reg_cost" type="number" min="0" placeholder="0">
+            <div class="field-note">Deducted from the linked project's profit</div>
+          </div>
+          <div class="form-group">
+            <label>Annual Renewal Cost (₹)</label>
+            <input id="d_renewal_cost" type="number" min="0" placeholder="0">
+            <div class="field-note">Deducted from yearly maintenance profit</div>
+          </div>
+        </div>
+        <div class="form-group"><label>Linked Project (optional)</label><select id="d_project">
+            <option value="">— No Project —</option>
+          </select></div>
+      </div>
+      <div class="modal-ft"><button class="btn btn-ghost" onclick="closeModal('domain')">Cancel</button><button
+          class="btn btn-primary" onclick="saveDomain()">Save Domain</button></div>
+    </div>
+  </div>
+
+  <!-- FINANCE MODAL -->
+  <div class="overlay" id="modal-finance">
+    <div class="modal" style="max-width:480px">
+      <div class="modal-hd">
+        <div class="modal-title" id="financeModalTitle">Add Transaction</div><button class="btn btn-ghost btn-icon"
+          onclick="closeModal('finance')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg></button>
+      </div>
+      <div class="modal-bd">
+        <input type="hidden" id="financeEditId">
+        <div class="form-row c2">
+          <div class="form-group"><label>Type</label><select id="f_type">
+              <option value="revenue">Revenue</option>
+              <option value="expense">Expense</option>
+            </select></div>
+          <div class="form-group"><label>Amount (₹) *</label><input id="f_amount" type="number" min="0" placeholder="0">
+          </div>
+        </div>
+        <div class="form-row c2">
+          <div class="form-group"><label>Description *</label><input id="f_desc" placeholder="What is this for?"></div>
+          <div class="form-group"><label>Date</label><input id="f_date" type="date"></div>
+        </div>
+        <div class="form-row c2">
+          <div class="form-group"><label>Category</label>
+            <select id="f_cat">
+              <option value="project">Project Payment</option>
+              <option value="maintenance">Maintenance</option>
+              <option value="freelance">Freelance</option>
+              <option value="domain">Domain</option>
+              <option value="software">Software/Tools</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Client</label><select id="f_client">
+              <option value="">— None —</option>
+            </select></div>
+        </div>
+      </div>
+      <div class="modal-ft"><button class="btn btn-ghost" onclick="closeModal('finance')">Cancel</button><button
+          class="btn btn-primary" onclick="saveFinance()">Save</button></div>
+    </div>
+  </div>
+
+
+
+
+
+
+  <!-- CONFIRM -->
+  <div class="confirm-overlay" id="confirmOverlay">
+    <div class="confirm-box">
+      <div class="confirm-title" id="confirmTitle">Delete entry?</div>
+      <div class="confirm-sub">This cannot be undone.</div>
+      <div class="flex gap-8 justify-between">
+        <button class="btn btn-ghost" onclick="cancelConfirm()">Cancel</button>
+        <button class="btn btn-danger" id="confirmOk">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ════════════════════════════════════════════════════════
+    //  DATA MODEL
+    // ════════════════════════════════════════════════════════
+    let DB = { clients: [], projects: [], maintenance: [], domains: [], finance: [] };
+    let _finTab = 'all';
+    let charts = {};
+
+    function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+
+    // ── AUTH & SYNC ──
+    let syncConfig = { token: '', gistId: '' };
+    function loadConfig() {
+      const conf = localStorage.getItem('th3_sync_config');
+      if (conf) syncConfig = JSON.parse(conf);
+    }
+    function handleLogout() {
+      localStorage.removeItem('th3_sync_config');
+      location.reload();
+    }
+    async function handleLogin() {
+      const token = document.getElementById('loginToken').value.trim() || syncConfig.token;
+      if (!token) return;
+      const msg = document.getElementById('loginMsg');
+      const btn = document.getElementById('loginBtn');
+      msg.textContent = 'Verifying and syncing...';
+      if (btn) btn.disabled = true;
+      try {
+        const resUser = await fetch('https://api.github.com/user', { headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' } });
+        if (!resUser.ok) throw new Error('Invalid GitHub Token');
+        msg.textContent = 'Finding cloud database...';
+        const resGists = await fetch('https://api.github.com/gists', { headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' } });
+        const gists = await resGists.json();
+        let targetGist = gists.find(g => g.description === 'Th3-C0der Dashboard DB');
+        if (!targetGist) {
+          msg.textContent = 'Creating new cloud database...';
+          const resCreate = await fetch('https://api.github.com/gists', { method: 'POST', headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' }, body: JSON.stringify({ description: "Th3-C0der Dashboard DB", public: false, files: { "th3fi.json": { content: JSON.stringify(DB) } } }) });
+          targetGist = await resCreate.json();
+        } else {
+          msg.textContent = 'Downloading data...';
+          const resGistData = await fetch(`https://api.github.com/gists/${targetGist.id}`, { headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' } });
+          const gistData = await resGistData.json();
+          if (gistData.files['th3fi.json']) {
+            const parsed = JSON.parse(gistData.files['th3fi.json'].content);
+            if (parsed) {
+              DB = { clients: [], projects: [], maintenance: [], domains: [], finance: [], ...parsed };
+              localStorage.setItem('th3_crm_v4', JSON.stringify(DB));
+            }
+          }
+        }
+        syncConfig = { token: token, gistId: targetGist.id };
+        localStorage.setItem('th3_sync_config', JSON.stringify(syncConfig));
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('mainApp').style.display = '';
+        const btnSync = document.getElementById('btnManualSync');
+        if (btnSync) { btnSync.style.display = 'inline-flex'; btnSync.classList.remove('btn-sync-glow'); }
+        const btnDiscard = document.getElementById('btnDiscardSync');
+        if (btnDiscard) btnDiscard.style.display = 'none';
+        renderAll();
+        updateDomainBadge();
+        document.getElementById('topbarSub').textContent = 'Cloud synced securely (Just now)';
+      } catch (e) {
+        msg.textContent = 'Error: ' + e.message;
+        msg.style.color = 'var(--red)';
+        if (btn) btn.disabled = false;
+        syncConfig.token = '';
+      }
+    }
+    async function forceSync() {
+      if (!syncConfig.token || !syncConfig.gistId) return;
+      const sub = document.getElementById('topbarSub');
+      sub.textContent = 'Syncing to cloud...';
+      try {
+        const res = await fetch(`https://api.github.com/gists/${syncConfig.gistId}`, {
+          method: 'PATCH',
+          headers: { 'Authorization': `token ${syncConfig.token}`, 'Accept': 'application/vnd.github.v3+json' },
+          body: JSON.stringify({ files: { "th3fi.json": { content: JSON.stringify(DB) } } })
+        });
+        if (res.ok) {
+          sub.textContent = 'Cloud saved (Just now)';
+          const btnSync = document.getElementById('btnManualSync');
+          if (btnSync) btnSync.classList.remove('btn-sync-glow');
+          const btnDiscard = document.getElementById('btnDiscardSync');
+          if (btnDiscard) btnDiscard.style.display = 'none';
+        }
+        else throw new Error('Failed to update Gist');
+      } catch (e) {
+        sub.textContent = 'Cloud save failed!';
+      }
+    }
+    
+    async function discardChanges() {
+      if(!confirm("Are you sure you want to discard all local changes? This will revert to the last cloud save.")) return;
+      document.getElementById('topbarSub').textContent = 'Discarding changes...';
+      await handleLogin();
+    }
+    let syncTimeout;
+    function backgroundSync() { clearTimeout(syncTimeout); syncTimeout = setTimeout(forceSync, 2000); }
+
+
+
+
+
+    // ── PERSISTENCE ──
+    function save() {
+      const str = JSON.stringify(DB);
+      localStorage.setItem('th3_crm_v4', str);
+      updateStorageInfo(str);
+      updateDomainBadge();
+      const sub = document.getElementById('topbarSub');
+      if (sub && syncConfig.token) {
+        sub.textContent = 'Unsynced changes (Click Sync Cloud)';
+        const btnSync = document.getElementById('btnManualSync');
+        if (btnSync) btnSync.classList.add('btn-sync-glow');
+        const btnDiscard = document.getElementById('btnDiscardSync');
+        if (btnDiscard) btnDiscard.style.display = 'inline-flex';
+      }
+    }
+    function load() {
+      const raw = localStorage.getItem('th3_crm_v4') || localStorage.getItem('th3_crm_v3') || localStorage.getItem('th3_crm_v2');
+      if (raw) {
+        try {
+          const p = JSON.parse(raw);
+          DB = { clients: [], projects: [], maintenance: [], domains: [], finance: [], ...p };
+          DB.domains.forEach(d => {
+            if (d.cost !== undefined && d.renewal_cost === undefined) { d.renewal_cost = d.cost; d.reg_cost = 0; delete d.cost; }
+            if (!d.dns) d.dns = ''; if (!d.registered) d.registered = ''; if (d.projectId === undefined) d.projectId = '';
+          });
+          DB.projects.forEach(p => {
+            if (!p.extraIncome) p.extraIncome = []; if (!p.extraCosts) p.extraCosts = [];
+            if (!p.opCosts) p.opCosts = []; if (!p.maintExtraIncome) p.maintExtraIncome = [];
+            if (!p.payments) {
+              p.payments = [];
+              if (p.value) p.payments.push({ label: 'Initial Payment', amount: p.value, date: p.payDate || p.createdAt || '' });
+            }
+            if (p.expectedValue === undefined) p.expectedValue = 0;
+          });
+          updateStorageInfo(raw);
+        } catch (e) { }
+      }
+    }
+    function updateStorageInfo(str) {
+      const bytes = new Blob([str || JSON.stringify(DB)]).size;
+      document.getElementById('storageSize').textContent = (bytes / 1024).toFixed(1) + ' KB';
+      document.getElementById('storageFill').style.width = Math.min((bytes / (5 * 1024 * 1024)) * 100, 100) + '%';
+    }
+    function updateDomainBadge() {
+      const n = DB.domains.filter(d => daysUntil(d.expiry) >= 0 && daysUntil(d.expiry) <= 30).length;
+      const b = document.getElementById('domainBadge');
+      if (b) { b.textContent = n; b.style.display = n > 0 ? 'inline-flex' : 'none'; }
+    }
+
+    // ── EXPORT / IMPORT ──
+    function exportJSON() {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([JSON.stringify(DB, null, 2)], { type: 'application/json' }));
+      a.download = 'th3_backup_' + new Date().toISOString().slice(0, 10) + '.json';
+      a.click();
+    }
+    function importJSON(e) {
+      const f = e.target.files[0]; if (!f) return;
+      const r = new FileReader();
+      r.onload = () => {
+        try {
+          const p = JSON.parse(r.result);
+          if (p.clients || p.projects || p.finance || p.domains) {
+            DB = { clients: [], projects: [], maintenance: [], domains: [], finance: [], ...p };
+            save(); renderAll(); alert('Imported successfully!');
+          } else alert('Invalid file format.');
+        } catch (e) { alert('Failed to parse file.'); }
+      };
+      r.readAsText(f); e.target.value = '';
+    }
+    function getAutoLedger() {
+      const ledger = [];
+      DB.projects.forEach(p => {
+        (p.payments || []).forEach(pmt => {
+          if (pmt.amount) ledger.push({ id: 'auto', isAuto: true, date: pmt.date || p.createdAt || '', desc: `Proj Payment: ${p.name} (${pmt.label})`, cat: 'project', clientId: p.clientId, type: 'revenue', amount: pmt.amount });
+        });
+        (p.extraIncome || []).filter(e => e.type !== 'Expected').forEach(e => {
+          if (e.amount) ledger.push({ id: 'auto', isAuto: true, date: e.date || p.createdAt || '', desc: `Proj Extra: ${p.name} (${e.label})`, cat: 'project', clientId: p.clientId, type: 'revenue', amount: e.amount });
+        });
+        (p.extraCosts || []).forEach(e => {
+          if (e.amount) ledger.push({ id: 'auto', isAuto: true, date: e.date || p.createdAt || '', desc: `Proj Cost: ${p.name} (${e.label})`, cat: 'project', clientId: p.clientId, type: 'expense', amount: e.amount });
+        });
+        if (p.hasMaint && p.maintFee && p.maintLast) {
+          ledger.push({ id: 'auto', isAuto: true, date: p.maintLast, desc: `Maint: ${p.name}`, cat: 'maintenance', clientId: p.clientId, type: 'revenue', amount: p.maintFee });
+        }
+        (p.opCosts || []).forEach(e => {
+          if (e.amount) ledger.push({ id: 'auto', isAuto: true, date: e.date || p.createdAt || '', desc: `Maint Cost: ${p.name} (${e.label})`, cat: 'maintenance', clientId: p.clientId, type: 'expense', amount: e.amount });
+        });
+        (p.maintExtraIncome || []).filter(e => e.type !== 'Expected').forEach(e => {
+          if (e.amount) ledger.push({ id: 'auto', isAuto: true, date: e.date || p.createdAt || '', desc: `Maint Extra: ${p.name} (${e.label})`, cat: 'maintenance', clientId: p.clientId, type: 'revenue', amount: e.amount });
+        });
+      });
+      DB.domains.forEach(d => {
+        if (d.reg_cost) {
+          ledger.push({ id: 'auto', isAuto: true, date: d.registered || d.createdAt || '', desc: `Domain Reg: ${d.name}`, cat: 'domain', clientId: d.projectId ? DB.projects.find(x => x.id === d.projectId)?.clientId : '', type: 'expense', amount: d.reg_cost });
+        }
+      });
+      DB.maintenance.forEach(m => {
+        if (m.fee && m.last) {
+          ledger.push({ id: 'auto', isAuto: true, date: m.last, desc: `Maint: ${m.name}`, cat: 'maintenance', clientId: m.clientId, type: 'revenue', amount: m.fee });
+        }
+      });
+      return ledger;
+    }
+
+    function exportCSV() {
+      const rows = [['Date', 'Type', 'Description', 'Amount', 'Category', 'Client', 'Source']];
+      const combined = [...DB.finance, ...getAutoLedger()].sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+      combined.forEach(f => rows.push([f.date, f.type, f.desc, f.amount, f.cat, clientName(f.clientId), f.isAuto ? 'Auto' : 'Manual']));
+      const csv = rows.map(r => r.map(c => '"' + String(c || '').replace(/"/g, '""') + '"').join(',')).join('\n');
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+      a.download = 'th3_finance_' + new Date().toISOString().slice(0, 10) + '.csv';
+      a.click();
+    }
+
+    // ════════════════════════════════════════════════════════
+    //  NAVIGATION
+    // ════════════════════════════════════════════════════════
+    const sectionMeta = {
+      dashboard: { title: 'Dashboard', sub: 'Overview of your freelance business' },
+      clients: { title: 'Clients', sub: 'Manage client relationships' },
+      projects: { title: 'Projects', sub: 'Track all your projects & financials' },
+      maintenance: { title: 'Maintenance', sub: 'Annual maintenance plans' },
+      domains: { title: 'Domains', sub: 'Domain portfolio & renewal costs' },
+      finance: { title: 'Finance', sub: 'Manual revenue & expense entries' },
+      analytics: { title: 'Analytics', sub: 'Charts & business insights' }
+    };
+    function navigate(id, el) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.getElementById('sec-' + id).classList.add('active');
+      if (el) el.classList.add('active');
+      const m = sectionMeta[id] || {};
+      document.getElementById('topbarTitle').textContent = m.title || id;
+      document.getElementById('topbarSub').textContent = m.sub || '';
+      renderSection(id);
+    }
+    function renderSection(id) {
+      if (id === 'dashboard') renderDashboard();
+      if (id === 'clients') renderClients();
+      if (id === 'projects') renderProjects();
+      if (id === 'maintenance') renderMaintenance();
+      if (id === 'domains') renderDomains();
+      if (id === 'finance') { populateMonthFilter(); renderFinance(); }
+      if (id === 'analytics') renderAnalytics();
+    }
+    function renderAll() { renderSection(document.querySelector('.nav-item.active')?.dataset.section || 'dashboard'); }
+
+    // ════════════════════════════════════════════════════════
+    //  HELPERS
+    // ════════════════════════════════════════════════════════
+    function daysUntil(d) { if (!d) return 9999; return Math.floor((new Date(d) - new Date()) / 86400000); }
+    function fDate(d) { if (!d) return '—'; return new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }); }
+    function fMoney(n) { if (n === null || n === undefined || n === '') return '—'; return '₹' + Number(n).toLocaleString('en-IN'); }
+    function fMoneyRaw(n) { return '₹' + Number(n || 0).toLocaleString('en-IN'); }
+    function clientName(id) { const c = DB.clients.find(c => c.id === id); return c ? c.name : (id ? id : '—'); }
+    function projectName(id) { const p = DB.projects.find(p => p.id === id); return p ? p.name : '—'; }
+    function avatarColor(s) {
+      const c = ['#10B981', '#4B8EF1', '#9C6EFF', '#D4A017', '#E05252', '#14B8A6', '#F97316', '#EC4899'];
+      let h = 0; for (let i = 0; i < (s || '').length; i++) h = s.charCodeAt(i) + ((h << 5) - h);
+      return c[Math.abs(h) % c.length];
+    }
+    function initials(n) { return (n || '?').split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase(); }
+    function dChart(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
+    function sum(arr) { return arr.reduce((s, v) => s + (+v || 0), 0); }
+    function renewalBadge(days) {
+      if (days < 0) return `<span class="badge badge-urgent">Expired</span>`;
+      if (days <= 30) return `<span class="badge badge-urgent">${days}d</span>`;
+      if (days <= 60) return `<span class="badge badge-warning">${days}d</span>`;
+      if (days <= 90) return `<span class="badge badge-onhold">${days}d</span>`;
+      return `<span class="badge badge-ok">${days}d</span>`;
+    }
+    function statusBadge(s) {
+      const m = { Active: 'active', Ongoing: 'ongoing', 'Awaiting Payment': 'ongoing', Completed: 'completed', 'On Hold': 'onhold', Archived: 'archived', Due: 'warning', Expired: 'urgent', Cancelled: 'archived', Parked: 'archived', Transferred: 'completed' };
+      return `<span class="badge badge-${m[s] || 'plain'}">${s || '—'}</span>`;
+    }
+    function typeBadge(t) {
+      const m = { Client: 'type-client', Freelance: 'type-freelance', Personal: 'type-personal' };
+      return `<span class="badge badge-${m[t] || 'plain'}">${t || ''}</span>`;
+    }
+
+    // ════════════════════════════════════════════════════════
+    //  FINANCIAL ENGINE
+    // ════════════════════════════════════════════════════════
+    function projectActualRev(p) { return sum((p.payments || []).map(e => e.amount)) + sum((p.extraIncome || []).filter(e => e.type !== 'Expected').map(e => e.amount)); }
+    function projectExpectedRev(p) { return (p.expectedValue || 0) + sum((p.extraIncome || []).filter(e => e.type === 'Expected').map(e => e.amount)); }
+    function projectCosts(p) { return sum((p.extraCosts || []).map(e => e.amount)) + DB.domains.filter(d => d.projectId === p.id).reduce((s, d) => s + (d.reg_cost || 0), 0); }
+
+    function projectActualProfit(p) { return projectActualRev(p) - projectCosts(p); }
+    function projectExpectedProfit(p) { return projectExpectedRev(p) - projectCosts(p); }
+
+    function projectMaintProfit(p) {
+      if (!p.hasMaint) return 0;
+      const maintRev = p.maintFee || 0;
+      const maintInc = sum((p.maintExtraIncome || []).map(e => e.amount));
+      const domainRen = DB.domains.filter(d => d.projectId === p.id).reduce((s, d) => s + (d.renewal_cost || 0), 0);
+      const opCosts = sum((p.opCosts || []).map(e => e.amount));
+      return maintRev + maintInc - domainRen - opCosts;
+    }
+    function standaloneMaintProfit(m) { return m.fee || 0; }
+
+    function calcFinancials() {
+      const combined = [...DB.finance, ...getAutoLedger()];
+      const totalActualRev = combined.filter(f => f.type === 'revenue').reduce((s, f) => s + f.amount, 0);
+      const totalExp = combined.filter(f => f.type === 'expense').reduce((s, f) => s + f.amount, 0);
+
+      // Project aggregates
+      const totalProjExpectedRev = DB.projects.reduce((s, p) => s + projectExpectedRev(p), 0);
+      const totalProjCosts = DB.projects.reduce((s, p) => s + projectCosts(p), 0);
+
+      const totalProjActualProfit = DB.projects.reduce((s, p) => s + projectActualProfit(p), 0);
+      const totalProjExpectedProfit = DB.projects.reduce((s, p) => s + projectExpectedProfit(p), 0);
+
+      // Maintenance aggregates
+      const projMaintRev = DB.projects.filter(p => p.hasMaint && p.maintStatus === 'Active').reduce((s, p) => s + (p.maintFee || 0), 0);
+      const standaloneMaintRev = DB.maintenance.filter(m => m.status === 'Active').reduce((s, m) => s + (m.fee || 0), 0);
+      const totalMaintRev = projMaintRev + standaloneMaintRev;
+
+      const totalMaintProfit = DB.projects.filter(p => p.hasMaint && p.maintStatus === 'Active').reduce((s, p) => s + projectMaintProfit(p), 0)
+        + DB.maintenance.filter(m => m.status === 'Active').reduce((s, m) => s + standaloneMaintProfit(m), 0);
+
+      // Totals
+      const totalExpectedRev = totalProjExpectedRev;
+
+      const totalActualProfit = totalActualRev - totalExp;
+      const totalExpectedProfit = totalExpectedRev - totalProjCosts;
+
+      const activeMaintCount = DB.projects.filter(p => p.hasMaint && p.maintStatus === 'Active').length
+        + DB.maintenance.filter(m => m.status === 'Active').length;
+
+      return {
+        finRev: 0, finExp: 0, totalProjActualRev: 0, totalProjExpectedRev, totalProjCosts,
+        totalMaintRev, totalMaintProfit,
+        totalActualRev, totalExpectedRev, totalExp,
+        totalActualProfit, totalExpectedProfit, activeMaintCount
+      };
+    }
+
+    // ════════════════════════════════════════════════════════
+    //  DYNAMIC ROW HELPERS (extra costs / income)
+    // ════════════════════════════════════════════════════════
+    function addExtraRow(containerId, kind, label = '', amount = '', type = 'Actual', date = '') {
+      const c = document.getElementById(containerId); if (!c) return;
+      const row = document.createElement('div');
+      row.className = 'extra-row';
+      let typeSelect = '';
+      if (kind === 'income' || kind === 'maintincome') {
+        typeSelect = `<select><option ${type === 'Actual' ? 'selected' : ''}>Actual</option><option ${type === 'Expected' ? 'selected' : ''}>Expected</option></select>`;
+      } else if (kind !== 'payment') {
+        typeSelect = `<span></span>`;
+      }
+
+      if (kind === 'payment') {
+        row.style.gridTemplateColumns = '1fr 130px 140px auto';
+        row.innerHTML = `
+        <input type="text" placeholder="e.g. Advance payment" value="${label}">
+        <input type="number" min="0" placeholder="₹ Amount" value="${amount}" style="width:100%">
+        <input type="date" value="${date}" style="padding:8px 4px">
+        <button class="btn-remove" onclick="this.closest('.extra-row').remove()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+      `;
+      } else {
+        row.innerHTML = `
+        <input type="text" placeholder="${kind === 'cost' ? 'e.g. Server hosting' : kind === 'opcost' ? 'e.g. Server cost/year' : kind === 'maintincome' ? 'e.g. Emergency fix' : 'e.g. Feature request'}" value="${label}">
+        <input type="number" min="0" placeholder="₹ Amount" value="${amount}" style="width:100%">
+        <input type="date" value="${date}" style="padding:8px 4px">
+        ${typeSelect}
+        <button class="btn-remove" onclick="this.closest('.extra-row').remove()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+      `;
+      }
+      c.appendChild(row);
+    }
+    function clearExtraRows(id) { const el = document.getElementById(id); if (el) el.innerHTML = ''; }
+    function getExtraRows(id) {
+      const rows = []; const el = document.getElementById(id); if (!el) return rows;
+      el.querySelectorAll('.extra-row').forEach(row => {
+        const inputs = row.querySelectorAll('input');
+        const typeSelect = row.querySelector('select');
+        const label = inputs[0].value.trim(); const amount = +inputs[1].value || 0;
+        const date = inputs[2] ? inputs[2].value : '';
+        const type = typeSelect ? typeSelect.value : 'Actual';
+        if (label || amount) rows.push({ label, amount, type, date });
+      });
+      return rows;
+    }
+    function populateExtraRows(id, data, kind) { clearExtraRows(id); (data || []).forEach(e => addExtraRow(id, kind, e.label, e.amount, e.type, e.date)); }
+
+    // ════════════════════════════════════════════════════════
+    //  MODALS
+    // ════════════════════════════════════════════════════════
+    function setDomainExpiry() {
+      const reg = document.getElementById('d_registered').value;
+      if (reg) {
+        const d = new Date(reg);
+        d.setFullYear(d.getFullYear() + 1);
+        document.getElementById('d_expiry').value = d.toISOString().slice(0, 10);
+      }
+    }
+    function toggleMaintFields() {
+      const on = document.getElementById('p_has_maint').checked;
+      document.getElementById('maintFields').style.display = on ? 'block' : 'none';
+    }
+    function openModal(type, id) {
+      populateClientDropdowns();
+      const ov = document.getElementById('modal-' + type); if (!ov) return;
+
+      if (type === 'client') {
+        document.getElementById('clientEditId').value = id || '';
+        document.getElementById('clientModalTitle').textContent = id ? 'Edit Client' : 'Add Client';
+        if (id) {
+          const c = DB.clients.find(x => x.id === id);
+          if (c) { document.getElementById('c_name').value = c.name || ''; document.getElementById('c_org').value = c.org || ''; document.getElementById('c_email').value = c.email || ''; document.getElementById('c_phone').value = c.phone || ''; document.getElementById('c_notes').value = c.notes || ''; }
+        } else['c_name', 'c_org', 'c_email', 'c_phone', 'c_notes'].forEach(f => document.getElementById(f).value = '');
+      }
+
+      if (type === 'project') {
+        document.getElementById('projectEditId').value = id || '';
+        document.getElementById('projectModalTitle').textContent = id ? 'Edit Project' : 'Add Project';
+        clearExtraRows('p_payment_rows'); clearExtraRows('p_income_rows'); clearExtraRows('p_cost_rows'); clearExtraRows('p_op_cost_rows'); clearExtraRows('p_maint_income_rows');
+        if (id) {
+          const p = DB.projects.find(x => x.id === id);
+          if (p) {
+            document.getElementById('p_name').value = p.name || '';
+            document.getElementById('p_client').value = p.clientId || '';
+            document.getElementById('p_type').value = p.type || 'Client';
+            document.getElementById('p_status').value = p.status || 'Active';
+            document.getElementById('p_exp_value').value = p.expectedValue || '';
+            document.getElementById('p_has_maint').checked = !!p.hasMaint;
+            document.getElementById('p_maint_fee').value = p.maintFee || '';
+            document.getElementById('p_maint_status').value = p.maintStatus || 'Active';
+            document.getElementById('p_maint_last').value = p.maintLast || '';
+            document.getElementById('p_maint_next').value = p.maintNext || '';
+            document.getElementById('p_notes').value = p.notes || '';
+            populateExtraRows('p_payment_rows', p.payments, 'payment');
+            populateExtraRows('p_income_rows', p.extraIncome, 'income');
+            populateExtraRows('p_cost_rows', p.extraCosts, 'cost');
+            populateExtraRows('p_op_cost_rows', p.opCosts, 'opcost');
+            populateExtraRows('p_maint_income_rows', p.maintExtraIncome, 'maintincome');
+          }
+        } else {
+          ['p_name', 'p_notes', 'p_exp_value', 'p_maint_fee'].forEach(f => document.getElementById(f).value = '');
+          ['p_maint_last', 'p_maint_next'].forEach(f => document.getElementById(f).value = '');
+          document.getElementById('p_client').value = ''; document.getElementById('p_type').value = 'Client';
+          document.getElementById('p_status').value = 'Active'; document.getElementById('p_has_maint').checked = false;
+          document.getElementById('p_maint_status').value = 'Active';
+        }
+        toggleMaintFields();
+      }
+
+      if (type === 'maintenance') {
+        document.getElementById('maintEditId').value = id || '';
+        document.getElementById('maintModalTitle').textContent = id ? 'Edit Maintenance Plan' : 'Add Maintenance Plan';
+        if (id) { const m = DB.maintenance.find(x => x.id === id); if (m) { document.getElementById('m_name').value = m.name || ''; document.getElementById('m_client').value = m.clientId || ''; document.getElementById('m_fee').value = m.fee || ''; document.getElementById('m_status').value = m.status || 'Active'; document.getElementById('m_last').value = m.last || ''; document.getElementById('m_next').value = m.next || ''; document.getElementById('m_notes').value = m.notes || ''; } }
+        else { ['m_name', 'm_last', 'm_next', 'm_notes'].forEach(f => document.getElementById(f).value = ''); document.getElementById('m_fee').value = ''; document.getElementById('m_client').value = ''; document.getElementById('m_status').value = 'Active'; }
+      }
+
+      if (type === 'domain') {
+        const pOpts = '<option value="">— No Project —</option>' + DB.projects.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+        document.getElementById('d_project').innerHTML = pOpts;
+        document.getElementById('domainEditId').value = id || '';
+        document.getElementById('domainModalTitle').textContent = id ? 'Edit Domain' : 'Add Domain';
+        if (id) {
+          const d = DB.domains.find(x => x.id === id);
+          if (d) {
+            document.getElementById('d_name').value = d.name || '';
+            document.getElementById('d_registrar').value = d.registrar || '';
+            document.getElementById('d_dns').value = d.dns || '';
+            document.getElementById('d_registered').value = d.registered || '';
+            document.getElementById('d_expiry').value = d.expiry || '';
+            document.getElementById('d_reg_cost').value = d.reg_cost || '';
+            document.getElementById('d_renewal_cost').value = d.renewal_cost || '';
+            document.getElementById('d_project').value = d.projectId || '';
+          }
+        } else {
+          ['d_name', 'd_registrar', 'd_dns', 'd_registered', 'd_expiry', 'd_reg_cost', 'd_renewal_cost'].forEach(f => document.getElementById(f).value = '');
+          document.getElementById('d_project').value = '';
+        }
+      }
+
+      if (type === 'finance') {
+        document.getElementById('financeEditId').value = id || '';
+        document.getElementById('financeModalTitle').textContent = id ? 'Edit Transaction' : 'Add Transaction';
+        if (id) { const f = DB.finance.find(x => x.id === id); if (f) { document.getElementById('f_type').value = f.type || 'revenue'; document.getElementById('f_amount').value = f.amount || ''; document.getElementById('f_desc').value = f.desc || ''; document.getElementById('f_date').value = f.date || ''; document.getElementById('f_cat').value = f.cat || 'project'; document.getElementById('f_client').value = f.clientId || ''; } }
+        else { document.getElementById('f_desc').value = ''; document.getElementById('f_amount').value = ''; document.getElementById('f_type').value = 'revenue'; document.getElementById('f_cat').value = 'project'; document.getElementById('f_client').value = ''; document.getElementById('f_date').value = new Date().toISOString().slice(0, 10); }
+      }
+      ov.classList.add('open');
+    }
+    function closeModal(t) { document.getElementById('modal-' + t).classList.remove('open'); }
+    function populateClientDropdowns() {
+      const opts = '<option value="">— No Client —</option>' + DB.clients.map(c => `<option value="${c.id}">${c.name}${c.org ? ' (' + c.org + ')' : ''}</option>`).join('');
+      ['p_client', 'm_client'].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = opts; });
+      const fOpts = '<option value="">— None —</option>' + DB.clients.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+      const fc = document.getElementById('f_client'); if (fc) fc.innerHTML = fOpts;
+    }
+
+    // ════════════════════════════════════════════════════════
+    //  SAVE FUNCTIONS
+    // ════════════════════════════════════════════════════════
+    function saveClient() {
+      const id = document.getElementById('clientEditId').value;
+      const name = document.getElementById('c_name').value.trim();
+      if (!name) { alert('Client name required.'); return; }
+      const data = { id: id || uid(), name, org: document.getElementById('c_org').value.trim(), email: document.getElementById('c_email').value.trim(), phone: document.getElementById('c_phone').value.trim(), notes: document.getElementById('c_notes').value.trim(), createdAt: id ? undefined : new Date().toISOString() };
+      if (id) { const i = DB.clients.findIndex(c => c.id === id); if (i >= 0) { data.createdAt = DB.clients[i].createdAt; DB.clients[i] = data; } } else DB.clients.push(data);
+      save(); closeModal('client'); renderClients();
+    }
+    function saveProject() {
+      const id = document.getElementById('projectEditId').value;
+      const name = document.getElementById('p_name').value.trim();
+      if (!name) { alert('Project name required.'); return; }
+      const hasMaint = document.getElementById('p_has_maint').checked;
+      const data = {
+        id: id || uid(), name,
+        clientId: document.getElementById('p_client').value,
+        type: document.getElementById('p_type').value,
+        status: document.getElementById('p_status').value,
+        expectedValue: +document.getElementById('p_exp_value').value || 0,
+        payments: getExtraRows('p_payment_rows'),
+        extraIncome: getExtraRows('p_income_rows'),
+        extraCosts: getExtraRows('p_cost_rows'),
+        hasMaint,
+        maintFee: hasMaint ? +document.getElementById('p_maint_fee').value || 0 : 0,
+        maintStatus: hasMaint ? document.getElementById('p_maint_status').value : '',
+        maintLast: hasMaint ? document.getElementById('p_maint_last').value : '',
+        maintNext: hasMaint ? document.getElementById('p_maint_next').value : '',
+        opCosts: hasMaint ? getExtraRows('p_op_cost_rows') : [],
+        maintExtraIncome: hasMaint ? getExtraRows('p_maint_income_rows') : [],
+        notes: document.getElementById('p_notes').value.trim(),
+        createdAt: id ? undefined : new Date().toISOString()
+      };
+      if (id) { const i = DB.projects.findIndex(p => p.id === id); if (i >= 0) { data.createdAt = DB.projects[i].createdAt; DB.projects[i] = data; } } else DB.projects.push(data);
+      save(); closeModal('project'); renderProjects();
+    }
+    function saveMaintenance() {
+      const id = document.getElementById('maintEditId').value;
+      const name = document.getElementById('m_name').value.trim();
+      if (!name) { alert('Plan name required.'); return; }
+      const data = { id: id || uid(), name, clientId: document.getElementById('m_client').value, fee: +document.getElementById('m_fee').value || 0, status: document.getElementById('m_status').value, last: document.getElementById('m_last').value, next: document.getElementById('m_next').value, notes: document.getElementById('m_notes').value.trim(), createdAt: id ? undefined : new Date().toISOString() };
+      if (id) { const i = DB.maintenance.findIndex(m => m.id === id); if (i >= 0) { data.createdAt = DB.maintenance[i].createdAt; DB.maintenance[i] = data; } } else DB.maintenance.push(data);
+      save(); closeModal('maintenance'); renderMaintenance();
+    }
+    function saveDomain() {
+      const id = document.getElementById('domainEditId').value;
+      const name = document.getElementById('d_name').value.trim();
+      if (!name) { alert('Domain name required.'); return; }
+      const data = {
+        id: id || uid(), name: name.toLowerCase(),
+        registrar: document.getElementById('d_registrar').value.trim(),
+        dns: document.getElementById('d_dns').value.trim(),
+        registered: document.getElementById('d_registered').value,
+        expiry: document.getElementById('d_expiry').value,
+        reg_cost: +document.getElementById('d_reg_cost').value || 0,
+        renewal_cost: +document.getElementById('d_renewal_cost').value || 0,
+        projectId: document.getElementById('d_project').value,
+        createdAt: id ? undefined : new Date().toISOString()
+      };
+      if (id) { const i = DB.domains.findIndex(d => d.id === id); if (i >= 0) { data.createdAt = DB.domains[i].createdAt; DB.domains[i] = data; } } else DB.domains.push(data);
+      save(); closeModal('domain'); renderDomains();
+    }
+    function saveFinance() {
+      const id = document.getElementById('financeEditId').value;
+      const desc = document.getElementById('f_desc').value.trim();
+      const amount = +document.getElementById('f_amount').value;
+      if (!desc || !amount) { alert('Description and amount required.'); return; }
+      const data = { id: id || uid(), type: document.getElementById('f_type').value, amount, desc, date: document.getElementById('f_date').value || new Date().toISOString().slice(0, 10), cat: document.getElementById('f_cat').value, clientId: document.getElementById('f_client').value, createdAt: id ? undefined : new Date().toISOString() };
+      if (id) { const i = DB.finance.findIndex(f => f.id === id); if (i >= 0) { data.createdAt = DB.finance[i].createdAt; DB.finance[i] = data; } } else DB.finance.push(data);
+      save(); closeModal('finance'); renderFinance();
+    }
+
+    // ════════════════════════════════════════════════════════
+    //  DELETE
+    // ════════════════════════════════════════════════════════
+    function confirmDelete(title, cb) {
+      document.getElementById('confirmTitle').textContent = title;
+      document.getElementById('confirmOverlay').style.display = 'flex';
+      document.getElementById('confirmOk').onclick = () => { cb(); cancelConfirm(); };
+    }
+    function cancelConfirm() { document.getElementById('confirmOverlay').style.display = 'none'; }
+    function deleteEntry(table, id) {
+      DB[table] = DB[table].filter(x => x.id !== id); save();
+      ({ clients: renderClients, projects: renderProjects, maintenance: renderMaintenance, domains: renderDomains, finance: renderFinance })[table]?.();
+    }
+
+    // ════════════════════════════════════════════════════════
+    //  DASHBOARD
+    // ════════════════════════════════════════════════════════
+    function renderDashboard() {
+      const fin = calcFinancials();
+      const activeProj = DB.projects.filter(p => ['Active', 'Ongoing', 'Awaiting Payment'].includes(p.status)).length;
+      const expiring30 = DB.domains.filter(d => daysUntil(d.expiry) >= 0 && daysUntil(d.expiry) <= 30).length;
+      document.getElementById('dashStats').innerHTML = `
+    <div class="stat-card c-accent"><div class="stat-label">Actual Revenue</div><div class="stat-value sm">${fMoneyRaw(fin.totalActualRev)}</div><div class="stat-sub text-green">Projects + extras + manual</div></div>
+    <div class="stat-card c-blue"><div class="stat-label">Expected Revenue</div><div class="stat-value sm">${fMoneyRaw(fin.totalExpectedRev)}</div><div class="stat-sub text-blue">Ongoing &amp; future</div></div>
+    <div class="stat-card c-red"><div class="stat-label">Total Expenses</div><div class="stat-value sm">${fMoneyRaw(fin.totalExp)}</div><div class="stat-sub text-red">Costs + reg + manual</div></div>
+    <div class="stat-card c-${fin.totalActualProfit >= 0 ? 'accent' : 'red'}"><div class="stat-label">Actual Profit</div><div class="stat-value sm ${fin.totalActualProfit >= 0 ? 'text-green' : 'text-red'}">${fMoneyRaw(fin.totalActualProfit)}</div><div class="stat-sub">Actual Rev − Expenses</div></div>
+    <div class="stat-card c-${fin.totalExpectedProfit >= 0 ? 'blue' : 'red'}"><div class="stat-label">Expected Profit</div><div class="stat-value sm ${fin.totalExpectedProfit >= 0 ? 'text-blue' : 'text-red'}">${fMoneyRaw(fin.totalExpectedProfit)}</div><div class="stat-sub">Expected Rev − Proj Costs</div></div>
+    <div class="stat-card c-purple"><div class="stat-label">Recurring Maint./yr</div><div class="stat-value sm">${fMoneyRaw(fin.totalMaintRev)}</div><div class="stat-sub">Net: ${fMoneyRaw(fin.totalMaintProfit)}/yr</div></div>
+    <div class="stat-card c-gold">
+      <div class="stat-label">Total Potential Gross</div>
+      <div class="stat-value sm">${fMoneyRaw(fin.totalActualRev + fin.totalExpectedRev)}</div>
+      <div class="stat-sub" style="margin-top:5px"><span class="text-muted">Total Net:</span> <span class="${(fin.totalActualProfit + fin.totalExpectedProfit) >= 0 ? 'text-green' : 'text-red'}">${fMoneyRaw(fin.totalActualProfit + fin.totalExpectedProfit)}</span></div>
+    </div>
+  `;
+      renderRevExpChart(); renderRenewalList(); renderClientChart(); renderTypeChart();
+    }
+    function renderRevExpChart() {
+      dChart('revExp');
+      const type = document.getElementById('dashChartRange')?.value || '6m';
+      const months = getMonthsRange(type);
+      const sub = document.getElementById('revExpSub');
+      if (sub) {
+        if (type === '6m') sub.textContent = 'Last 6 months';
+        if (type === '12m') sub.textContent = 'Last 12 months';
+        if (type === 'ty') sub.textContent = 'This year';
+        if (type === 'ly') sub.textContent = 'Last year';
+        if (type === 'all') sub.textContent = 'All time';
+      }
+      const combined = [...DB.finance, ...getAutoLedger()];
+      const actRevData = months.map(m => combined.filter(f => f.type === 'revenue' && f.date?.startsWith(m)).reduce((s, f) => s + f.amount, 0));
+      const expRevData = months.map(m => DB.projects.filter(p => p.createdAt?.startsWith(m)).reduce((s, p) => s + projectExpectedRev(p), 0));
+      const expData = months.map(m => combined.filter(f => f.type === 'expense' && f.date?.startsWith(m)).reduce((s, f) => s + f.amount, 0));
+      const labels = months.map(m => { const d = new Date(m + '-01'); return d.toLocaleDateString('en-IN', { month: 'short' }); });
+      const ctx = document.getElementById('chartRevExp'); if (!ctx) return;
+      charts['revExp'] = new Chart(ctx, {
+        type: 'bar', data: {
+          labels, datasets: [
+            { label: 'Actual Rev', data: actRevData, backgroundColor: 'rgba(16,185,129,.75)', borderRadius: 4 },
+            { label: 'Expected Rev', data: expRevData, backgroundColor: 'rgba(75,142,241,.65)', borderRadius: 4 },
+            { label: 'Expenses', data: expData, backgroundColor: 'rgba(224,82,82,.65)', borderRadius: 4 }
+          ]
+        }, options: { ...cDef(), scales: { x: { ...cAxis() }, y: { ...cAxis() } } }
+      });
+    }
+    function renderClientChart() {
+      dChart('byClient');
+      const combined = [...DB.finance, ...getAutoLedger()];
+      const top = DB.clients.map(c => ({ name: c.name, rev: combined.filter(f => f.type === 'revenue' && f.clientId === c.id).reduce((s, f) => s + f.amount, 0) })).filter(c => c.rev > 0).sort((a, b) => b.rev - a.rev).slice(0, 6);
+      const ctx = document.getElementById('chartByClient'); if (!ctx) return;
+      if (top.length === 0) { ctx.parentElement.innerHTML = '<div class="empty"><div class="empty-sub">No revenue data yet</div></div>'; return; }
+      charts['byClient'] = new Chart(ctx, { type: 'doughnut', data: { labels: top.map(c => c.name), datasets: [{ data: top.map(c => c.rev), backgroundColor: ['#10B981', '#4B8EF1', '#9C6EFF', '#D4A017', '#E05252', '#14B8A6'], borderWidth: 0 }] }, options: { ...cDef(), cutout: '65%' } });
+    }
+    function renderTypeChart() {
+      dChart('types'); const types = ['Client', 'Freelance', 'Personal'];
+      const counts = types.map(t => DB.projects.filter(p => p.type === t).length);
+      const ctx = document.getElementById('chartTypes'); if (!ctx) return;
+      if (counts.reduce((a, b) => a + b, 0) === 0) { ctx.parentElement.innerHTML = '<div class="empty"><div class="empty-sub">No projects data yet</div></div>'; return; }
+      charts['types'] = new Chart(ctx, { type: 'doughnut', data: { labels: types, datasets: [{ data: counts, backgroundColor: ['#10B981', '#9C6EFF', '#4B8EF1'], borderWidth: 0 }] }, options: { ...cDef(), cutout: '65%' } });
+    }
+    function renderRenewalList() {
+      const renewals = [];
+      DB.domains.forEach(d => { if (d.expiry) renewals.push({ name: d.name, date: d.expiry, type: 'Domain', days: daysUntil(d.expiry), cost: d.renewal_cost }); });
+      DB.maintenance.forEach(m => { if (m.next) renewals.push({ name: m.name, date: m.next, type: 'Maintenance', days: daysUntil(m.next), cost: m.fee }); });
+      DB.projects.filter(p => p.hasMaint && p.maintNext).forEach(p => renewals.push({ name: p.name + ' (Maint.)', date: p.maintNext, type: 'Maintenance', days: daysUntil(p.maintNext), cost: p.maintFee }));
+      renewals.sort((a, b) => a.days - b.days);
+      const el = document.getElementById('renewalList'); if (!el) return;
+      const top = renewals.slice(0, 6);
+      if (top.length === 0) { el.innerHTML = '<div class="empty"><div class="empty-sub">No upcoming renewals</div></div>'; return; }
+      el.innerHTML = top.map(r => {
+        const col = r.days < 0 ? 'var(--red)' : r.days <= 30 ? 'var(--red)' : r.days <= 60 ? 'var(--gold)' : 'var(--accent)';
+        return `<div class="renewal-row"><div class="renewal-dot" style="background:${col}"></div><div class="renewal-info"><div class="renewal-name">${r.name}</div><div class="renewal-sub">${r.type} · ${fDate(r.date)}${r.cost ? ' · ' + fMoneyRaw(r.cost) : ''}</div></div><div class="renewal-days" style="color:${col}">${r.days < 0 ? 'Expired' : r.days + 'd'}</div></div>`;
+      }).join('');
+    }
+
+    // ════════════════════════════════════════════════════════
+    //  CLIENTS
+    // ════════════════════════════════════════════════════════
+    function renderClients() {
+      const q = (document.getElementById('clientSearch')?.value || '').toLowerCase();
+      const list = DB.clients.filter(c => !q || c.name.toLowerCase().includes(q) || (c.org || '').toLowerCase().includes(q));
+      const el = document.getElementById('clientsTable'); if (!el) return;
+      if (list.length === 0) { el.innerHTML = `<div class="empty"><div class="empty-ico">◉</div><div class="empty-title">${q ? 'No clients match' : 'No clients yet'}</div><div class="empty-sub">${q ? '' : 'Add your first client to get started'}</div></div>`; return; }
+      const combined = [...DB.finance, ...getAutoLedger()];
+      el.innerHTML = '<div class="card"><div class="table-wrap"><table><thead><tr><th>Client</th><th>Organization</th><th>Projects</th><th>Actual Profit</th><th>Actions</th></tr></thead><tbody>' +
+        list.map(c => {
+          const projs = DB.projects.filter(p => p.clientId === c.id);
+          const prof = combined.filter(f => f.type === 'revenue' && f.clientId === c.id).reduce((s, f) => s + f.amount, 0) - combined.filter(f => f.type === 'expense' && f.clientId === c.id).reduce((s, f) => s + f.amount, 0);
+          const col = avatarColor(c.name);
+          return `<tr><td><div class="flex items-center gap-8"><div class="avatar" style="background:${col}18;color:${col}">${initials(c.name)}</div><div><div style="font-weight:500">${c.name}</div>${c.email ? `<div class="td-muted" style="font-size:11px">${c.email}</div>` : ''}</div></div></td><td class="td-muted">${c.org || '—'}</td><td><span class="badge badge-plain">${projs.length} project${projs.length !== 1 ? 's' : ''}</span></td><td class="td-mono ${prof > 0 ? 'text-green' : ''}">${prof > 0 ? fMoneyRaw(prof) : '—'}</td><td><div class="td-actions"><button class="btn btn-ghost btn-sm" onclick="openModal('client','${c.id}')">Edit</button><button class="btn btn-danger btn-sm" onclick="confirmDelete('Delete client?',()=>deleteEntry('clients','${c.id}'))">Del</button></div></td></tr>`;
+        }).join('') + '</tbody></table></div></div>';
+    }
+
+    // ════════════════════════════════════════════════════════
+    //  PROJECTS
+    // ════════════════════════════════════════════════════════
+    function profitBreakdownHTML(p) {
+      const actRev = sum((p.payments || []).map(e => e.amount));
+      const expRev = p.expectedValue || 0;
+      const actInc = sum((p.extraIncome || []).filter(e => e.type !== 'Expected').map(e => e.amount));
+      const expInc = sum((p.extraIncome || []).filter(e => e.type === 'Expected').map(e => e.amount));
+      const domainReg = DB.domains.filter(d => d.projectId === p.id).reduce((s, d) => s + (d.reg_cost || 0), 0);
+      const extraCost = sum((p.extraCosts || []).map(e => e.amount));
+
+      const actProf = projectActualProfit(p);
+      const expProf = projectExpectedProfit(p);
+
+      let html = `<div class="profit-box">`;
+      if (actRev || actInc) {
+        if (actRev) html += `<div class="pb-row"><span>Actual Revenue</span><span class="label">${fMoneyRaw(actRev)}</span></div>`;
+        if (actInc) html += `<div class="pb-row add"><span>+ Actual Extra Income</span><span class="label">${fMoneyRaw(actInc)}</span></div>`;
+      }
+      if (expRev || expInc) {
+        if (expRev) html += `<div class="pb-row"><span>Expected Revenue</span><span class="label">${fMoneyRaw(expRev)}</span></div>`;
+        if (expInc) html += `<div class="pb-row add"><span>+ Expected Extra Income</span><span class="label">${fMoneyRaw(expInc)}</span></div>`;
+      }
+      if (domainReg) html += `<div class="pb-row sub"><span>− Domain Reg. Cost</span><span class="label">${fMoneyRaw(domainReg)}</span></div>`;
+      if (extraCost) html += `<div class="pb-row sub"><span>− Additional Costs</span><span class="label">${fMoneyRaw(extraCost)}</span></div>`;
+
+      html += `<div class="pb-row total"><span>Actual Profit</span><span class="label ${actProf >= 0 ? 'text-green' : 'text-red'}">${fMoneyRaw(actProf)}</span></div>`;
+      if (expRev || expInc) {
+        html += `<div class="pb-row total" style="border-top:none;padding-top:2px;margin-top:0;color:var(--text2)"><span>Expected Profit</span><span class="label text-blue">${fMoneyRaw(expProf)}</span></div>`;
+      }
+
+      if (p.hasMaint) {
+        const mFee = p.maintFee || 0;
+        const mInc = sum((p.maintExtraIncome || []).filter(e => e.type !== 'Expected').map(e => e.amount));
+        const mIncExp = sum((p.maintExtraIncome || []).filter(e => e.type === 'Expected').map(e => e.amount));
+        const mRen = DB.domains.filter(d => d.projectId === p.id).reduce((s, d) => s + (d.renewal_cost || 0), 0);
+        const mOp = sum((p.opCosts || []).map(e => e.amount));
+        const mProfitAct = mFee + mInc - mRen - mOp;
+        const mProfitExp = mFee + mIncExp - mRen - mOp;
+
+        html += `</div><div class="profit-box">
+      <div class="pb-row"><span>Maint. Revenue/yr</span><span class="label">${fMoneyRaw(mFee)}</span></div>`;
+        if (mInc) html += `<div class="pb-row add"><span>+ Maint. Actual Extra</span><span class="label">${fMoneyRaw(mInc)}</span></div>`;
+        if (mIncExp) html += `<div class="pb-row add"><span>+ Maint. Expected Extra</span><span class="label">${fMoneyRaw(mIncExp)}</span></div>`;
+        if (mRen) html += `<div class="pb-row sub"><span>− Domain Renewals</span><span class="label">${fMoneyRaw(mRen)}</span></div>`;
+        if (mOp) html += `<div class="pb-row sub"><span>− Op. Costs/yr</span><span class="label">${fMoneyRaw(mOp)}</span></div>`;
+
+        html += `<div class="pb-row total"><span>Maint. Actual Profit</span><span class="label ${mProfitAct >= 0 ? 'text-green' : 'text-red'}">${fMoneyRaw(mProfitAct)}</span></div>`;
+        if (mIncExp) {
+          html += `<div class="pb-row total" style="border-top:none;padding-top:2px;margin-top:0;color:var(--text2)"><span>Maint. Expected Profit</span><span class="label text-blue">${fMoneyRaw(mProfitExp)}</span></div>`;
+        }
+      }
+      html += `</div>`;
+      return html;
+    }
+    function renderProjects() {
+      const q = (document.getElementById('projectSearch')?.value || '').toLowerCase();
+      const sf = document.getElementById('projectStatusFilter')?.value || '';
+      const tf = document.getElementById('projectTypeFilter')?.value || '';
+      const list = DB.projects.filter(p => (!q || p.name.toLowerCase().includes(q) || clientName(p.clientId).toLowerCase().includes(q)) && (!sf || p.status === sf) && (!tf || p.type === tf));
+      const el = document.getElementById('projectsTable'); if (!el) return;
+      if (list.length === 0) { el.innerHTML = `<div class="empty"><div class="empty-ico">◈</div><div class="empty-title">No projects found</div><div class="empty-sub">Add your first project</div></div>`; return; }
+      el.innerHTML = list.map(p => {
+        const domains = DB.domains.filter(d => d.projectId === p.id);
+        return `<div class="card" style="margin-bottom:12px">
+      <div class="card-header">
+        <div>
+          <div style="font-weight:600;font-size:14px">${p.name} ${typeBadge(p.type)} ${statusBadge(p.status)}</div>
+          <div class="td-muted" style="font-size:12px;margin-top:3px">${clientName(p.clientId)}${domains.length ? ' · ' + domains.map(d => d.name).join(', ') : ''}</div>
+          ${p.notes ? `<div class="td-muted" style="font-size:11px;margin-top:3px">${p.notes}</div>` : ''}
+        </div>
+        <div class="flex gap-4">
+          <button class="btn btn-ghost btn-sm" onclick="openModal('project','${p.id}')">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="confirmDelete('Delete project?',()=>deleteEntry('projects','${p.id}'))">Del</button>
+        </div>
+      </div>
+      <div class="${p.hasMaint ? 'grid-2' : ''}">
+        ${profitBreakdownHTML(p)}
+      </div>
+      ${p.hasMaint ? `<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <span style="font-size:12px;color:var(--text3)">Maintenance:</span>
+        ${statusBadge(p.maintStatus)}
+        <span style="font-size:12px;color:var(--text2)">Next: ${fDate(p.maintNext)}</span>
+        ${renewalBadge(daysUntil(p.maintNext))}
+      </div>`: ''}
+    </div>`;
+      }).join('');
+    }
+
+    // ════════════════════════════════════════════════════════
+    //  MAINTENANCE
+    // ════════════════════════════════════════════════════════
+    function renderMaintenance() {
+      const q = (document.getElementById('maintSearch')?.value || '').toLowerCase();
+      const standalone = DB.maintenance.filter(m => !q || m.name.toLowerCase().includes(q) || clientName(m.clientId).toLowerCase().includes(q));
+      const projMaint = DB.projects.filter(p => p.hasMaint && (!q || p.name.toLowerCase().includes(q) || clientName(p.clientId).toLowerCase().includes(q)));
+      const el = document.getElementById('maintenanceTable');
+      const statsEl = document.getElementById('maintStats');
+      if (!el) return;
+      const fin = calcFinancials();
+      const allActive = DB.maintenance.filter(m => m.status === 'Active').length + DB.projects.filter(p => p.hasMaint && p.maintStatus === 'Active').length;
+      const due30 = DB.maintenance.filter(m => daysUntil(m.next) >= 0 && daysUntil(m.next) <= 30).length + DB.projects.filter(p => p.hasMaint && daysUntil(p.maintNext) >= 0 && daysUntil(p.maintNext) <= 30).length;
+      if (statsEl) statsEl.innerHTML = `
+    <div class="stat-card c-accent"><div class="stat-label">Active Plans</div><div class="stat-value">${allActive}</div></div>
+    <div class="stat-card c-accent"><div class="stat-label">Gross Recurring/yr</div><div class="stat-value sm">${fMoneyRaw(fin.totalMaintRev)}</div></div>
+    <div class="stat-card c-${fin.totalMaintProfit >= 0 ? 'accent' : 'red'}"><div class="stat-label">Net Maint. Profit/yr</div><div class="stat-value sm ${fin.totalMaintProfit >= 0 ? 'text-green' : 'text-red'}">${fMoneyRaw(fin.totalMaintProfit)}</div><div class="stat-sub">After all deductions</div></div>
+    <div class="stat-card c-gold"><div class="stat-label">Due (30d)</div><div class="stat-value">${due30}</div></div>
+  `;
+      if (standalone.length === 0 && projMaint.length === 0) { el.innerHTML = `<div class="empty"><div class="empty-ico">◌</div><div class="empty-title">No maintenance plans yet</div><div class="empty-sub">Add plans here or enable maintenance on a project</div></div>`; return; }
+      const rows = [
+        ...standalone.map(m => { const days = daysUntil(m.next); return `<tr><td><div style="font-weight:500">${m.name}</div></td><td class="td-muted">${clientName(m.clientId)}</td><td class="td-mono text-green">${fMoneyRaw(m.fee)}</td><td class="td-mono text-green">${fMoneyRaw(m.fee)}</td><td>${statusBadge(m.status)}</td><td class="td-muted td-mono">${fDate(m.last)}</td><td class="td-mono">${fDate(m.next)}</td><td>${renewalBadge(days)}</td><td><div class="td-actions"><button class="btn btn-ghost btn-sm" onclick="openModal('maintenance','${m.id}')">Edit</button><button class="btn btn-danger btn-sm" onclick="confirmDelete('Delete plan?',()=>deleteEntry('maintenance','${m.id}'))">Del</button></div></td></tr>`; }),
+        ...projMaint.map(p => { const days = daysUntil(p.maintNext); const mProfit = projectMaintProfit(p); return `<tr><td><div style="font-weight:500">${p.name}</div><div class="td-muted" style="font-size:11px">Via project</div></td><td class="td-muted">${clientName(p.clientId)}</td><td class="td-mono text-green">${fMoneyRaw(p.maintFee)}</td><td class="td-mono ${mProfit >= 0 ? 'text-green' : 'text-red'}">${fMoneyRaw(mProfit)}</td><td>${statusBadge(p.maintStatus)}</td><td class="td-muted td-mono">${fDate(p.maintLast)}</td><td class="td-mono">${fDate(p.maintNext)}</td><td>${renewalBadge(days)}</td><td><div class="td-actions"><button class="btn btn-ghost btn-sm" onclick="openModal('project','${p.id}')">Edit</button></div></td></tr>`; }),
+      ];
+      el.innerHTML = '<div class="card"><div class="table-wrap"><table><thead><tr><th>Plan</th><th>Client</th><th>Gross Fee</th><th>Net Profit/yr</th><th>Status</th><th>Last Renewed</th><th>Next Renewal</th><th>Days Left</th><th>Actions</th></tr></thead><tbody>' + rows.join('') + '</tbody></table></div></div>';
+    }
+
+    // ════════════════════════════════════════════════════════
+    //  DOMAINS
+    // ════════════════════════════════════════════════════════
+    function renderDomains() {
+      const q = (document.getElementById('domainSearch')?.value || '').toLowerCase();
+      let list = DB.domains.filter(d => !q || d.name.toLowerCase().includes(q) || (d.registrar || '').toLowerCase().includes(q));
+      list.sort((a, b) => daysUntil(a.expiry) - daysUntil(b.expiry));
+      const el = document.getElementById('domainsTable'); const statsEl = document.getElementById('domainStats'); if (!el) return;
+      const exp30 = DB.domains.filter(d => daysUntil(d.expiry) >= 0 && daysUntil(d.expiry) <= 30).length;
+      const totalReg = DB.domains.reduce((s, d) => s + (d.reg_cost || 0), 0);
+      const totalRen = DB.domains.reduce((s, d) => s + (d.renewal_cost || 0), 0);
+      if (statsEl) statsEl.innerHTML = `
+    <div class="stat-card c-blue"><div class="stat-label">Total Domains</div><div class="stat-value">${DB.domains.length}</div></div>
+    <div class="stat-card c-red"><div class="stat-label">Expiring (30d)</div><div class="stat-value">${exp30}</div></div>
+    <div class="stat-card c-gold"><div class="stat-label">Total Reg. Costs</div><div class="stat-value sm">${fMoneyRaw(totalReg)}</div><div class="stat-sub">Deducted from project profit</div></div>
+    <div class="stat-card c-red"><div class="stat-label">Annual Renewal Costs</div><div class="stat-value sm">${fMoneyRaw(totalRen)}</div><div class="stat-sub">Deducted from maint. profit</div></div>
+  `;
+      if (list.length === 0) { el.innerHTML = `<div class="empty"><div class="empty-ico">◎</div><div class="empty-title">No domains found</div><div class="empty-sub">Track all managed domains here</div></div>`; return; }
+      el.innerHTML = '<div class="card"><div class="table-wrap"><table><thead><tr><th>Domain</th><th>Registrar</th><th>DNS</th><th>Linked Project</th><th>Registered</th><th>Expiry</th><th>Reg. Cost</th><th>Renewal/yr</th><th>Status</th><th>Actions</th></tr></thead><tbody>' +
+        list.map(d => {
+          const days = daysUntil(d.expiry);
+          return `<tr><td><div class="td-mono" style="font-weight:500">${d.name}</div></td><td class="td-muted">${d.registrar || '—'}</td><td class="td-muted">${d.dns || '—'}</td><td class="td-muted">${d.projectId ? projectName(d.projectId) : '—'}</td><td class="td-mono td-muted">${fDate(d.registered)}</td><td class="td-mono">${fDate(d.expiry)}</td><td class="td-mono ${d.reg_cost ? 'text-red' : ''}">${d.reg_cost ? fMoneyRaw(d.reg_cost) : '—'}</td><td class="td-mono ${d.renewal_cost ? 'text-red' : ''}">${d.renewal_cost ? fMoneyRaw(d.renewal_cost) : '—'}</td><td>${renewalBadge(days)}</td><td><div class="td-actions"><button class="btn btn-ghost btn-sm" onclick="openModal('domain','${d.id}')">Edit</button><button class="btn btn-danger btn-sm" onclick="confirmDelete('Delete domain?',()=>deleteEntry('domains','${d.id}'))">Del</button></div></td></tr>`;
+        }).join('') + '</tbody></table></div></div>';
+    }
+
+    // ════════════════════════════════════════════════════════
+    //  FINANCE
+    // ════════════════════════════════════════════════════════
+    function switchFinTab(tab, el) { _finTab = tab; document.querySelectorAll('.tab-bar .tab').forEach(t => t.classList.remove('active')); el.classList.add('active'); renderFinance(); }
+    function populateMonthFilter() {
+      const sel = document.getElementById('financeMonthFilter'); if (!sel) return;
+      const combined = [...DB.finance, ...getAutoLedger()];
+      const months = new Set(combined.map(f => f.date?.slice(0, 7)).filter(Boolean));
+      const sorted = [...months].sort().reverse();
+      sel.innerHTML = '<option value="">All Time</option>' + sorted.map(m => { const d = new Date(m + '-01'); return `<option value="${m}">${d.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' })}</option>`; }).join('');
+    }
+    function renderFinance() {
+      const q = (document.getElementById('financeSearch')?.value || '').toLowerCase();
+      const mf = document.getElementById('financeMonthFilter')?.value || '';
+      const combined = [...DB.finance, ...getAutoLedger()];
+      let list = combined.filter(f => (_finTab === 'all' || f.type === _finTab) && (!q || f.desc.toLowerCase().includes(q)) && (!mf || (f.date || '').startsWith(mf))).sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+      const el = document.getElementById('financeTable'); const statsEl = document.getElementById('financeStats'); if (!el) return;
+      const fin = calcFinancials();
+      if (statsEl) statsEl.innerHTML = `
+    <div class="stat-card c-accent"><div class="stat-label">Actual Revenue</div><div class="stat-value sm">${fMoneyRaw(fin.totalActualRev)}</div></div>
+    <div class="stat-card c-blue"><div class="stat-label">Expected Revenue</div><div class="stat-value sm">${fMoneyRaw(fin.totalExpectedRev)}</div></div>
+    <div class="stat-card c-red"><div class="stat-label">Total Expenses</div><div class="stat-value sm">${fMoneyRaw(fin.totalExp)}</div></div>
+    <div class="stat-card c-${fin.totalActualProfit >= 0 ? 'accent' : 'red'}"><div class="stat-label">Actual Profit</div><div class="stat-value sm ${fin.totalActualProfit >= 0 ? 'text-green' : 'text-red'}">${fMoneyRaw(fin.totalActualProfit)}</div></div>
+  `;
+      if (list.length === 0) { el.innerHTML = `<div class="empty"><div class="empty-ico">◆</div><div class="empty-title">No transactions found</div><div class="empty-sub">Add entries manually or save a project</div></div>`; return; }
+      const catMap = { project: 'Project', maintenance: 'Maintenance', freelance: 'Freelance', domain: 'Domain', software: 'Software', other: 'Other' };
+      el.innerHTML = '<div class="card"><div style="display:flex;justify-content:flex-end;margin-bottom:10px"><button class="btn btn-ghost btn-sm" onclick="exportCSV()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>Export CSV</button></div><div class="table-wrap"><table><thead><tr><th>Date</th><th>Description</th><th>Category</th><th>Client</th><th>Type</th><th>Amount</th><th>Actions</th></tr></thead><tbody>' +
+        list.map(f => {
+          const pos = f.type === 'revenue';
+          const acts = f.isAuto ? `<span class="badge badge-plain">Auto Ledger</span>` : `<button class="btn btn-ghost btn-sm" onclick="openModal('finance','${f.id}')">Edit</button><button class="btn btn-danger btn-sm" onclick="confirmDelete('Delete transaction?',()=>deleteEntry('finance','${f.id}'))">Del</button>`;
+          return `<tr><td class="td-mono td-muted">${fDate(f.date)}</td><td style="font-weight:500">${f.desc}</td><td><span class="badge badge-plain">${catMap[f.cat] || f.cat}</span></td><td class="td-muted">${clientName(f.clientId)}</td><td><span class="badge ${pos ? 'badge-active' : 'badge-urgent'}">${f.type}</span></td><td class="td-mono ${pos ? 'text-green' : 'text-red'}" style="font-weight:600">${pos ? '+' : '−'}${fMoneyRaw(f.amount)}</td><td><div class="td-actions">${acts}</div></td></tr>`;
+        }).join('') + '</tbody></table></div></div>';
+    }
+
+    // ════════════════════════════════════════════════════════
+    //  ANALYTICS
+    // ════════════════════════════════════════════════════════
+    function renderAnalytics() {
+      const fin = calcFinancials();
+      const yr = new Date().getFullYear().toString();
+      const combined = [...DB.finance, ...getAutoLedger()];
+      const yrRev = combined.filter(f => f.type === 'revenue' && f.date?.startsWith(yr)).reduce((s, f) => s + f.amount, 0);
+      const statsEl = document.getElementById('analyticsStats');
+      if (statsEl) statsEl.innerHTML = `
+    <div class="stat-card c-accent"><div class="stat-label">All-time Actual Rev</div><div class="stat-value sm">${fMoneyRaw(fin.totalActualRev)}</div></div>
+    <div class="stat-card c-blue"><div class="stat-label">All-time Expected Rev</div><div class="stat-value sm">${fMoneyRaw(fin.totalExpectedRev)}</div></div>
+    <div class="stat-card c-${fin.totalActualProfit >= 0 ? 'accent' : 'red'}"><div class="stat-label">Actual Profit (All-time)</div><div class="stat-value sm ${fin.totalActualProfit >= 0 ? 'text-green' : 'text-red'}">${fMoneyRaw(fin.totalActualProfit)}</div></div>
+    <div class="stat-card c-${fin.totalExpectedProfit >= 0 ? 'blue' : 'red'}"><div class="stat-label">Expected Profit (All-time)</div><div class="stat-value sm ${fin.totalExpectedProfit >= 0 ? 'text-blue' : 'text-red'}">${fMoneyRaw(fin.totalExpectedProfit)}</div></div>
+    <div class="stat-card c-${fin.totalMaintProfit >= 0 ? 'accent' : 'red'}"><div class="stat-label">Net Maint. Profit/yr</div><div class="stat-value sm ${fin.totalMaintProfit >= 0 ? 'text-green' : 'text-red'}">${fMoneyRaw(fin.totalMaintProfit)}</div></div>
+    <div class="stat-card c-gold"><div class="stat-label">${yr} Actual Revenue</div><div class="stat-value sm">${fMoneyRaw(yrRev)}</div></div>
+    <div class="stat-card c-gold">
+      <div class="stat-label">Total Potential Gross</div>
+      <div class="stat-value sm">${fMoneyRaw(fin.totalActualRev + fin.totalExpectedRev)}</div>
+      <div class="stat-sub" style="margin-top:5px"><span class="text-muted">Total Net:</span> <span class="${(fin.totalActualProfit + fin.totalExpectedProfit) >= 0 ? 'text-green' : 'text-red'}">${fMoneyRaw(fin.totalActualProfit + fin.totalExpectedProfit)}</span></div>
+    </div>
+  `;
+      renderProfitChart(); renderDomainForecastChart(); renderRevTimelineChart(); renderTopClients(); renderMaintProjection();
+    }
+    function renderProfitChart() {
+      dChart('profit');
+      const type = document.getElementById('profitChartRange')?.value || '12m';
+      const months = getMonthsRange(type);
+      const sub = document.getElementById('profitSub');
+      if (sub) {
+        if (type === '6m') sub.textContent = 'Last 6 months';
+        if (type === '12m') sub.textContent = 'Last 12 months';
+        if (type === 'ty') sub.textContent = 'This year';
+        if (type === 'ly') sub.textContent = 'Last year';
+        if (type === 'all') sub.textContent = 'All time';
+      }
+      const combined = [...DB.finance, ...getAutoLedger()];
+      const data = months.map(m => {
+        let r = combined.filter(f => f.type === 'revenue' && f.date?.startsWith(m)).reduce((s, f) => s + f.amount, 0);
+        let e = combined.filter(f => f.type === 'expense' && f.date?.startsWith(m)).reduce((s, f) => s + f.amount, 0);
+        return r - e;
+      });
+      const labels = months.map(m => { const d = new Date(m + '-01'); return d.toLocaleDateString('en-IN', { month: 'short', year: '2-digit' }); });
+      const ctx = document.getElementById('chartProfit'); if (!ctx) return;
+      charts['profit'] = new Chart(ctx, { type: 'line', data: { labels, datasets: [{ label: 'Actual Profit', data, borderColor: '#10B981', backgroundColor: 'rgba(16,185,129,.08)', fill: true, tension: .4, pointRadius: 3, pointBackgroundColor: '#10B981' }] }, options: { ...cDef(), scales: { x: { ...cAxis() }, y: { ...cAxis() } } } });
+    }
+    function renderDomainForecastChart() {
+      dChart('domainForecast');
+      const type = document.getElementById('domainForecastRange')?.value || '6m';
+      const next = getNextMonthsRange(type);
+      const sub = document.getElementById('domainForecastSub');
+      if (sub) {
+        if (type === '0m') sub.textContent = 'Current month';
+        if (type === '1m') sub.textContent = 'Next month';
+        if (type === '3m') sub.textContent = 'Next 3 months';
+        if (type === '6m') sub.textContent = 'Next 6 months';
+        if (type === '12m') sub.textContent = 'Next 12 months';
+      }
+      const data = next.map(m => DB.domains.filter(d => d.expiry?.startsWith(m)).reduce((s, d) => s + (d.renewal_cost || 0), 0));
+      const labels = next.map(m => { const d = new Date(m + '-01'); return d.toLocaleDateString('en-IN', { month: 'short', year: '2-digit' }); });
+      const ctx = document.getElementById('chartDomainForecast'); if (!ctx) return;
+      charts['domainForecast'] = new Chart(ctx, { type: 'bar', data: { labels, datasets: [{ label: 'Renewal Cost (₹)', data, backgroundColor: 'rgba(212,160,23,.65)', borderRadius: 4 }] }, options: { ...cDef(), scales: { x: { ...cAxis() }, y: { ...cAxis() } } } });
+    }
+    function renderRevTimelineChart() {
+      dChart('revTimeline');
+      const type = document.getElementById('timelineChartRange')?.value || '12m';
+      const months = getMonthsRange(type);
+      const sub = document.getElementById('timelineSub');
+      if (sub) {
+        if (type === '6m') sub.textContent = 'Last 6 months';
+        if (type === '12m') sub.textContent = 'Last 12 months';
+        if (type === 'ty') sub.textContent = 'This year';
+        if (type === 'ly') sub.textContent = 'Last year';
+        if (type === 'all') sub.textContent = 'All time';
+      }
+      const combined = [...DB.finance, ...getAutoLedger()];
+      const actRevData = months.map(m => combined.filter(f => f.type === 'revenue' && f.date?.startsWith(m)).reduce((s, f) => s + f.amount, 0));
+      const expRevData = months.map(m => DB.projects.filter(p => p.createdAt?.startsWith(m)).reduce((s, p) => s + projectExpectedRev(p), 0));
+      const labels = months.map(m => { const d = new Date(m + '-01'); return d.toLocaleDateString('en-IN', { month: 'short', year: '2-digit' }); });
+      const ctx = document.getElementById('chartRevTimeline'); if (!ctx) return;
+      charts['revTimeline'] = new Chart(ctx, {
+        type: 'line', data: {
+          labels, datasets: [
+            { label: 'Actual Rev', data: actRevData, borderColor: '#10B981', backgroundColor: 'rgba(16,185,129,.06)', fill: true, tension: .3, pointRadius: 3 },
+            { label: 'Expected Rev', data: expRevData, borderColor: '#4B8EF1', backgroundColor: 'rgba(75,142,241,.06)', fill: true, tension: .3, pointRadius: 3 }
+          ]
+        }, options: { ...cDef(), scales: { x: { ...cAxis() }, y: { ...cAxis() } } }
+      });
+    }
+    function renderTopClients() {
+      const el = document.getElementById('topClientsEl'); if (!el) return;
+      const combined = [...DB.finance, ...getAutoLedger()];
+      const clients = DB.clients.map(c => {
+        const rev = combined.filter(f => f.type === 'revenue' && f.clientId === c.id).reduce((s, f) => s + f.amount, 0);
+        return { ...c, rev, proj: DB.projects.filter(p => p.clientId === c.id).length };
+      }).filter(c => c.rev > 0).sort((a, b) => b.rev - a.rev);
+      if (clients.length === 0) { el.innerHTML = '<div class="empty"><div class="empty-sub">No actual revenue data yet</div></div>'; return; }
+      const max = clients[0].rev;
+      el.innerHTML = clients.slice(0, 8).map(c => {
+        const pct = Math.round((c.rev / max) * 100); const col = avatarColor(c.name);
+        return `<div style="margin-bottom:12px"><div class="flex items-center justify-between mb-8"><div class="flex items-center gap-8"><div class="avatar avatar-sm" style="background:${col}18;color:${col}">${initials(c.name)}</div><span style="font-size:13px">${c.name}</span><span class="badge badge-plain">${c.proj}p</span></div><span class="td-mono text-green" style="font-size:13px">${fMoneyRaw(c.rev)}</span></div><div class="prog-bar"><div class="prog-fill" style="width:${pct}%;background:${col}"></div></div></div>`;
+      }).join('');
+    }
+    function renderMaintProjection() {
+      const el = document.getElementById('maintProjectionEl'); if (!el) return;
+      const fin = calcFinancials();
+      const plans = [
+        ...DB.maintenance.filter(m => m.status === 'Active').map(m => ({ name: m.name, client: clientName(m.clientId), gross: m.fee, profit: standaloneMaintProfit(m), next: m.next, days: daysUntil(m.next) })),
+        ...DB.projects.filter(p => p.hasMaint && p.maintStatus === 'Active').map(p => ({ name: p.name, client: clientName(p.clientId), gross: p.maintFee, profit: projectMaintProfit(p), next: p.maintNext, days: daysUntil(p.maintNext) }))
+      ].sort((a, b) => a.days - b.days);
+      if (plans.length === 0) { el.innerHTML = '<div class="empty"><div class="empty-sub">No active maintenance plans</div></div>'; return; }
+      el.innerHTML = `<div class="profit-box" style="margin-bottom:12px">
+    <div class="pb-row"><span>Gross Recurring/yr</span><span class="label">${fMoneyRaw(fin.totalMaintRev)}</span></div>
+    <div class="pb-row total"><span>Net Maint. Profit/yr</span><span class="label ${fin.totalMaintProfit >= 0 ? 'text-green' : 'text-red'}">${fMoneyRaw(fin.totalMaintProfit)}</span></div>
+    <div class="pb-row"><span>Monthly avg</span><span class="label">${fMoneyRaw(Math.round(fin.totalMaintProfit / 12))}</span></div>
+  </div>`+ plans.map(p => `<div class="renewal-row"><div class="renewal-dot" style="background:${p.days <= 30 ? 'var(--gold)' : 'var(--accent)'}"></div><div class="renewal-info"><div class="renewal-name">${p.name}</div><div class="renewal-sub">${p.client} · Next: ${fDate(p.next)}</div></div><div style="text-align:right"><div class="td-mono text-green" style="font-size:13px">${fMoneyRaw(p.gross)}</div><div style="font-size:10px;color:var(--text3)">net ${fMoneyRaw(p.profit)}</div></div></div>`).join('');
+    }
+
+    // ════════════════════════════════════════════════════════
+    //  CHART CONFIG
+    // ════════════════════════════════════════════════════════
+    function cDef() { return { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#8B949E', font: { family: 'Inter', size: 11 }, boxWidth: 10, padding: 14 } }, tooltip: { backgroundColor: '#21293A', titleColor: '#E6EDF3', bodyColor: '#8B949E', borderColor: '#2D3A4E', borderWidth: 1, padding: 10 } } }; }
+    function cAxis() { return { ticks: { color: '#484F58', font: { size: 10, family: 'Inter' } }, grid: { color: 'rgba(255,255,255,.03)' } }; }
+    function last6Months() { const m = []; for (let i = 5; i >= 0; i--) { const d = new Date(); d.setDate(1); d.setMonth(d.getMonth() - i); m.push(d.toISOString().slice(0, 7)); } return m; }
+    function last12Months() { const m = []; for (let i = 11; i >= 0; i--) { const d = new Date(); d.setDate(1); d.setMonth(d.getMonth() - i); m.push(d.toISOString().slice(0, 7)); } return m; }
+    function getNextMonthsRange(type) {
+      const m = []; const d = new Date(); d.setDate(1);
+      let count = 6;
+      if (type === '0m') count = 1;
+      else if (type === '1m') count = 2;
+      else if (type === '3m') count = 3;
+      else if (type === '6m') count = 6;
+      else if (type === '12m') count = 12;
+      for (let i = 0; i < count; i++) { const temp = new Date(d); temp.setMonth(temp.getMonth() + i); m.push(temp.toISOString().slice(0, 7)); }
+      return m;
+    }
+
+    function getMonthsRange(type) {
+      const m = []; const d = new Date();
+      if (type === '6m') {
+        for (let i = 5; i >= 0; i--) { const temp = new Date(d); temp.setDate(1); temp.setMonth(temp.getMonth() - i); m.push(temp.toISOString().slice(0, 7)); }
+      } else if (type === '12m') {
+        for (let i = 11; i >= 0; i--) { const temp = new Date(d); temp.setDate(1); temp.setMonth(temp.getMonth() - i); m.push(temp.toISOString().slice(0, 7)); }
+      } else if (type === 'ty') {
+        const yr = d.getFullYear(); const currM = d.getMonth();
+        for (let i = 0; i <= currM; i++) { m.push(`${yr}-${String(i + 1).padStart(2, '0')}`); }
+      } else if (type === 'ly') {
+        const yr = d.getFullYear() - 1;
+        for (let i = 1; i <= 12; i++) { m.push(`${yr}-${String(i).padStart(2, '0')}`); }
+      } else if (type === 'all') {
+        const combined = [...DB.finance, ...getAutoLedger()];
+        let earliest = d.toISOString().slice(0, 7);
+        combined.forEach(f => { if (f.date && f.date.slice(0, 7) < earliest) earliest = f.date.slice(0, 7); });
+        DB.projects.forEach(p => { if (p.createdAt && p.createdAt.slice(0, 7) < earliest) earliest = p.createdAt.slice(0, 7); });
+        let [ey, em] = earliest.split('-').map(Number);
+        let [cy, cm] = d.toISOString().slice(0, 7).split('-').map(Number);
+        while (ey < cy || (ey === cy && em <= cm)) {
+          m.push(`${ey}-${String(em).padStart(2, '0')}`);
+          em++; if (em > 12) { em = 1; ey++; }
+        }
+        if (m.length > 60) m.splice(0, m.length - 60); // Cap at 5 years for chart readability
+      }
+      return m;
+    }
+
+    // ════════════════════════════════════════════════════════
+    //  INIT + MIGRATION
+    // ════════════════════════════════════════════════════════
+    function toggleSidebar() {
+      const sb = document.querySelector('.sidebar');
+      const ov = document.getElementById('sidebarOverlay');
+      if (sb.classList.contains('open')) {
+        sb.classList.remove('open');
+        ov.classList.remove('open');
+      } else {
+        sb.classList.add('open');
+        ov.classList.add('open');
+      }
+    }
+
+    // Auto-close sidebar on mobile when navigating
+    const originalNavigate = navigate;
+    navigate = function (id, el) {
+      originalNavigate(id, el);
+      if (window.innerWidth <= 768) {
+        document.querySelector('.sidebar').classList.remove('open');
+        document.getElementById('sidebarOverlay').classList.remove('open');
+      }
+    };
+
+    async function initApp() {
+      load();
+      loadConfig();
+      if (syncConfig.token) {
+        document.getElementById('loginMsg').textContent = 'Auto-logging in...';
+        await handleLogin();
+      } else {
+        // App remains hidden, login screen remains visible
+      }
+    }
+    initApp();
+  </script>
+</body>
+
+</html>

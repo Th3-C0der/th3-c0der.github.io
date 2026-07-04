@@ -467,22 +467,17 @@ class PokemonEffect {
 
 // Initialize Pokemon Effect
 function initPokemonEffect() {
-    // Check if anime.js is loaded
-    if (typeof anime === 'undefined') {
-        console.warn('Pokemon Effect: anime.js not loaded, waiting...');
-        setTimeout(initPokemonEffect, 100);
-        return;
-    }
-
-    window.pokemonEffect = new PokemonEffect();
+    return; // Pokemon animations disabled
 }
 
 // Export for ES modules
 export { initPokemonEffect, PokemonEffect };
 
-// Auto-initialize when DOM is ready
+// Auto-initialize disabled
+/*
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initPokemonEffect);
 } else {
     initPokemonEffect();
 }
+*/

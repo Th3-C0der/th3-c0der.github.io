@@ -31,9 +31,6 @@ Experience the full interactive portfolio and explore the playground at:
 A versatile and dynamic AI assistant specializing in creative problem-solving and advanced image generation.
 [Visit DynaSpark](https://dynaspark.onrender.com)
 
-### 🎬 Th3-Movies
-A comprehensive streaming platform for Movies, TV Series, and Anime with real-time trending content discovery.
-[Visit Th3-Movies](https://th3-movies.onrender.com)
 
 ### 🛸 Th3-Space
 Interactive data explorer offering real-time access to astronomy images, planetary information, and Earth observations.

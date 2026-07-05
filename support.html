@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="author" content="Th3-C0der">
+	<meta name="description" content="Support Th3-C0der - Open source projects">
+
+	<!-- Favicons -->
+	<link rel="icon"
+		href="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png/:/rs=w:32,h:32,m"
+		sizes="32x32">
+
+	<title>Support Th3-C0der</title>
+
+	<!-- Fonts -->
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link
+		href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
+		rel="stylesheet">
+
+	<!-- Icons -->
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+	<!-- Styles -->
+	<link rel="stylesheet" href="static/new-style.css">
+	<link rel="stylesheet" href="static/support.css">
+</head>
+
+<body>
+	<!-- Custom Cursor -->
+	<div class="cursor-wrapper">
+		<div class="cursor-dot" id="cursor-dot"></div>
+		<div class="cursor-outline" id="cursor-outline"></div>
+		<div class="cursor-trail" id="cursor-trail"></div>
+	</div>
+
+	<!-- Animated Background -->
+	<div class="animated-bg">
+		<div class="gradient-orb gradient-orb-1"></div>
+		<div class="gradient-orb gradient-orb-2"></div>
+		<div class="gradient-orb gradient-orb-3"></div>
+		<canvas id="particle-canvas"></canvas>
+	</div>
+
+	<!-- Navigation -->
+	<header class="main-header" id="main-header">
+		<nav class="nav-container">
+			<a href="/" class="logo">
+				<div class="logo-icon">
+					<img src="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png"
+						alt="Logo">
+				</div>
+				<span class="logo-text">Th3-C0der</span>
+			</a>
+			<div class="nav-links" id="nav-links">
+				<a href="/" class="nav-link">Home</a>
+				<a href="/#projects" class="nav-link">Projects</a>
+				<a href="/blog" class="nav-link">Blog</a>
+				<a href="/#about" class="nav-link">About</a>
+				<a href="/#contact" class="nav-link">Contact</a>
+			</div>
+			<div class="nav-actions">
+				<button class="theme-switch" id="theme-switch" aria-label="Toggle theme">
+					<i class="fas fa-moon"></i>
+					<i class="fas fa-sun"></i>
+				</button>
+				<button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">
+					<span></span>
+					<span></span>
+					<span></span>
+				</button>
+			</div>
+		</nav>
+	</header>
+
+	<!-- Mobile Menu Overlay -->
+	<div class="mobile-menu-overlay" id="mobile-overlay"></div>
+
+	<!-- Main Content -->
+	<main class="support-main">
+		<div class="support-container">
+			<div class="support-header">
+				<div class="heart-icon">
+					<i class="fas fa-heart"></i>
+				</div>
+				<h1>Support Th3-C0der</h1>
+			</div>
+
+			<div class="support-card">
+				<div class="currency-toggle">
+					<button class="toggle-btn active" data-currency="INR">₹ INR</button>
+					<button class="toggle-btn" data-currency="USD">$ USD</button>
+				</div>
+
+				<div class="amount-grid" id="amount-grid">
+					<!-- Populated by JS -->
+				</div>
+
+				<div class="custom-amount">
+					<span class="currency-symbol">₹</span>
+					<input type="number" id="custom-amount-input" placeholder="Custom amount" min="1">
+				</div>
+
+				<form id="donation-form" class="donation-form">
+					<div class="form-group-simple">
+						<input type="text" id="donor-name" required placeholder="Your name *">
+					</div>
+					<div class="form-group-simple">
+						<input type="email" id="donor-email" placeholder="Email address (optional)">
+					</div>
+					<div class="form-group-simple">
+						<div class="input-with-icon">
+							<i class="fab fa-github"></i>
+							<input type="text" id="donor-github"
+								placeholder="GitHub username (optional - shows your avatar)">
+						</div>
+					</div>
+
+					<div class="review-toggle">
+						<input type="checkbox" id="leave-review">
+						<label for="leave-review">Leave a review (optional - shown on homepage)</label>
+					</div>
+
+					<div class="form-group-simple review-group" style="display: none;">
+						<textarea id="donor-review" rows="3"
+							placeholder="Share why you support Th3-C0der, or leave a kind word..."
+							maxlength="280"></textarea>
+						<div class="char-count">0/280</div>
+					</div>
+
+					<button type="submit" class="donate-btn magnetic-btn">
+						<i class="far fa-heart"></i>
+						<span id="donate-btn-text">Donate ₹500</span>
+					</button>
+				</form>
+
+				<p class="secure-text">Secure payment powered by Razorpay. Your name, avatar, amount, and review will be
+					publicly listed. Email stays private.</p>
+			</div>
+
+			<!-- Supporters Section -->
+			<div class="wall-of-love" style="margin-top: 3rem; text-align: center;">
+				<h2 style="font-family: var(--font-primary); color: var(--text-primary); margin-bottom: 0.5rem; font-size: 2rem;">Recent Supporters</h2>
+				<p style="color: var(--text-secondary); margin-bottom: 2rem;">Thank you to everyone who supports my work! ❤️</p>
+				
+				<div class="supporters-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem;">
+					<!-- Placeholder Supporter -->
+					<div class="supporter-card" style="background: var(--bg-glass); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: var(--radius-sm); padding: 1.5rem; display: flex; align-items: center; gap: 1rem; text-align: left;">
+						<div class="avatar" style="width: 50px; height: 50px; border-radius: 50%; background: var(--bg-tertiary); display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 1.5rem;">
+							<i class="fas fa-user"></i>
+						</div>
+						<div class="info">
+							<h4 style="color: var(--text-primary); font-family: var(--font-secondary); font-size: 1rem; margin-bottom: 0.2rem;">Be the first!</h4>
+							<p style="color: var(--accent-primary); font-size: 0.85rem; font-weight: 600;">₹500</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</main>
+
+	<!-- Footer -->
+	<footer class="main-footer">
+		<div class="footer-content">
+			<div class="footer-inner">
+				<p class="copyright">© 2026 Th3-C0der. All rights reserved.</p>
+				<a href="/terms" class="footer-link">Terms & Privacy</a>
+			</div>
+		</div>
+	</footer>
+
+	<!-- Scripts -->
+	<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+	<!-- Use existing script for cursor and theme -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+	<script src="static/new-script.js"></script>
+	<script src="static/support.js"></script>
+</body>
+
+</html>

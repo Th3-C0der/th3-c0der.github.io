@@ -1,0 +1,302 @@
+.support-main {
+    padding-top: 60px;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-bottom: 40px;
+    position: relative;
+    z-index: var(--z-content);
+}
+
+.support-container {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: var(--space-md);
+}
+
+.support-header {
+    text-align: center;
+    margin-bottom: var(--space-lg);
+}
+
+.support-header .heart-icon {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto var(--space-sm);
+    font-size: 1.5rem;
+    color: var(--accent-primary);
+    background: var(--bg-glass);
+    box-shadow: 0 0 20px var(--accent-glow);
+}
+
+.support-header h1 {
+    font-family: var(--font-primary);
+    font-size: 2.5rem;
+    margin-bottom: var(--space-sm);
+    color: var(--text-primary);
+}
+
+.support-header p {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+/* Card */
+.support-card {
+    background: var(--bg-glass);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    backdrop-filter: blur(20px);
+    box-shadow: var(--shadow-lg);
+}
+
+.currency-toggle {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-lg);
+}
+
+.toggle-btn {
+    background: var(--bg-secondary);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary);
+    padding: 8px 24px;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    font-family: var(--font-secondary);
+    font-weight: 600;
+    transition: all var(--transition-base);
+}
+
+.toggle-btn:hover {
+    background: rgba(255,255,255,0.05);
+}
+
+.toggle-btn.active {
+    background: var(--accent-primary);
+    color: var(--bg-primary);
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 15px var(--accent-glow);
+}
+
+.amount-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+}
+
+.amount-btn {
+    background: var(--bg-secondary);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    padding: 12px 0;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-family: var(--font-secondary);
+    font-weight: 600;
+    transition: all var(--transition-base);
+    text-align: center;
+}
+
+.amount-btn:hover {
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.amount-btn.active {
+    background: transparent;
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+    box-shadow: inset 0 0 10px var(--accent-glow);
+}
+
+.custom-amount {
+    position: relative;
+    margin-bottom: var(--space-lg);
+}
+
+.custom-amount .currency-symbol {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.custom-amount input {
+    width: 100%;
+    background: var(--bg-secondary);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    padding: 15px 15px 15px 35px;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-secondary);
+    font-size: 1rem;
+    transition: all var(--transition-base);
+}
+
+.custom-amount input:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    background: var(--bg-tertiary);
+}
+
+.custom-amount input.active {
+    border-color: var(--accent-primary);
+}
+
+/* Chrome, Safari, Edge, Opera */
+.custom-amount input::-webkit-outer-spin-button,
+.custom-amount input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+/* Firefox */
+.custom-amount input[type=number] {
+  -moz-appearance: textfield;
+}
+
+.form-group-simple {
+    position: relative;
+    margin-bottom: var(--space-md);
+}
+
+.form-group-simple input,
+.form-group-simple textarea {
+    width: 100%;
+    background: var(--bg-secondary);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    padding: 15px;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-secondary);
+    font-size: 1rem;
+    transition: all var(--transition-base);
+}
+
+.form-group-simple input:focus,
+.form-group-simple textarea:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    background: var(--bg-tertiary);
+}
+
+.form-group-simple textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.input-with-icon {
+    position: relative;
+}
+
+.input-with-icon i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+}
+
+.input-with-icon input {
+    padding-left: 40px !important;
+}
+
+.review-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: var(--space-md);
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+
+.review-toggle input[type="checkbox"] {
+    accent-color: var(--accent-primary);
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.char-count {
+    position: absolute;
+    bottom: 10px;
+    right: 15px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.donate-btn {
+    width: 100%;
+    background: var(--accent-primary);
+    color: var(--bg-primary);
+    border: none;
+    padding: 16px;
+    border-radius: var(--radius-sm);
+    font-size: 1.1rem;
+    font-weight: 700;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    margin-top: var(--space-md);
+    font-family: var(--font-primary);
+}
+
+.donate-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px var(--accent-glow);
+}
+
+.secure-text {
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: var(--space-lg);
+    line-height: 1.5;
+}
+
+@media (max-width: 600px) {
+    .support-main {
+        padding-top: 80px;
+        padding-bottom: 20px;
+    }
+    .amount-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    .support-card {
+        padding: 1.25rem;
+    }
+    .support-header h1 {
+        font-size: 1.8rem;
+    }
+    .support-header .heart-icon {
+        width: 45px;
+        height: 45px;
+        font-size: 1.2rem;
+    }
+    .donate-btn {
+        padding: 14px;
+        font-size: 1rem;
+    }
+}
+@media (max-width: 400px) {
+    .amount-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}

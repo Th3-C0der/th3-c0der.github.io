@@ -263,6 +263,95 @@
     box-shadow: 0 5px 20px var(--accent-glow);
 }
 
+.github-sponsor-badge-top {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    border-radius: var(--radius-full);
+    background: rgba(234, 74, 170, 0.1);
+    border: 1px solid rgba(234, 74, 170, 0.3);
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-decoration: none;
+    margin-top: var(--space-xs);
+    transition: all var(--transition-base);
+    backdrop-filter: blur(10px);
+}
+
+.github-sponsor-badge-top:hover {
+    background: rgba(234, 74, 170, 0.2);
+    border-color: rgba(234, 74, 170, 0.6);
+    box-shadow: 0 0 15px rgba(234, 74, 170, 0.3);
+    transform: translateY(-2px);
+    color: #fff;
+}
+
+.github-sponsor-badge-top .sponsor-badge-heart {
+    color: #ea4aaa;
+    font-size: 0.85rem;
+}
+
+.support-divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: var(--space-lg) 0;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+.support-divider::before,
+.support-divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.support-divider span {
+    padding: 0 var(--space-sm);
+}
+
+.github-sponsor-btn {
+    width: 100%;
+    background: linear-gradient(135deg, rgba(234, 74, 170, 0.15) 0%, rgba(20, 20, 30, 0.7) 100%);
+    border: 1px solid rgba(234, 74, 170, 0.35);
+    color: var(--text-primary);
+    padding: 14px 20px;
+    border-radius: var(--radius-sm);
+    font-size: 1rem;
+    font-weight: 600;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all var(--transition-base);
+    font-family: var(--font-primary);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.github-sponsor-btn:hover {
+    background: linear-gradient(135deg, rgba(234, 74, 170, 0.25) 0%, rgba(30, 30, 45, 0.9) 100%);
+    border-color: rgba(234, 74, 170, 0.7);
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(234, 74, 170, 0.25);
+}
+
+.github-sponsor-btn .sponsor-btn-heart {
+    color: #ea4aaa;
+    transition: transform var(--transition-base);
+}
+
+.github-sponsor-btn:hover .sponsor-btn-heart {
+    transform: scale(1.25);
+}
+
 .secure-text {
     text-align: center;
     font-size: 0.75rem;

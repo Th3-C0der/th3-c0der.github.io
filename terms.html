@@ -1,64 +1,396 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Terms of Use & Copyright Notice</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        h1, h2 {
-            color: #333;
-        }
-        .copyright {
-            background-color: #f5f5f5;
-            padding: 20px;
-            border-radius: 5px;
-            margin: 20px 0;
-        }
-    </style>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="author" content="Th3-C0der">
+	<meta name="description"
+		content="Terms of Service, Payment & Donation Policies, Refund Policy, and Privacy - Th3-C0der">
+
+	<!-- Favicons -->
+	<link rel="icon"
+		href="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png/:/rs=w:32,h:32,m"
+		sizes="32x32">
+	<link rel="apple-touch-icon"
+		href="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png/:/rs=w:180,h:180,m">
+	<link rel="manifest" href="manifest.webmanifest">
+
+	<!-- Open Graph -->
+	<meta property="og:url" content="https://th3-c0der.github.io/terms">
+	<meta property="og:site_name" content="Th3-C0der">
+	<meta property="og:title" content="Terms of Service & Policies - Th3-C0der">
+	<meta property="og:description"
+		content="Terms of Use, Payment/Donation Policies, Refund, Privacy & Legal Information">
+	<meta property="og:type" content="website">
+	<meta property="og:image"
+		content="https://img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png">
+
+	<title>Terms & Policies | Th3-C0der</title>
+
+	<!-- Fonts -->
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link
+		href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
+		rel="stylesheet">
+
+	<!-- Icons -->
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
 	<!-- AdSense -->
 	<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5166575587547718"
 		crossorigin="anonymous"></script>
+
+	<!-- Styles -->
+	<link rel="stylesheet" href="static/new-style.css">
+	<style>
+		.terms-main {
+			padding-top: 100px;
+			padding-bottom: 60px;
+			min-height: 100vh;
+			position: relative;
+			z-index: var(--z-content);
+		}
+
+		.terms-container {
+			max-width: 860px;
+			margin: 0 auto;
+			padding: 0 var(--space-lg);
+		}
+
+		.terms-header {
+			text-align: center;
+			margin-bottom: var(--space-xl);
+		}
+
+		.terms-badge {
+			display: inline-flex;
+			align-items: center;
+			gap: 8px;
+			padding: 6px 16px;
+			border-radius: var(--radius-full);
+			background: rgba(0, 255, 157, 0.1);
+			border: 1px solid rgba(0, 255, 157, 0.3);
+			color: var(--accent-primary);
+			font-size: 0.85rem;
+			font-weight: 600;
+			margin-bottom: var(--space-sm);
+			font-family: var(--font-secondary);
+		}
+
+		.terms-header h1 {
+			font-family: var(--font-primary);
+			font-size: 2.75rem;
+			color: var(--text-primary);
+			margin-bottom: var(--space-xs);
+		}
+
+		.terms-header p {
+			color: var(--text-secondary);
+			font-size: 1rem;
+		}
+
+		.terms-card {
+			background: var(--bg-glass);
+			backdrop-filter: blur(20px);
+			border: 1px solid rgba(255, 255, 255, 0.06);
+			border-radius: var(--radius-lg);
+			padding: var(--space-xl);
+			box-shadow: var(--shadow-lg);
+			margin-bottom: var(--space-xl);
+		}
+
+		.policy-section {
+			margin-bottom: var(--space-xl);
+			padding-bottom: var(--space-lg);
+			border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+		}
+
+		.policy-section:last-child {
+			margin-bottom: 0;
+			padding-bottom: 0;
+			border-bottom: none;
+		}
+
+		.policy-section h2 {
+			font-family: var(--font-primary);
+			font-size: 1.35rem;
+			color: var(--text-primary);
+			display: flex;
+			align-items: center;
+			gap: 12px;
+			margin-bottom: var(--space-sm);
+		}
+
+		.policy-section h2 i {
+			color: var(--accent-primary);
+			font-size: 1.15rem;
+		}
+
+		.policy-section p {
+			color: var(--text-secondary);
+			line-height: 1.7;
+			margin-bottom: var(--space-sm);
+			font-size: 0.95rem;
+		}
+
+		.policy-section ul {
+			list-style: none;
+			padding-left: 0;
+			margin-bottom: var(--space-sm);
+		}
+
+		.policy-section ul li {
+			position: relative;
+			padding-left: 24px;
+			color: var(--text-secondary);
+			line-height: 1.6;
+			margin-bottom: 8px;
+			font-size: 0.95rem;
+		}
+
+		.policy-section ul li::before {
+			content: '▹';
+			position: absolute;
+			left: 6px;
+			color: var(--accent-primary);
+			font-weight: bold;
+		}
+
+		.highlight-box {
+			background: rgba(0, 255, 157, 0.05);
+			border-left: 3px solid var(--accent-primary);
+			padding: var(--space-md);
+			border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+			margin: var(--space-md) 0;
+		}
+
+		.highlight-box p {
+			color: var(--text-primary);
+			margin-bottom: 0;
+			font-size: 0.9rem;
+		}
+
+		.contact-card {
+			display: flex;
+			flex-wrap: wrap;
+			gap: var(--space-md);
+			background: var(--bg-secondary);
+			border: 1px solid rgba(255, 255, 255, 0.06);
+			border-radius: var(--radius-sm);
+			padding: var(--space-md);
+			margin-top: var(--space-sm);
+		}
+
+		.contact-item {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			color: var(--text-secondary);
+			text-decoration: none;
+			font-size: 0.95rem;
+			transition: color var(--transition-base);
+		}
+
+		.contact-item i {
+			color: var(--accent-primary);
+		}
+
+		.contact-item:hover {
+			color: var(--text-primary);
+		}
+
+		@media (max-width: 768px) {
+			.terms-main {
+				padding-top: 80px;
+			}
+
+			.terms-header h1 {
+				font-size: 2rem;
+			}
+
+			.terms-card {
+				padding: var(--space-lg);
+			}
+		}
+	</style>
 </head>
+
 <body>
-    <h1>Terms of Use & Copyright Notice</h1>
-    
-    <div class="copyright">
-        <h2>Copyright Notice</h2>
-        <p>© 2026 Th3-C0der. All rights reserved.</p>
-        <p>All content on this website, including but not limited to code, demos, games, text, graphics, logos, and software, is the property of Th3-C0der and is protected by international copyright laws.</p>
-    </div>
+	<!-- Custom Cursor -->
+	<div class="cursor-wrapper">
+		<div class="cursor-dot" id="cursor-dot"></div>
+		<div class="cursor-outline" id="cursor-outline"></div>
+		<div class="cursor-trail" id="cursor-trail"></div>
+	</div>
 
-    <h2>Terms of Use</h2>
-    <p>By accessing and using this website, you agree to the following terms:</p>
-    
-    <h3>1. Intellectual Property Rights</h3>
-    <p>All content on this website is protected by copyright and other intellectual property rights. You may not:</p>
-    <ul>
-        <li>Copy, reproduce, or distribute any content without explicit permission</li>
-        <li>Modify, adapt, or create derivative works</li>
-        <li>Use the content for commercial purposes without authorization</li>
-        <li>Remove any copyright or proprietary notices</li>
-    </ul>
+	<!-- Animated Background -->
+	<div class="animated-bg">
+		<div class="gradient-orb gradient-orb-1"></div>
+		<div class="gradient-orb gradient-orb-2"></div>
+		<div class="gradient-orb gradient-orb-3"></div>
+		<canvas id="particle-canvas"></canvas>
+	</div>
 
-    <h3>2. Code and Demos</h3>
-    <p>The code and demos presented on this website are for educational and demonstration purposes only. Unauthorized copying, distribution, or use of this code is strictly prohibited.</p>
+	<!-- Navigation -->
+	<header class="main-header" id="main-header">
+		<nav class="nav-container">
+			<a href="/" class="logo">
+				<div class="logo-icon">
+					<img src="//img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png"
+						alt="Logo">
+				</div>
+				<span class="logo-text">Th3-C0der</span>
+			</a>
+			<div class="nav-links" id="nav-links">
+				<a href="/" class="nav-link">Home</a>
+				<a href="/#projects" class="nav-link">Projects</a>
+				<a href="/blog" class="nav-link">Blog</a>
+				<a href="/support" class="nav-link">Support</a>
+				<a href="/#about" class="nav-link">About</a>
+				<a href="/#contact" class="nav-link">Contact</a>
+			</div>
+			<div class="nav-actions">
+				<button class="theme-switch" id="theme-switch" aria-label="Toggle theme">
+					<i class="fas fa-moon"></i>
+					<i class="fas fa-sun"></i>
+				</button>
+				<button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">
+					<span></span>
+					<span></span>
+					<span></span>
+				</button>
+			</div>
+		</nav>
+	</header>
 
-    <h3>3. Enforcement</h3>
-    <p>We reserve the right to take legal action against any unauthorized use of our content, including but not limited to DMCA takedown notices and legal proceedings.</p>
+	<!-- Mobile Menu Overlay -->
+	<div class="mobile-menu-overlay" id="mobile-overlay"></div>
 
-    <h3>4. Contact</h3>
-    <p>For permission to use any content from this website, please contact the website administrator.</p>
+	<!-- Main Content -->
+	<main class="terms-main">
+		<div class="terms-container">
+			<div class="terms-header">
+				<span class="terms-badge"><i class="fas fa-shield-alt"></i> Legal & Compliance</span>
+				<h1>Terms & Policies</h1>
+				<p>Terms of Service, Payment & Donation Terms, Refund, and Privacy Policy</p>
+			</div>
 
-    <footer>
-        <p>Last updated: June 2025</p>
-    </footer>
+			<div class="terms-card">
+				<!-- Section 1: Copyright & IP -->
+				<div class="policy-section">
+					<h2><i class="fas fa-copyright"></i> 1. Intellectual Property & Terms of Use</h2>
+					<p>All content on this website, including but not limited to open-source code repositories,
+						interactive demos, web games, visual experiments, graphics, logos, and written articles, is the
+						intellectual property of <strong>Th3-C0der</strong> and is protected under international
+						copyright and intellectual property laws.</p>
+					<ul>
+						<li>Website demos and source code are provided for educational and demonstration purposes.</li>
+						<li>You may not reproduce, redistribute, or commercially exploit proprietary code or assets
+							without prior written consent.</li>
+						<li>Open-source projects hosted on GitHub are governed by their respective individual
+							open-source licenses (e.g., MIT License).</li>
+					</ul>
+				</div>
+
+				<!-- Section 2: Payments & Voluntary Donations -->
+				<div class="policy-section">
+					<h2><i class="fas fa-hand-holding-heart"></i> 2. Donations & Payment Terms</h2>
+					<p>Contributions made through this website (via Razorpay or GitHub Sponsors) are voluntary financial
+						gifts and donations to support independent project development, server upkeep, maintenance of
+						free online developer utilities, and content creation by Th3-C0der.</p>
+					<ul>
+						<li><strong>Voluntary Support:</strong> Payments made on the Support page are non-commercial
+							voluntary contributions. Making a donation does not create a commercial partnership,
+							vendor-client relationship, or entitlement to equity.</li>
+						<li><strong>Payment Processors:</strong> Transactions are securely processed through trusted
+							third-party payment gateways (Razorpay and GitHub Sponsors). We do not store or process your
+							banking passwords, credit/debit card numbers, or CVVs.</li>
+						<li><strong>Currency:</strong> Contributions are processed in Indian Rupees (INR ₹) or US
+							Dollars (USD $) as selected at checkout.</li>
+					</ul>
+				</div>
+
+				<!-- Section 3: Refund & Cancellation -->
+				<div class="policy-section">
+					<h2><i class="fas fa-undo-alt"></i> 3. Cancellation & Refund Policy</h2>
+					<p>Because payments made on this platform represent voluntary donations directly utilized for server
+						costs and project maintenance, all completed transactions are generally
+						<strong>non-refundable</strong>.</p>
+					<div class="highlight-box">
+						<p><strong>Exceptions:</strong> In the event of an unintended technical error, duplicate charge,
+							or unauthorized transaction, please reach out to us at <a href="mailto:dvp.ai.ml@gmail.com"
+								style="color: var(--accent-primary); font-weight: 600;">dvp.ai.ml@gmail.com</a> within
+							<strong>7 business days</strong> with your payment ID and transaction receipt for prompt
+							assistance.</p>
+					</div>
+				</div>
+
+				<!-- Section 4: Shipping & Delivery -->
+				<div class="policy-section">
+					<h2><i class="fas fa-box-open"></i> 4. Shipping & Delivery Policy</h2>
+					<p>As this website provides digital services, open-source software, and voluntary support channels,
+						<strong>no physical products or merchandise are shipped or delivered</strong>.</p>
+					<p>Any digital acknowledgements (such as your name, avatar, and review message appearing on the
+						Supporters Wall) are delivered electronically and reflected immediately following payment
+						confirmation.</p>
+				</div>
+
+				<!-- Section 5: Privacy & Donor Information -->
+				<div class="policy-section">
+					<h2><i class="fas fa-user-shield"></i> 5. Privacy Policy & Data Usage</h2>
+					<p>We respect your privacy and handle your information with care:</p>
+					<ul>
+						<li><strong>Publicly Displayed Info:</strong> If provided during a donation, your Name, GitHub
+							username, avatar, donation amount, and optional review message may be displayed publicly on
+							our Wall of Love / Supporters section.</li>
+						<li><strong>Confidential Info:</strong> Your email address and transaction IDs are kept strictly
+							private and will never be sold, rented, or shared with third parties for marketing purposes.
+						</li>
+						<li><strong>Cookies & Analytics:</strong> This website may use basic cookies, Google AdSense and
+							analytics to improve user experience and monitor website performance.</li>
+					</ul>
+				</div>
+
+				<!-- Section 6: Contact -->
+				<div class="policy-section">
+					<h2><i class="fas fa-envelope-open-text"></i> 6. Contact Information & Support</h2>
+					<p>If you have any questions regarding these terms, payment verification, or need assistance, please
+						feel free to reach out:</p>
+					<div class="contact-card">
+						<a href="mailto:dvp.ai.ml@gmail.com" class="contact-item">
+							<i class="fas fa-envelope"></i>
+							<span>dvp.ai.ml@gmail.com</span>
+						</a>
+						<a href="https://github.com/Th3-C0der" target="_blank" rel="noopener noreferrer"
+							class="contact-item">
+							<i class="fab fa-github"></i>
+							<span>github.com/Th3-C0der</span>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</main>
+
+	<!-- Footer -->
+	<footer class="main-footer">
+		<div class="footer-content">
+			<div class="footer-inner">
+				<p class="copyright">© 2026 Th3-C0der. All rights reserved.</p>
+				<div class="footer-links">
+					<a href="/terms" class="footer-link">Terms & Privacy</a>
+					<a href="/support" class="footer-link">Support</a>
+				</div>
+			</div>
+		</div>
+	</footer>
+
+	<!-- Scripts -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+	<script src="static/new-script.js"></script>
 </body>
-</html> 
+
+</html>

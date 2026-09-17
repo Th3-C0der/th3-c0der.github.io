@@ -196,10 +196,10 @@ async function loadSupporters(page = 1, append = false) {
             filtered.sort((a, b) => getRankWeight(b) - getRankWeight(a));
         } else if (currentSort === 'reviews') {
             filtered = filtered.filter(s => s.review && s.review.trim() !== '');
-            filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+            filtered.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
         } else {
             // 'recent'
-            filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+            filtered.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
         }
         
         const totalCount = filtered.length;

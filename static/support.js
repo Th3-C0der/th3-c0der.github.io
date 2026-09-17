@@ -92,54 +92,125 @@ reviewTextarea.addEventListener('input', (e) => {
     charCount.textContent = `${len}/280`;
 });
 
-// Load Supporters
-async function loadSupporters() {
+// Load Supporters with Pagination & Zero-Lag Lazy Loading
+let currentSupportersPage = 1;
+const SUPPORTERS_PAGE_SIZE = 12;
+let hasMoreSupporters = false;
+let isLoadingSupporters = false;
+
+async function loadSupporters(page = 1, append = false) {
     const grid = document.querySelector('.supporters-grid');
+    const loadMoreContainer = document.getElementById('load-more-container');
+    const loadMoreBtn = document.getElementById('load-more-btn');
+    const countBadge = document.getElementById('supporters-count');
+    
     if (!grid) return;
+    if (isLoadingSupporters) return;
+    
+    isLoadingSupporters = true;
+    if (loadMoreBtn && append) {
+        loadMoreBtn.disabled = true;
+        loadMoreBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+    }
     
     try {
-        const response = await fetch("https://idk.skillvox-ai.workers.dev/supporters");
-        if (!response.ok) return; // Silent fail if worker not updated yet
+        const response = await fetch(`https://idk.skillvox-ai.workers.dev/supporters?limit=${SUPPORTERS_PAGE_SIZE}&page=${page}`);
+        if (!response.ok) return;
         
-        const supporters = await response.json();
+        const data = await response.json();
         
-        if (!Array.isArray(supporters) || supporters.length === 0) return; // Keep placeholder if empty
+        // Supports both new paginated response { supporters, total, hasMore } and legacy array [...]
+        let supporters = [];
+        let totalCount = 0;
         
-        grid.innerHTML = ''; // Clear placeholder
+        if (Array.isArray(data)) {
+            // Legacy response: slice client-side if needed
+            const start = (page - 1) * SUPPORTERS_PAGE_SIZE;
+            supporters = data.slice(start, start + SUPPORTERS_PAGE_SIZE);
+            totalCount = data.length;
+            hasMoreSupporters = start + SUPPORTERS_PAGE_SIZE < data.length;
+        } else if (data && Array.isArray(data.supporters)) {
+            supporters = data.supporters;
+            totalCount = data.total || supporters.length;
+            hasMoreSupporters = Boolean(data.hasMore);
+        }
+        
+        if (!append) {
+            grid.innerHTML = ''; // Clear placeholder or previous items on fresh load
+        }
+        
+        if (countBadge && totalCount > 0) {
+            countBadge.textContent = `${totalCount} Supporter${totalCount === 1 ? '' : 's'}`;
+            countBadge.style.display = 'inline-flex';
+        }
+        
+        if (supporters.length === 0 && !append) {
+            grid.innerHTML = `
+                <div class="supporter-card" style="background: var(--bg-glass); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: var(--radius-sm); padding: 1.5rem; display: flex; align-items: center; gap: 1rem; text-align: left;">
+                    <div class="avatar" style="width: 50px; height: 50px; border-radius: 50%; background: var(--bg-tertiary); display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 1.5rem;">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="info">
+                        <h4 style="color: var(--text-primary); font-family: var(--font-secondary); font-size: 1rem; margin-bottom: 0.2rem;">Be the first!</h4>
+                        <p style="color: var(--accent-primary); font-size: 0.85rem; font-weight: 600;">₹500</p>
+                    </div>
+                </div>
+            `;
+            if (loadMoreContainer) loadMoreContainer.style.display = 'none';
+            return;
+        }
         
         supporters.forEach(supporter => {
-            const hasGithub = supporter.github && supporter.github.trim() !== '';
+            const hasGithub = supporter.github && supporter.github.trim() !== '' && supporter.github.trim().toLowerCase() !== 'male' && supporter.github.trim().toLowerCase() !== 'upi';
             let githubUsername = '';
             
             if (hasGithub) {
                 // Clean up github input (remove @ or full url)
-                githubUsername = supporter.github.replace('https://github.com/', '').replace('@', '').trim();
+                githubUsername = supporter.github.replace(/https?:\/\/github\.com\//, '').replace('@', '').trim();
             }
             
-            const avatarHtml = hasGithub 
-                ? `<img src="https://github.com/${githubUsername}.png?size=100" alt="${supporter.name}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`
+            // Format donation date if available
+            let dateStr = '';
+            if (supporter.date) {
+                try {
+                    const d = new Date(supporter.date);
+                    dateStr = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+                } catch (e) {}
+            }
+            
+            const avatarHtml = hasGithub && githubUsername
+                ? `<img src="https://github.com/${githubUsername}.png?size=100" alt="${supporter.name}" loading="lazy" onerror="this.onerror=null;this.parentElement.innerHTML='<i class=\\\'fas fa-user\\\'></i>';" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`
                 : `<i class="fas fa-user"></i>`;
                 
             const reviewHtml = supporter.review && supporter.review.trim() !== ''
-                ? `<p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.5rem; font-style: italic;">"${supporter.review}"</p>`
+                ? `<p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.5rem; font-style: italic; word-break: break-word;">"${supporter.review}"</p>`
                 : ``;
 
             const card = document.createElement('div');
             card.className = 'supporter-card';
-            card.style.cssText = 'background: var(--bg-glass); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: var(--radius-sm); padding: 1.5rem; display: flex; align-items: flex-start; gap: 1rem; text-align: left; transition: transform 0.3s ease;';
-            card.onmouseover = () => card.style.transform = 'translateY(-5px)';
-            card.onmouseout = () => card.style.transform = 'translateY(0)';
+            card.style.cssText = 'background: var(--bg-glass); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: var(--radius-sm); padding: 1.5rem; display: flex; align-items: flex-start; gap: 1rem; text-align: left; transition: transform 0.3s ease, border-color 0.3s ease;';
+            card.onmouseover = () => {
+                card.style.transform = 'translateY(-5px)';
+                card.style.borderColor = 'rgba(0, 255, 157, 0.3)';
+            };
+            card.onmouseout = () => {
+                card.style.transform = 'translateY(0)';
+                card.style.borderColor = 'rgba(255, 255, 255, 0.05)';
+            };
             
             card.innerHTML = `
                 <div class="avatar" style="width: 50px; height: 50px; border-radius: 50%; background: var(--bg-tertiary); display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 1.5rem; flex-shrink: 0; overflow: hidden;">
                     ${avatarHtml}
                 </div>
-                <div class="info" style="flex: 1;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.2rem;">
-                        <h4 style="color: var(--text-primary); font-family: var(--font-secondary); font-size: 1rem; margin: 0;">${supporter.name}</h4>
-                        <span style="color: var(--accent-primary); font-size: 0.85rem; font-weight: 600;">${supporter.currency === 'INR' ? '₹' : '$'}${supporter.amount}</span>
+                <div class="info" style="flex: 1; min-width: 0;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.2rem; gap: 0.5rem;">
+                        <h4 style="color: var(--text-primary); font-family: var(--font-secondary); font-size: 1rem; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${supporter.name}</h4>
+                        <span style="color: var(--accent-primary); font-size: 0.85rem; font-weight: 600; white-space: nowrap;">${supporter.currency === 'INR' ? '₹' : '$'}${supporter.amount}</span>
                     </div>
-                    ${hasGithub ? `<a href="https://github.com/${githubUsername}" target="_blank" style="color: var(--text-muted); font-size: 0.75rem; text-decoration: none;"><i class="fab fa-github"></i> @${githubUsername}</a>` : ''}
+                    <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.5rem;">
+                        ${hasGithub && githubUsername ? `<a href="https://github.com/${githubUsername}" target="_blank" rel="noopener noreferrer" style="color: var(--text-muted); font-size: 0.75rem; text-decoration: none;"><i class="fab fa-github"></i> @${githubUsername}</a>` : '<span></span>'}
+                        ${dateStr ? `<span style="color: var(--text-muted); font-size: 0.7rem; opacity: 0.7;">${dateStr}</span>` : ''}
+                    </div>
                     ${reviewHtml}
                 </div>
             `;
@@ -147,23 +218,47 @@ async function loadSupporters() {
             grid.appendChild(card);
         });
         
+        // Show/hide Load More button
+        if (loadMoreContainer) {
+            loadMoreContainer.style.display = hasMoreSupporters ? 'flex' : 'none';
+        }
+        
     } catch (err) {
         console.error("Failed to load Recent Supporters", err);
+    } finally {
+        isLoadingSupporters = false;
+        if (loadMoreBtn) {
+            loadMoreBtn.disabled = false;
+            loadMoreBtn.innerHTML = '<span>Load More Supporters</span> <i class="fas fa-chevron-down"></i>';
+        }
     }
 }
 
 // Initial render
 renderAmounts();
-loadSupporters();
+loadSupporters(1, false);
+
+// Wire Load More Button
+const loadMoreBtn = document.getElementById('load-more-btn');
+if (loadMoreBtn) {
+    loadMoreBtn.addEventListener('click', () => {
+        if (!isLoadingSupporters && hasMoreSupporters) {
+            currentSupportersPage++;
+            loadSupporters(currentSupportersPage, true);
+        }
+    });
+}
 
 // Razorpay Integration Form Submit
 document.getElementById('donation-form').addEventListener('submit', async function (e) {
     e.preventDefault();
 
-    const name = document.getElementById('donor-name').value;
-    const email = document.getElementById('donor-email').value;
-    const github = document.getElementById('donor-github').value;
-    const review = document.getElementById('donor-review').value;
+    const name = document.getElementById('donor-name').value.trim();
+    const email = document.getElementById('donor-email').value.trim();
+    const github = document.getElementById('donor-github').value.trim();
+    const review = document.getElementById('donor-review').value.trim();
+    const isReviewChecked = document.getElementById('leave-review').checked;
+    const finalReview = isReviewChecked ? review : "";
 
     // In paise or cents
     const amountInSubunits = selectedAmount * 100;
@@ -175,7 +270,7 @@ document.getElementById('donation-form').addEventListener('submit', async functi
         donateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
         donateBtn.disabled = true;
 
-        // 1. Ask Cloudflare Worker to create an order
+        // 1. Ask Cloudflare Worker to create an order - also pass notes for redundant Razorpay backup
         const orderResponse = await fetch("https://idk.skillvox-ai.workers.dev/", {
             method: "POST",
             headers: {
@@ -183,7 +278,10 @@ document.getElementById('donation-form').addEventListener('submit', async functi
             },
             body: JSON.stringify({
                 amount: amountInSubunits,
-                currency: currentCurrency
+                currency: currentCurrency,
+                name: name,
+                github: github,
+                review: finalReview
             })
         });
 
@@ -197,21 +295,25 @@ document.getElementById('donation-form').addEventListener('submit', async functi
             throw new Error(orderData.error.description || orderData.error);
         }
 
-        // 2. Initialize Razorpay with the generated order_id
+        // 2. Initialize Razorpay with the generated order_id & backup notes
         var options = {
-            "key": "rzp_live_T9nh2yCUFQfY2f", // Add your Razorpay Key ID here
+            "key": "rzp_live_Td0aBwnKAGFCei",
             "amount": amountInSubunits,
             "currency": currentCurrency,
             "name": "Th3-C0der",
-            "description": "Donation",
+            "description": "Donation to Th3-C0der",
             "image": "https://img1.wsimg.com/isteam/ip/fe671351-6f24-41a1-9382-e1e502b566f0/1000121535.png",
-            "order_id": orderData.id, // ID returned from our Cloudflare Worker!
+            "order_id": orderData.id,
+            "notes": {
+                "donor_name": name,
+                "github": github,
+                "review": finalReview
+            },
             "handler": async function (response) {
-                // Change button state to saving
                 donateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
                 
                 try {
-                    await fetch("https://idk.skillvox-ai.workers.dev/verify-payment", {
+                    const verifyResponse = await fetch("https://idk.skillvox-ai.workers.dev/verify-payment", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({
@@ -220,23 +322,29 @@ document.getElementById('donation-form').addEventListener('submit', async functi
                             signature: response.razorpay_signature,
                             name: name,
                             github: github,
-                            review: document.getElementById('leave-review').checked ? review : "",
+                            review: finalReview,
                             amount: selectedAmount,
                             currency: currentCurrency
                         })
                     });
                     
-                    alert("Thank you for your support, " + name + "!");
+                    const verifyData = await verifyResponse.json();
+                    if (!verifyResponse.ok || verifyData.error) {
+                        throw new Error(verifyData.error || "Payment verification failed");
+                    }
                     
-                    // Reset form and reload supporters
+                    alert("Thank you for your generous support, " + name + "! ❤️");
+                    
+                    // Reset form and reload supporters from page 1
                     document.getElementById('donation-form').reset();
                     document.querySelector('.review-group').style.display = 'none';
                     donateBtn.innerHTML = originalBtnText;
                     
-                    loadSupporters(); // Refresh Supporters
+                    currentSupportersPage = 1;
+                    loadSupporters(1, false); // Refresh Supporters Wall
                 } catch (e) {
                     console.error("Failed to save to Supporters List", e);
-                    alert("Payment successful! (But we couldn't automatically add you to the Supporters list right now).");
+                    alert("Payment successful! Your contribution was securely captured on Razorpay. (If it does not appear on the wall immediately, it will reflect shortly).");
                     donateBtn.innerHTML = originalBtnText;
                 }
             },
@@ -245,13 +353,13 @@ document.getElementById('donation-form').addEventListener('submit', async functi
                 "email": email || undefined
             },
             "theme": {
-                "color": "#00ff9d" // Matches accent color
+                "color": "#00ff9d"
             }
         };
 
         var rzp1 = new Razorpay(options);
         rzp1.on('payment.failed', function (response) {
-            alert("Payment Failed. Reason: " + response.error.description);
+            alert("Payment Failed. Reason: " + (response.error.description || response.error.reason));
         });
 
         rzp1.open();
@@ -260,7 +368,6 @@ document.getElementById('donation-form').addEventListener('submit', async functi
         alert("Could not initialize payment: " + error.message);
         console.error(error);
     } finally {
-        // Reset button state
         donateBtn.innerHTML = originalBtnText;
         donateBtn.disabled = false;
     }

@@ -159,7 +159,10 @@
 
 			<!-- Supporters Section -->
 			<div class="wall-of-love" style="margin-top: 3rem; text-align: center;">
-				<h2 style="font-family: var(--font-primary); color: var(--text-primary); margin-bottom: 0.5rem; font-size: 2rem;">Recent Supporters</h2>
+				<div style="display: inline-flex; align-items: center; justify-content: center; gap: 0.75rem; margin-bottom: 0.5rem; flex-wrap: wrap;">
+					<h2 style="font-family: var(--font-primary); color: var(--text-primary); font-size: 2rem; margin: 0;">Recent Supporters</h2>
+					<span class="supporters-count-badge" id="supporters-count" style="display: none;"></span>
+				</div>
 				<p style="color: var(--text-secondary); margin-bottom: 2rem;">Thank you to everyone who supports my work! ❤️</p>
 				
 				<div class="supporters-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem;">
@@ -173,6 +176,14 @@
 							<p style="color: var(--accent-primary); font-size: 0.85rem; font-weight: 600;">₹500</p>
 						</div>
 					</div>
+				</div>
+
+				<!-- Load More Supporters Button -->
+				<div class="load-more-container" id="load-more-container" style="display: none; justify-content: center; margin-top: 2rem;">
+					<button id="load-more-btn" class="load-more-btn magnetic-btn">
+						<span>Load More Supporters</span>
+						<i class="fas fa-chevron-down"></i>
+					</button>
 				</div>
 			</div>
 		</div>

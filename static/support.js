@@ -92,84 +92,173 @@ reviewTextarea.addEventListener('input', (e) => {
     charCount.textContent = `${len}/280`;
 });
 
-// Load Supporters with Pagination & Zero-Lag Lazy Loading
+// Load Supporters with High-Speed In-Memory Ranking & Lazy Loading
 let currentSupportersPage = 1;
 const SUPPORTERS_PAGE_SIZE = 12;
 let hasMoreSupporters = false;
 let isLoadingSupporters = false;
+let currentSort = 'recent'; // 'recent' | 'top' | 'reviews'
+let cachedAllSupporters = null; // In-memory cache for instant 0ms tab switching
+
+// Helper to normalize amount for fair USD/INR top ranking comparison
+function getRankWeight(item) {
+    const amt = Number(item.amount) || 0;
+    return item.currency === 'USD' ? amt * 85 : amt;
+}
+
+// Fetch all supporters from API and cache in memory (handles pagination if capped)
+async function fetchSupportersFromApi() {
+    try {
+        let all = [];
+        let page = 1;
+        let hasMore = true;
+        
+        while (hasMore && page <= 20) {
+            const response = await fetch(`https://idk.skillvox-ai.workers.dev/supporters?limit=1000&all=true&page=${page}`);
+            if (!response.ok) break;
+            const data = await response.json();
+            
+            if (Array.isArray(data)) {
+                all = data;
+                break;
+            } else if (data && Array.isArray(data.supporters)) {
+                all = all.concat(data.supporters);
+                const totalReported = data.total || 0;
+                // If we reached total reported, or hasMore is false, stop
+                if (all.length >= totalReported || !data.hasMore || data.supporters.length === 0) {
+                    hasMore = false;
+                } else {
+                    page++;
+                }
+            } else {
+                break;
+            }
+        }
+        return all;
+    } catch (e) {
+        console.error("Error fetching supporters:", e);
+        return [];
+    }
+}
+
+let scrollObserver = null;
+
+function setupInfiniteScroll() {
+    const sentinel = document.getElementById('scroll-sentinel');
+    if (!sentinel) return;
+
+    if (scrollObserver) {
+        scrollObserver.disconnect();
+    }
+
+    scrollObserver = new IntersectionObserver((entries) => {
+        const entry = entries[0];
+        if (entry.isIntersecting && hasMoreSupporters && !isLoadingSupporters) {
+            currentSupportersPage++;
+            loadSupporters(currentSupportersPage, true);
+        }
+    }, {
+        root: null,
+        rootMargin: '300px', // Preload 300px before reaching the bottom
+        threshold: 0.05
+    });
+
+    scrollObserver.observe(sentinel);
+}
 
 async function loadSupporters(page = 1, append = false) {
     const grid = document.querySelector('.supporters-grid');
-    const loadMoreContainer = document.getElementById('load-more-container');
-    const loadMoreBtn = document.getElementById('load-more-btn');
+    const infiniteLoader = document.getElementById('infinite-loader');
+    const endOfSupporters = document.getElementById('end-of-supporters');
     const countBadge = document.getElementById('supporters-count');
     
     if (!grid) return;
     if (isLoadingSupporters) return;
     
     isLoadingSupporters = true;
-    if (loadMoreBtn && append) {
-        loadMoreBtn.disabled = true;
-        loadMoreBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+    if (infiniteLoader && append) {
+        infiniteLoader.style.display = 'inline-flex';
+    }
+    if (endOfSupporters && !append) {
+        endOfSupporters.style.display = 'none';
     }
     
     try {
-        const response = await fetch(`https://idk.skillvox-ai.workers.dev/supporters?limit=${SUPPORTERS_PAGE_SIZE}&page=${page}`);
-        if (!response.ok) return;
-        
-        const data = await response.json();
-        
-        // Supports both new paginated response { supporters, total, hasMore } and legacy array [...]
-        let supporters = [];
-        let totalCount = 0;
-        
-        if (Array.isArray(data)) {
-            // Legacy response: slice client-side if needed
-            const start = (page - 1) * SUPPORTERS_PAGE_SIZE;
-            supporters = data.slice(start, start + SUPPORTERS_PAGE_SIZE);
-            totalCount = data.length;
-            hasMoreSupporters = start + SUPPORTERS_PAGE_SIZE < data.length;
-        } else if (data && Array.isArray(data.supporters)) {
-            supporters = data.supporters;
-            totalCount = data.total || supporters.length;
-            hasMoreSupporters = Boolean(data.hasMore);
+        // 1. Ensure we have the supporters list loaded
+        if (!cachedAllSupporters) {
+            cachedAllSupporters = await fetchSupportersFromApi();
         }
+        
+        // 2. Sort or Filter based on current active tab
+        let filtered = [...cachedAllSupporters];
+        
+        if (currentSort === 'top') {
+            filtered.sort((a, b) => getRankWeight(b) - getRankWeight(a));
+        } else if (currentSort === 'reviews') {
+            filtered = filtered.filter(s => s.review && s.review.trim() !== '');
+            filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+        } else {
+            // 'recent'
+            filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+        }
+        
+        const totalCount = filtered.length;
+        
+        // 3. Slice page items
+        const startIndex = append ? (page - 1) * SUPPORTERS_PAGE_SIZE : 0;
+        const endIndex = page * SUPPORTERS_PAGE_SIZE;
+        const supportersToRender = filtered.slice(startIndex, endIndex);
+        hasMoreSupporters = endIndex < totalCount;
         
         if (!append) {
-            grid.innerHTML = ''; // Clear placeholder or previous items on fresh load
+            grid.innerHTML = ''; // Clear previous items on tab change or initial load
         }
         
-        if (countBadge && totalCount > 0) {
-            countBadge.textContent = `${totalCount} Supporter${totalCount === 1 ? '' : 's'}`;
-            countBadge.style.display = 'inline-flex';
+        // 4. Update Header Count Badge
+        if (countBadge) {
+            if (totalCount > 0) {
+                let badgeLabel = currentSort === 'reviews' 
+                    ? `${totalCount} Review${totalCount === 1 ? '' : 's'}`
+                    : `${totalCount} Supporter${totalCount === 1 ? '' : 's'}`;
+                countBadge.textContent = badgeLabel;
+                countBadge.style.display = 'inline-flex';
+            } else {
+                countBadge.style.display = 'none';
+            }
         }
         
-        if (supporters.length === 0 && !append) {
+        // 5. Handle Empty State
+        if (filtered.length === 0) {
+            let emptyMsg = "No reviews yet. Be the first to leave one!";
+            let emptyIcon = "far fa-comment-dots";
+            if (currentSort !== 'reviews') {
+                emptyMsg = "Be the first to support!";
+                emptyIcon = "fas fa-heart";
+            }
             grid.innerHTML = `
-                <div class="supporter-card" style="background: var(--bg-glass); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: var(--radius-sm); padding: 1.5rem; display: flex; align-items: center; gap: 1rem; text-align: left;">
-                    <div class="avatar" style="width: 50px; height: 50px; border-radius: 50%; background: var(--bg-tertiary); display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 1.5rem;">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <div class="info">
-                        <h4 style="color: var(--text-primary); font-family: var(--font-secondary); font-size: 1rem; margin-bottom: 0.2rem;">Be the first!</h4>
-                        <p style="color: var(--accent-primary); font-size: 0.85rem; font-weight: 600;">₹500</p>
-                    </div>
+                <div class="supporters-empty">
+                    <i class="${emptyIcon}"></i>
+                    <p>${emptyMsg}</p>
                 </div>
             `;
-            if (loadMoreContainer) loadMoreContainer.style.display = 'none';
+            if (infiniteLoader) infiniteLoader.style.display = 'none';
+            if (endOfSupporters) endOfSupporters.style.display = 'none';
             return;
         }
         
-        supporters.forEach(supporter => {
-            const hasGithub = supporter.github && supporter.github.trim() !== '' && supporter.github.trim().toLowerCase() !== 'male' && supporter.github.trim().toLowerCase() !== 'upi';
+        // 6. Render Cards
+        supportersToRender.forEach((supporter, idx) => {
+            const globalIndex = startIndex + idx;
+            const hasGithub = supporter.github && supporter.github.trim() !== '' && 
+                              supporter.github.trim().toLowerCase() !== 'male' && 
+                              supporter.github.trim().toLowerCase() !== 'upi';
             let githubUsername = '';
             
             if (hasGithub) {
-                // Clean up github input (remove @ or full url)
                 githubUsername = supporter.github.replace(/https?:\/\/github\.com\//, '').replace('@', '').trim();
             }
             
-            // Format donation date if available
+            // Format donation date
             let dateStr = '';
             if (supporter.date) {
                 try {
@@ -183,53 +272,68 @@ async function loadSupporters(page = 1, append = false) {
                 : `<i class="fas fa-user"></i>`;
                 
             const reviewHtml = supporter.review && supporter.review.trim() !== ''
-                ? `<p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.5rem; font-style: italic; word-break: break-word;">"${supporter.review}"</p>`
+                ? `<div class="donor-review"><i class="fas fa-quote-left"></i> ${supporter.review}</div>`
                 : ``;
 
+            // Calculate Ranking Badge (if in 'top' sort mode)
+            let rankClass = '';
+            let rankBadgeHtml = '';
+            if (currentSort === 'top') {
+                const globalRank = globalIndex + 1;
+                if (globalRank === 1) {
+                    rankClass = 'rank-1';
+                    rankBadgeHtml = `<div class="rank-badge badge-gold"><i class="fas fa-crown"></i> 1st Top Donor</div>`;
+                } else if (globalRank === 2) {
+                    rankClass = 'rank-2';
+                    rankBadgeHtml = `<div class="rank-badge badge-silver"><i class="fas fa-medal"></i> 2nd Top Donor</div>`;
+                } else if (globalRank === 3) {
+                    rankClass = 'rank-3';
+                    rankBadgeHtml = `<div class="rank-badge badge-bronze"><i class="fas fa-medal"></i> 3rd Top Donor</div>`;
+                } else {
+                    rankBadgeHtml = `<div class="rank-badge badge-other">#${globalRank} Top Supporter</div>`;
+                }
+            }
+
             const card = document.createElement('div');
-            card.className = 'supporter-card';
-            card.style.cssText = 'background: var(--bg-glass); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: var(--radius-sm); padding: 1.5rem; display: flex; align-items: flex-start; gap: 1rem; text-align: left; transition: transform 0.3s ease, border-color 0.3s ease;';
-            card.onmouseover = () => {
-                card.style.transform = 'translateY(-5px)';
-                card.style.borderColor = 'rgba(0, 255, 157, 0.3)';
-            };
-            card.onmouseout = () => {
-                card.style.transform = 'translateY(0)';
-                card.style.borderColor = 'rgba(255, 255, 255, 0.05)';
-            };
+            card.className = `supporter-card ${rankClass}`;
             
             card.innerHTML = `
-                <div class="avatar" style="width: 50px; height: 50px; border-radius: 50%; background: var(--bg-tertiary); display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 1.5rem; flex-shrink: 0; overflow: hidden;">
-                    ${avatarHtml}
-                </div>
-                <div class="info" style="flex: 1; min-width: 0;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.2rem; gap: 0.5rem;">
-                        <h4 style="color: var(--text-primary); font-family: var(--font-secondary); font-size: 1rem; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${supporter.name}</h4>
-                        <span style="color: var(--accent-primary); font-size: 0.85rem; font-weight: 600; white-space: nowrap;">${supporter.currency === 'INR' ? '₹' : '$'}${supporter.amount}</span>
+                ${rankBadgeHtml}
+                <div class="supporter-card-top">
+                    <div class="avatar">
+                        ${avatarHtml}
                     </div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.5rem;">
-                        ${hasGithub && githubUsername ? `<a href="https://github.com/${githubUsername}" target="_blank" rel="noopener noreferrer" style="color: var(--text-muted); font-size: 0.75rem; text-decoration: none;"><i class="fab fa-github"></i> @${githubUsername}</a>` : '<span></span>'}
-                        ${dateStr ? `<span style="color: var(--text-muted); font-size: 0.7rem; opacity: 0.7;">${dateStr}</span>` : ''}
+                    <div class="info">
+                        <div class="name-row">
+                            <h4 class="donor-name" title="${supporter.name}">${supporter.name}</h4>
+                            <span class="donor-amount">${supporter.currency === 'USD' ? '$' : '₹'}${supporter.amount}</span>
+                        </div>
+                        <div class="meta-row">
+                            ${hasGithub && githubUsername ? `<a href="https://github.com/${githubUsername}" target="_blank" rel="noopener noreferrer" class="donor-github"><i class="fab fa-github"></i> @${githubUsername}</a>` : '<span></span>'}
+                            ${dateStr ? `<span class="donor-date">${dateStr}</span>` : ''}
+                        </div>
                     </div>
-                    ${reviewHtml}
                 </div>
+                ${reviewHtml}
             `;
             
             grid.appendChild(card);
         });
         
-        // Show/hide Load More button
-        if (loadMoreContainer) {
-            loadMoreContainer.style.display = hasMoreSupporters ? 'flex' : 'none';
+        // 7. Auto-scroll UI indicators
+        if (infiniteLoader) {
+            infiniteLoader.style.display = 'none';
+        }
+        if (endOfSupporters) {
+            endOfSupporters.style.display = (!hasMoreSupporters && totalCount > SUPPORTERS_PAGE_SIZE) ? 'inline-flex' : 'none';
         }
         
     } catch (err) {
-        console.error("Failed to load Recent Supporters", err);
+        console.error("Failed to load Supporters", err);
     } finally {
         isLoadingSupporters = false;
-        if (loadMoreBtn) {
-            loadMoreBtn.disabled = false;
-            loadMoreBtn.innerHTML = '<span>Load More Supporters</span> <i class="fas fa-chevron-down"></i>';
+        if (infiniteLoader) {
+            infiniteLoader.style.display = 'none';
         }
     }
 }
@@ -237,17 +341,24 @@ async function loadSupporters(page = 1, append = false) {
 // Initial render
 renderAmounts();
 loadSupporters(1, false);
+setupInfiniteScroll();
 
-// Wire Load More Button
-const loadMoreBtn = document.getElementById('load-more-btn');
-if (loadMoreBtn) {
-    loadMoreBtn.addEventListener('click', () => {
-        if (!isLoadingSupporters && hasMoreSupporters) {
-            currentSupportersPage++;
-            loadSupporters(currentSupportersPage, true);
-        }
+// Wire Ranking / Filter Tabs
+const tabButtons = document.querySelectorAll('.supporter-tab-btn');
+tabButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+        if (isLoadingSupporters) return;
+        const sortType = btn.dataset.sort;
+        if (sortType === currentSort) return;
+
+        tabButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        currentSort = sortType;
+        currentSupportersPage = 1;
+        loadSupporters(1, false);
     });
-}
+});
 
 // Razorpay Integration Form Submit
 document.getElementById('donation-form').addEventListener('submit', async function (e) {
@@ -335,13 +446,14 @@ document.getElementById('donation-form').addEventListener('submit', async functi
                     
                     alert("Thank you for your generous support, " + name + "! ❤️");
                     
-                    // Reset form and reload supporters from page 1
+                    // Reset form, clear cache, and reload fresh supporters list from worker
                     document.getElementById('donation-form').reset();
                     document.querySelector('.review-group').style.display = 'none';
                     donateBtn.innerHTML = originalBtnText;
                     
+                    cachedAllSupporters = null; // Clear cache so new donor is fetched immediately
                     currentSupportersPage = 1;
-                    loadSupporters(1, false); // Refresh Supporters Wall
+                    loadSupporters(1, false); // Refresh Supporters Wall with new live count
                 } catch (e) {
                     console.error("Failed to save to Supporters List", e);
                     alert("Payment successful! Your contribution was securely captured on Razorpay. (If it does not appear on the wall immediately, it will reflect shortly).");

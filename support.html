@@ -158,14 +158,34 @@
 			</div>
 
 			<!-- Supporters Section -->
-			<div class="wall-of-love" style="margin-top: 3rem; text-align: center;">
-				<div style="display: inline-flex; align-items: center; justify-content: center; gap: 0.75rem; margin-bottom: 0.5rem; flex-wrap: wrap;">
-					<h2 style="font-family: var(--font-primary); color: var(--text-primary); font-size: 2rem; margin: 0;">Recent Supporters</h2>
-					<span class="supporters-count-badge" id="supporters-count" style="display: none;"></span>
+			<div class="wall-of-love" id="wall-of-love">
+				<div class="wall-header">
+					<div class="wall-title-row">
+						<h2 class="wall-title">Recent Supporters</h2>
+						<span class="supporters-count-badge" id="supporters-count" style="display: none;"></span>
+					</div>
+					<p class="wall-subtitle">Thank you to everyone who supports my work! ❤️</p>
+					
+					<!-- Ranking / Filter Tabs -->
+					<div class="supporters-tabs-container">
+						<div class="supporters-tabs" role="tablist">
+							<button type="button" class="supporter-tab-btn active" data-sort="recent" id="tab-recent">
+								<i class="fas fa-bolt"></i>
+								<span>Recent</span>
+							</button>
+							<button type="button" class="supporter-tab-btn" data-sort="top" id="tab-top">
+								<i class="fas fa-crown"></i>
+								<span>Top Supporters</span>
+							</button>
+							<button type="button" class="supporter-tab-btn" data-sort="reviews" id="tab-reviews">
+								<i class="fas fa-heart"></i>
+								<span>With Reviews</span>
+							</button>
+						</div>
+					</div>
 				</div>
-				<p style="color: var(--text-secondary); margin-bottom: 2rem;">Thank you to everyone who supports my work! ❤️</p>
 				
-				<div class="supporters-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem;">
+				<div class="supporters-grid" id="supporters-grid">
 					<!-- Placeholder Supporter -->
 					<div class="supporter-card" style="background: var(--bg-glass); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: var(--radius-sm); padding: 1.5rem; display: flex; align-items: center; gap: 1rem; text-align: left;">
 						<div class="avatar" style="width: 50px; height: 50px; border-radius: 50%; background: var(--bg-tertiary); display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 1.5rem;">
@@ -178,13 +198,18 @@
 					</div>
 				</div>
 
-				<!-- Load More Supporters Button -->
-				<div class="load-more-container" id="load-more-container" style="display: none; justify-content: center; margin-top: 2rem;">
-					<button id="load-more-btn" class="load-more-btn magnetic-btn">
-						<span>Load More Supporters</span>
-						<i class="fas fa-chevron-down"></i>
-					</button>
+				<!-- Auto-scroll Infinite Pagination & Sentinel -->
+				<div class="infinite-scroll-container" id="infinite-scroll-container">
+					<div class="infinite-loader" id="infinite-loader" style="display: none;">
+						<i class="fas fa-spinner fa-spin"></i>
+						<span>Loading more supporters...</span>
+					</div>
+					<div class="end-of-supporters" id="end-of-supporters" style="display: none;">
+						<i class="fas fa-heart"></i>
+						<span>You've reached the beginning of our supporters wall! ❤️</span>
+					</div>
 				</div>
+				<div id="scroll-sentinel" style="height: 15px; width: 100%;"></div>
 			</div>
 		</div>
 	</main>
